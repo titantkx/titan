@@ -1,0 +1,7 @@
+syntax = "proto3";
+package titanlab.titan.titan;
+
+option go_package = "github.com/titanlab/titan/x/titan/types";
+
+// Msg defines the Msg service.
+service Msg {}
