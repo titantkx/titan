@@ -1,12 +1,9 @@
 syntax = "proto3";
-package titan.titan;
+package titan.titan.v1alpha1;
 
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/titanlab/titan/x/titan/types";
 
 // Params defines the parameters for the module.
-message Params {
-  option (gogoproto.goproto_stringer) = false;
-  
-}
+message Params { option (gogoproto.goproto_stringer) = false; }
