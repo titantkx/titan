@@ -113,6 +113,7 @@ import (
 	titanmodule "github.com/titanlab/titan/x/titan"
 	titanmodulekeeper "github.com/titanlab/titan/x/titan/keeper"
 	titanmoduletypes "github.com/titanlab/titan/x/titan/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/titanlab/titan/app/params"
@@ -277,6 +278,13 @@ func New(
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 	txConfig := encodingConfig.TxConfig
+
+	// @note : set `DefaultPowerReduction`. This can be understand as minium stake amount of validator but not actually.
+	//				This value is used to calculate the voting power of validator.
+	// TODO : maybe this need to be rework to get config from genesis file.
+	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000)
+	// TODO : this maybe effect when use command `titand init`. Must recheck
+	sdk.DefaultBondDenom = "titan"
 
 	bApp := baseapp.NewBaseApp(
 		Name,
