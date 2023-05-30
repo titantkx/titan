@@ -36,6 +36,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+
 	// this line is used by starport scaffolding # root/moduleImport
 
 	"github.com/titanlab/titan/app"
@@ -53,7 +54,7 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithHomeDir(app.DefaultNodeHome).
-		WithViper("")
+		WithViper("") // TODO : env prefix, we need to config this
 
 	rootCmd := &cobra.Command{
 		Use:   app.Name + "d",
