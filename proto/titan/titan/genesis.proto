@@ -1,5 +1,5 @@
 syntax = "proto3";
-package titanlab.titan.titan;
+package titan.titan;
 
 import "gogoproto/gogo.proto";
 import "titan/titan/params.proto";

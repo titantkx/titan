@@ -1,5 +1,5 @@
 syntax = "proto3";
-package titanlab.titan.titan;
+package titan.titan;
 
 option go_package = "github.com/titanlab/titan/x/titan/types";
 
