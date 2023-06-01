@@ -21,6 +21,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	runtimeservices "github.com/cosmos/cosmos-sdk/runtime/services"
+	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -110,6 +111,7 @@ import (
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 	"github.com/spf13/cast"
 
+	"github.com/titanlab/titan/docs"
 	titanmodule "github.com/titanlab/titan/x/titan"
 	titanmodulekeeper "github.com/titanlab/titan/x/titan/keeper"
 	titanmoduletypes "github.com/titanlab/titan/x/titan/types"
@@ -117,7 +119,9 @@ import (
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/titanlab/titan/app/params"
-	"github.com/titanlab/titan/docs"
+
+	// unnamed import of statik for swagger UI support
+	_ "github.com/titanlab/titan/client/docs/statik"
 )
 
 const (
@@ -491,7 +495,7 @@ func New(
 	icaModule := ica.NewAppModule(&icaControllerKeeper, &app.ICAHostKeeper)
 	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
 
-	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
+	// Create evidence Keeper for to register the IBC light client misbehavior evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec,
 		keys[evidencetypes.StoreKey],
@@ -871,8 +875,15 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	// Register grpc-gateway routes for all modules.
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// register app's OpenAPI routes.
-	docs.RegisterOpenAPIService(Name, apiSvr.Router)
+	// TODO : need to use only one of openapi routes
+	// register swagger API from root so that other applications can override easily
+	if err := server.RegisterSwaggerAPI(apiSvr.ClientCtx, apiSvr.Router, apiConfig.Swagger); err != nil {
+		panic(err)
+	}
+	if apiConfig.Swagger {
+		// register app's OpenAPI routes (generate by ignite).
+		docs.RegisterOpenAPIService(Name, apiSvr.Router)
+	}
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
