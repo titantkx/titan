@@ -1,21 +1,63 @@
 version: 1
+
 accounts:
-- name: alice
-  coins:
-  - 20000token
-  - 200000000stake
-- name: bob
-  coins:
-  - 10000token
-  - 100000000stake
+- name: faucet
+  coins: ['1000000000000000000titan']
+  mnemonic: object depart submit ritual civil culture garment rubber they laundry expose strike proud mushroom curious
+- name: test
+  coins: ['1000000titan']
+  mnemonic: envelope confirm theory tennis noodle monitor poet car lady rely salt latin border bounce knock
+- name: test2
+  coins: ['1000000titan']
+  mnemonic: orient city dad visual junk accuse arch muscle tag fatal clump tube swarm unusual erosion
+- name: val1
+  coins: ['1000000titan']
+  mnemonic: seek depth rigid improve wear able below whisper reward survey effort rescue unveil daring skate
+- name: val2
+  coins: ['1000000titan']
+  mnemonic: health adapt wheel wheat caught inherit august dynamic ecology wheat ice magnet physical swap tower
+- name: val3
+  coins: ['1000000titan']
+  mnemonic: federal gate food arrest three yard fence furnace cousin source toast expose perfect toward maid
+
+validators:
+- name: val1
+  bonded: 1000titan
+  home: "local_test_data/.titan_val1"
+  app:
+    minimum-gas-prices: 0titan
+    api.enable: true
+    api.swagger: true
+    api.enabled-unsafe-cors: true
+  config:
+    moniker: "titan val1"
+  client:
+    chain-id: "titan_90000-1"
+    keyring-backend: "test"
+
 client:
   openapi:
     path: docs/static/openapi.yml
+
 faucet:
-  name: bob
-  coins:
-  - 5token
-  - 100000stake
-validators:
-- name: alice
-  bonded: 100000000stake
+  name: faucet
+  coins: ['10000titan']
+
+genesis:
+  chain_id: titan_90000-1
+  app_state:
+    staking:
+      params:
+        bond_denom: "titan"
+    crisis:
+      constant_fee:
+        denom: "titan"
+        amount: "1000"
+    gov:
+      params:
+        min_deposit:
+        - denom: "titan"
+          amount: "1000"
+    mint:
+      params:
+        mint_denom: "titan"

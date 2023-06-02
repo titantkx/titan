@@ -165,3 +165,26 @@ update-swagger-docs: statik
 		echo "\033[92mSwagger docs are in sync\033[0m";\
 	fi
 .PHONY: update-swagger-docs
+
+update-swagger-docs-by-ignite:
+	@ignite generate openapi -y
+
+
+###############################################################################
+###                              Dev tools		                              ###
+###############################################################################
+
+ignite:
+	@echo "Installing ignite (tag nightly) ..."
+	rm -rf ignite_tmp	
+	git clone --depth 1 --branch nightly https://github.com/ignite/cli.git ignite_tmp	
+	cd ignite_tmp && make install
+	rm -rf ignite_tmp
+
+
+###############################################################################
+###                                Localnet                                 ###
+###############################################################################
+
+localnet-serve:
+	@ignite chain serve
