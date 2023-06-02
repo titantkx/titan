@@ -41,6 +41,7 @@ coverage.out
 coverage.txt
 *profile.out
 sim_log_file
+local_test_data
 
 # Vagrant
 .vagrant/
