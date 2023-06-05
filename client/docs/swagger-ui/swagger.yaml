@@ -73,10 +73,10 @@ definitions:
             value:
               type: string
               format: byte
-  titan.titan.v1alpha1.Params:
+  titan.titan.Params:
     type: object
     description: Params defines the parameters for the module.
-  titan.titan.v1alpha1.QueryParamsResponse:
+  titan.titan.QueryParamsResponse:
     type: object
     properties:
       params:
