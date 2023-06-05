@@ -2,7 +2,7 @@ syntax = "proto3";
 package titan.titan;
 
 import "gogoproto/gogo.proto";
-import "titan/titan/titan.proto";
+import "titan/titan/params.proto";
 
 option go_package = "github.com/titanlab/titan/x/titan/types";
 
