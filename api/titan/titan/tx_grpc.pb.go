@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: titan/titan/v1alpha1/tx.proto
+// source: titan/titan/tx.proto
 
-package titanv1alpha1
+package titan
 
 import (
 	grpc "google.golang.org/grpc"
@@ -59,9 +59,9 @@ func RegisterMsgServer(s grpc.ServiceRegistrar, srv MsgServer) {
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Msg_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "titan.titan.v1alpha1.Msg",
+	ServiceName: "titan.titan.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams:     []grpc.StreamDesc{},
-	Metadata:    "titan/titan/v1alpha1/tx.proto",
+	Metadata:    "titan/titan/tx.proto",
 }
