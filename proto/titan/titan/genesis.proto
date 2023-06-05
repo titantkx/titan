@@ -1,10 +1,12 @@
 syntax = "proto3";
-package titan.titan.v1alpha1;
+package titan.titan;
 
 import "gogoproto/gogo.proto";
-import "titan/titan/v1alpha1/titan.proto";
+import "titan/titan/titan.proto";
 
 option go_package = "github.com/titanlab/titan/x/titan/types";
 
 // GenesisState defines the titan module's genesis state.
-message GenesisState { Params params = 1 [ (gogoproto.nullable) = false ]; }
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+}
