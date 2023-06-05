@@ -46186,7 +46186,7 @@ paths:
   /titanlab/titan/titan/params:
     get:
       summary: Parameters queries the parameters of the module.
-      operationId: TitanTitanV1Alpha1Params
+      operationId: TitanTitanParams
       responses:
         '200':
           description: A successful response.
@@ -74896,10 +74896,10 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
-  titan.titan.v1alpha1.Params:
+  titan.titan.Params:
     type: object
     description: Params defines the parameters for the module.
-  titan.titan.v1alpha1.QueryParamsResponse:
+  titan.titan.QueryParamsResponse:
     type: object
     properties:
       params:
