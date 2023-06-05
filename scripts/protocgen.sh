@@ -28,4 +28,4 @@ rm -rf github.com
 
 go mod tidy
 
-./scripts/protocgen-pulsar.sh
+# ./scripts/protocgen-pulsar.sh
