@@ -138,7 +138,7 @@ proto-gen:
 	@$(protoImage) sh ./scripts/protocgen.sh
 
 proto-format:
-	@$(protoImage) find ./ -name "*.proto" -exec clang-format --style="{ IndentWidth: 2, BasedOnStyle: google, AlignConsecutiveAssignments: true }" -i {} \;
+	@$(protoImage) find ./ -name "*.proto" -exec clang-format --style="{ IndentWidth: 2, BasedOnStyle: google, AlignConsecutiveAssignments: true, AlignConsecutiveDeclarations: Consecutive }" -i {} \;
 
 proto-lint:
 	@$(protoImage) buf lint --error-format=json
