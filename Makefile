@@ -8,6 +8,7 @@ BINDIR ?= $(GOPATH)/bin
 BUILDDIR ?= $(CURDIR)/build
 DOCKER := $(shell which docker)
 PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
+COSMOS_VERSION = v0.47.2
 
 # process build tags
 build_tags = netgo
@@ -188,7 +189,15 @@ ignite:
 	cd ignite_tmp && make install
 	rm -rf ignite_tmp
 
+cosmovisor:
+	@echo "Installing cosmovisor ..."
+	rm -rf cosmovisor_tmp	
+	git clone --depth 1 --branch ${COSMOS_VERSION} https://github.com/cosmos/cosmos-sdk.git cosmovisor_tmp
+	cd cosmovisor_tmp && make cosmovisor 	
+	cp cosmovisor_tmp/tools/cosmovisor/cosmovisor build/cosmovisor
+	rm -rf cosmovisor_tmp
 
+.PHONE: ignite cosmovisor
 ###############################################################################
 ###                                Localnet                                 ###
 ###############################################################################
