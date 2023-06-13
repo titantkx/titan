@@ -117,14 +117,12 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 
-	/** @note : when add migration, need to register migration here
-	*  EXAMPLE :
-	* if err := cfg.RegisterMigration(types.ModuleName, cv1Types.ConsensusVersion, func(ctx sdk.Context) error {
-	*		return cv2.PerformMigration(ctx, am.keeper, cv2Types.StoredGamesChunkSize)
-	*	}); err != nil {
-	*		panic(fmt.Errorf("failed to register migration for %s module: %w", types.ModuleName, err))
-	*	}
-	**/
+	if err := cfg.RegisterMigration(types.ModuleName, cv1Types.ConsensusVersion, func(ctx sdk.Context) error {
+		// @note : when add migration, need to call migrate function here
+		return nil
+	}); err != nil {
+		panic(fmt.Errorf("failed to register migration for %s module: %w", types.ModuleName, err))
+	}
 }
 
 // RegisterInvariants registers the invariants of the module. If an invariant deviates from its predicted value, the InvariantRegistry triggers appropriate logic (most often the chain will be halted)
