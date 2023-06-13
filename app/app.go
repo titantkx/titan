@@ -111,6 +111,7 @@ import (
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 	"github.com/spf13/cast"
 
+	v1 "github.com/titanlab/titan/app/upgrades/v1"
 	"github.com/titanlab/titan/docs"
 	titanmodule "github.com/titanlab/titan/x/titan"
 	titanmodulekeeper "github.com/titanlab/titan/x/titan/keeper"
@@ -741,6 +742,8 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
+	app.setupUpgradeHandlers()
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
@@ -936,4 +939,39 @@ func (app *App) SimulationManager() *module.SimulationManager {
 // ModuleManager returns the app ModuleManager
 func (app *App) ModuleManager() *module.Manager {
 	return app.mm
+}
+
+func (app *App) setupUpgradeHandlers() {
+	/** @note: SetUpgradeHandler here
+	* EXAMPLE:
+	* app.UpgradeKeeper.SetUpgradeHandler(
+	*		v1.UpgradeName,
+	*		func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
+	*			return app.mm.RunMigrations(ctx, app.configurator, vm)
+	*		},
+	*	)
+	**/
+
+	// When a planned update height is reached, the old binary will panic
+	// writing on disk the height and name of the update that triggered it
+	// This will read that value, and execute the preparations for the upgrade.
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		panic(fmt.Errorf("failed to read upgrade info from disk: %w", err))
+	}
+
+	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		return
+	}
+
+	var storeUpgrades *storetypes.StoreUpgrades
+
+	switch upgradeInfo.Name {
+	case v1.UpgradeName:
+	}
+
+	if storeUpgrades != nil {
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
+	}
 }

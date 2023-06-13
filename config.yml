@@ -3,21 +3,27 @@ version: 1
 accounts:
 - name: faucet
   coins: ['1000000000000000000titan']
+  # titan1wnf77kl35faq6hhmzud9g8c3xk9ytqsrlxmcy8
   mnemonic: object depart submit ritual civil culture garment rubber they laundry expose strike proud mushroom curious
 - name: test
+  # titan10xu7x72hj4l63m7msgwy3253py9ldmr0atnnyp
   coins: ['1000000titan']
   mnemonic: envelope confirm theory tennis noodle monitor poet car lady rely salt latin border bounce knock
 - name: test2
-  coins: ['1000000titan']
+  # titan19j75snylen63v9fmqkdu4sw4d9tyuqf0nlasjx
+  coins: ['1000001titan']
   mnemonic: orient city dad visual junk accuse arch muscle tag fatal clump tube swarm unusual erosion
 - name: val1
-  coins: ['1000000titan']
+  # titan1nz0pc6s0lhgl5x2reyevg5ev0j9xqhxd6yvcq0
+  coins: ['1000002titan']
   mnemonic: seek depth rigid improve wear able below whisper reward survey effort rescue unveil daring skate
 - name: val2
-  coins: ['1000000titan']
+  # titan1ey390szmxp62p0ld9tz75tzmnfkqww9ap2pmg7
+  coins: ['1000003titan']
   mnemonic: health adapt wheel wheat caught inherit august dynamic ecology wheat ice magnet physical swap tower
 - name: val3
-  coins: ['1000000titan']
+  # titan1up8x8fj4pvhhlmlpghf3nwpgfwnqr6lhm2ay37
+  coins: ['1000004titan']
   mnemonic: federal gate food arrest three yard fence furnace cousin source toast expose perfect toward maid
 
 validators:

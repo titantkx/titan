@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	// this line is used by starport scaffolding # 1
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -18,6 +19,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/titanlab/titan/x/titan/client/cli"
 	"github.com/titanlab/titan/x/titan/keeper"
+	cv1Types "github.com/titanlab/titan/x/titan/migrations/cv1/types"
 	"github.com/titanlab/titan/x/titan/types"
 )
 
@@ -114,6 +116,13 @@ func NewAppModule(
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+
+	if err := cfg.RegisterMigration(types.ModuleName, cv1Types.ConsensusVersion, func(ctx sdk.Context) error {
+		// @note : when add migration, need to call migrate function here
+		return nil
+	}); err != nil {
+		panic(fmt.Errorf("failed to register migration for %s module: %w", types.ModuleName, err))
+	}
 }
 
 // RegisterInvariants registers the invariants of the module. If an invariant deviates from its predicted value, the InvariantRegistry triggers appropriate logic (most often the chain will be halted)
@@ -137,7 +146,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // ConsensusVersion is a sequence number for state-breaking change of the module. It should be incremented on each consensus-breaking change introduced by the module. To avoid wrong/empty versions, the initial version should be set to 1
-func (AppModule) ConsensusVersion() uint64 { return 1 }
+func (AppModule) ConsensusVersion() uint64 { return cv1Types.ConsensusVersion }
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
 func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}

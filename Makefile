@@ -8,6 +8,7 @@ BINDIR ?= $(GOPATH)/bin
 BUILDDIR ?= $(CURDIR)/build
 DOCKER := $(shell which docker)
 PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
+COSMOS_VERSION = v0.47.2
 
 # process build tags
 build_tags = netgo
@@ -110,7 +111,7 @@ build-linux-amd64:
 build-linux-arm64:
 	GOOS=linux GOARCH=arm64 LEDGER_ENABLED=false $(MAKE) build
 
-$(BUILD_TARGETS): go.sum $(BUILDDIR)/
+$(BUILD_TARGETS): proto-all go.sum $(BUILDDIR)/
 	go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 $(BUILDDIR)/:
@@ -129,23 +130,30 @@ clean:
 
 protoVer=0.11.2
 protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
-protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(protoImageName)
+protoContainerName=protobuilder-titan-$(subst /,_,$(subst \,_,$(CURDIR)))
+protoImage=$(DOCKER) run -v $(CURDIR):/workspace --workdir /workspace --name $(protoContainerName) $(protoImageName)
+protoFormatImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(protoImageName)
 
 proto-all: proto-format proto-lint proto-gen
 
 proto-gen:
 	@echo "Generating Protobuf files"
-	@$(protoImage) sh ./scripts/protocgen.sh
+	@if [ ! "$(shell docker ps -aq -f name=$(protoContainerName))" ]; then \
+    $(protoImage) sh ./scripts/protocgen.sh ; \
+	else \
+		$(DOCKER) start -a $(protoContainerName) ; \
+	fi
+	
 
 proto-format:
-	@$(protoImage) find ./ -name "*.proto" -exec clang-format --style="{ IndentWidth: 2, BasedOnStyle: google, AlignConsecutiveAssignments: true }" -i {} \;
+	@$(protoFormatImage) find ./ -name "*.proto" -exec clang-format --style="{ IndentWidth: 2, BasedOnStyle: google, AlignConsecutiveAssignments: true, AlignConsecutiveDeclarations: Consecutive }" -i {} \;
 
 proto-lint:
-	@$(protoImage) buf lint --error-format=json
+	@$(protoFormatImage) buf lint --error-format=json
 
 proto-swagger-gen:
 	@echo "Generating Protobuf Swagger"
-	@$(protoImage) sh ./scripts/protoc-swagger-gen.sh	
+	@$(protoFormatImage) sh ./scripts/protoc-swagger-gen.sh	
 	$(MAKE) update-swagger-docs
 
 ###############################################################################
@@ -181,7 +189,15 @@ ignite:
 	cd ignite_tmp && make install
 	rm -rf ignite_tmp
 
+cosmovisor:
+	@echo "Installing cosmovisor ..."
+	rm -rf cosmovisor_tmp	
+	git clone --depth 1 --branch ${COSMOS_VERSION} https://github.com/cosmos/cosmos-sdk.git cosmovisor_tmp
+	cd cosmovisor_tmp && make cosmovisor 	
+	cp cosmovisor_tmp/tools/cosmovisor/cosmovisor build/cosmovisor
+	rm -rf cosmovisor_tmp
 
+.PHONE: ignite cosmovisor
 ###############################################################################
 ###                                Localnet                                 ###
 ###############################################################################
