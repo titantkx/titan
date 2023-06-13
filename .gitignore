@@ -28,6 +28,7 @@ artifacts
 release/
 vue/node_modules
 vue/dist
+*_tmp
 
 # Go
 go.work
