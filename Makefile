@@ -98,6 +98,19 @@ endif
 all: build
 
 ###############################################################################
+###                                Linting                                  ###
+###############################################################################
+
+lint:
+	go mod verify
+	golangci-lint run --out-format=tab
+
+lint-fix:
+	golangci-lint run --fix --out-format=tab --issues-exit-code=0
+
+.PHONY: lint lint-fix
+
+###############################################################################
 ###                                  Build                                  ###
 ###############################################################################
 
@@ -111,7 +124,7 @@ build-linux-amd64:
 build-linux-arm64:
 	GOOS=linux GOARCH=arm64 LEDGER_ENABLED=false $(MAKE) build
 
-$(BUILD_TARGETS): proto-all go.sum $(BUILDDIR)/
+$(BUILD_TARGETS): proto-all lint go.sum $(BUILDDIR)/
 	go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 $(BUILDDIR)/:
@@ -206,3 +219,4 @@ localnet-serve:
 # TODO : because ignite gen proto-go have different result with make proto-gen => so skip-proto
 # 			but we must findout why and sync 2 way to generate proto-go
 	@ignite chain serve --skip-proto
+
