@@ -23,6 +23,32 @@ In `app.go` we declare method `setupUpgradeHandlers` to clarify what must todo w
   )
   ```
 
+  Or maybe when add new module, we need call `InitGenesis` method of new module. Example:
+
+  ```go
+  app.UpgradeKeeper.SetUpgradeHandler(
+    v2.UpgradeName,
+    func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
+
+        vm[leaderboardmoduletypes.ModuleName] = leaderboardmodulemigrationscv2types.ConsensusVersion
+        genesis, err := leaderboardmodulemigrationscv2.ComputeInitGenesis(ctx, app.CheckersKeeper)
+        if err != nil {
+            return vm, err
+        }
+        gen, err := app.appCodec.MarshalJSON(genesis)
+        if err != nil {
+            return vm, err
+        }
+        app.mm.Modules[leaderboardmoduletypes.ModuleName].InitGenesis(
+            ctx,
+            app.appCodec,
+            gen)
+            
+        return app.mm.RunMigrations(ctx, app.configurator, vm)
+    },
+  )
+  ```
+
 `setupUpgradeHandlers` need to be call in `New` method in `app.go`.
 
 An upgrade cannot be process if it do not register in `setupUpgradeHandlers`.
