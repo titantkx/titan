@@ -1,4 +1,4 @@
-FROM golang:1.19-alpine as builder
+FROM golang:1.20-alpine as builder
 ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev
 RUN apk add --no-cache $PACKAGES
 WORKDIR /go/src/github.com/titanlab/titan
