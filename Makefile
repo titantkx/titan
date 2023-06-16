@@ -95,17 +95,17 @@ ifeq (debug,$(findstring debug,$(COSMOS_BUILD_OPTIONS)))
   BUILD_FLAGS += -gcflags "all=-N -l"
 endif
 
-all: build
+all: build-with-regen
 
 ###############################################################################
 ###                                Linting                                  ###
 ###############################################################################
 
-lint:
-	go mod verify
+lint:	golangci-lint
+	go mod verify	
 	golangci-lint run --out-format=tab
 
-lint-fix:
+lint-fix:	golangci-lint	
 	golangci-lint run --fix --out-format=tab --issues-exit-code=0
 
 .PHONY: lint lint-fix
@@ -129,13 +129,16 @@ build-linux-amd64:
 build-linux-arm64:
 	GOOS=linux GOARCH=arm64 LEDGER_ENABLED=false $(MAKE) build
 
-$(BUILD_TARGETS): proto-all lint go.sum $(BUILDDIR)/
+$(BUILD_TARGETS): go.sum $(BUILDDIR)/
+	go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
+
+build-with-regen: proto-all lint go.sum $(BUILDDIR)/
 	go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 $(BUILDDIR)/:
 	mkdir -p $(BUILDDIR)/
 
-.PHONY: build build-linux-amd64 build-linux-arm64 
+.PHONY: build build-with-regen build-linux-amd64 build-linux-arm64 
 
 clean:
 	rm -rf $(BUILDDIR)/
@@ -215,7 +218,12 @@ cosmovisor:
 	cp cosmovisor_tmp/tools/cosmovisor/cosmovisor build/cosmovisor
 	rm -rf cosmovisor_tmp
 
-.PHONE: ignite cosmovisor
+GOLANGCI_VERSION=v1.52.2
+
+golangci-lint:
+	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_VERSION)
+
+.PHONE: ignite cosmovisor golangci-lint
 ###############################################################################
 ###                                Localnet                                 ###
 ###############################################################################
