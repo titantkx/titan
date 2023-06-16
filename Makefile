@@ -104,10 +104,10 @@ all: build-with-regen
 
 lint:	golangci-lint
 	go mod verify	
-	golangci-lint run --out-format=tab
+	golangci-lint run --out-format=tab --timeout 2m0s
 
 lint-fix:	golangci-lint	
-	golangci-lint run --fix --out-format=tab --issues-exit-code=0
+	golangci-lint run --fix --out-format=tab --issues-exit-code=0 --timeout 2m0s
 
 .PHONY: lint lint-fix
 
@@ -134,7 +134,7 @@ $(BUILD_TARGETS): go.sum $(BUILDDIR)/
 	go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 build-with-regen: proto-all lint go.sum $(BUILDDIR)/
-	go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
+	go build -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 $(BUILDDIR)/:
 	mkdir -p $(BUILDDIR)/
