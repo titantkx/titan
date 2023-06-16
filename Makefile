@@ -9,6 +9,7 @@ BUILDDIR ?= $(CURDIR)/build
 DOCKER := $(shell which docker)
 PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 COSMOS_VERSION = v0.47.2
+IGNITE_VERSION = v0.27.1
 
 # process build tags
 build_tags = netgo
@@ -204,9 +205,9 @@ update-swagger-docs-by-ignite:
 ###############################################################################
 
 ignite:
-	@echo "Installing ignite (tag nightly) ..."
+	@echo "Installing ignite (tag ${IGNITE_VERSION}) ..."
 	rm -rf ignite_tmp	
-	git clone --depth 1 --branch nightly https://github.com/ignite/cli.git ignite_tmp	
+	git clone --depth 1 --branch ${IGNITE_VERSION} https://github.com/ignite/cli.git ignite_tmp	
 	cd ignite_tmp && make install
 	rm -rf ignite_tmp
 
@@ -233,3 +234,6 @@ localnet-serve:
 # 			but we must findout why and sync 2 way to generate proto-go
 	@ignite chain serve --skip-proto
 
+
+localnet-serve-reset:
+	@ignite chain serve --skip-proto --reset-once
