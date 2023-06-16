@@ -234,3 +234,6 @@ localnet-serve:
 # 			but we must findout why and sync 2 way to generate proto-go
 	@ignite chain serve --skip-proto
 
+
+localnet-serve-reset:
+	@ignite chain serve --skip-proto --reset-once
