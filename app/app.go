@@ -275,7 +275,7 @@ func New(
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 	txConfig := encodingConfig.TxConfig
 
-	// @note : set `DefaultPowerReduction`. This can be understand as minium stake amount of validator but not actually.
+	// NOTE: set `DefaultPowerReduction`. This can be understand as minium stake amount of validator but not actually.
 	//				This value is used to calculate the voting power of validator.
 	// Re config `DefaultPowerReduction`
 	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
