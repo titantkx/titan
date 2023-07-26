@@ -277,10 +277,8 @@ func New(
 
 	// @note : set `DefaultPowerReduction`. This can be understand as minium stake amount of validator but not actually.
 	//				This value is used to calculate the voting power of validator.
-	// TODO : maybe this need to be rework to get config from genesis file.
-	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000)
-	// TODO : this maybe effect when use command `titand init`. Must recheck
-	sdk.DefaultBondDenom = "titan"
+	// Re config `DefaultPowerReduction`
+	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
 
 	bApp := baseapp.NewBaseApp(
 		Name,
