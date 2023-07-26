@@ -2,33 +2,33 @@ version: 1
 
 accounts:
 - name: faucet
-  coins: ['1000000000000000000utkx']
+  coins: ['1000000000000000000000utkx']
   # titan1wnf77kl35faq6hhmzud9g8c3xk9ytqsrlxmcy8
   mnemonic: object depart submit ritual civil culture garment rubber they laundry expose strike proud mushroom curious
 - name: test
   # titan10xu7x72hj4l63m7msgwy3253py9ldmr0atnnyp
-  coins: ['1000000utkx']
+  coins: ['1000000000utkx']
   mnemonic: envelope confirm theory tennis noodle monitor poet car lady rely salt latin border bounce knock
 - name: test2
   # titan19j75snylen63v9fmqkdu4sw4d9tyuqf0nlasjx
-  coins: ['1000001utkx']
+  coins: ['1000001000utkx']
   mnemonic: orient city dad visual junk accuse arch muscle tag fatal clump tube swarm unusual erosion
 - name: val1
   # titan1nz0pc6s0lhgl5x2reyevg5ev0j9xqhxd6yvcq0
-  coins: ['1000002utkx']
+  coins: ['1000002000utkx']
   mnemonic: seek depth rigid improve wear able below whisper reward survey effort rescue unveil daring skate
 - name: val2
   # titan1ey390szmxp62p0ld9tz75tzmnfkqww9ap2pmg7
-  coins: ['1000003utkx']
+  coins: ['1000003000utkx']
   mnemonic: health adapt wheel wheat caught inherit august dynamic ecology wheat ice magnet physical swap tower
 - name: val3
   # titan1up8x8fj4pvhhlmlpghf3nwpgfwnqr6lhm2ay37
-  coins: ['1000004utkx']
+  coins: ['1000004000utkx']
   mnemonic: federal gate food arrest three yard fence furnace cousin source toast expose perfect toward maid
 
 validators:
 - name: val1
-  bonded: 1000utkx
+  bonded: 1000000utkx
   home: "local_test_data/.titan_val1"
   app:
     minimum-gas-prices: 0utkx
@@ -47,7 +47,7 @@ client:
 
 faucet:
   name: faucet
-  coins: ['10000utkx']
+  coins: ['10000000utkx']
 
 genesis:
   chain_id: titan-1
@@ -58,9 +58,9 @@ genesis:
     crisis:
       constant_fee:
         denom: "utkx"
-        amount: "1000"
+        amount: "1000000"
     gov:
       params:
         min_deposit:
         - denom: "utkx"
-          amount: "1000"    
+          amount: "1000000"    
