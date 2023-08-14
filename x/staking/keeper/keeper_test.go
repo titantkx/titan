@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"testing"
 
+	"cosmossdk.io/math"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtime "github.com/cometbft/cometbft/types/time"
 	"github.com/golang/mock/gomock"
@@ -70,6 +71,28 @@ func (s *KeeperTestSuite) SetupTest() {
 	stakingtypes.RegisterQueryServer(queryHelper, sdkstakingkeeper.Querier{Keeper: keeper.Keeper})
 	s.queryClient = stakingtypes.NewQueryClient(queryHelper)
 	s.msgServer = sdkstakingkeeper.NewMsgServerImpl(keeper.Keeper)
+}
+
+func (s *KeeperTestSuite) TestParams() {
+	ctx, keeper := s.ctx, s.stakingKeeper
+	require := s.Require()
+
+	expParams := stakingtypes.DefaultParams()
+	expParams.MaxValidators = 555
+	expParams.MaxEntries = 111
+	keeper.SetParams(ctx, expParams)
+	resParams := keeper.GetParams(ctx)
+	require.True(expParams.Equal(resParams))
+}
+
+func (s *KeeperTestSuite) TestLastTotalPower() {
+	ctx, keeper := s.ctx, s.stakingKeeper
+	require := s.Require()
+
+	expTotalPower := math.NewInt(10 ^ 9)
+	keeper.SetLastTotalPower(ctx, expTotalPower)
+	resTotalPower := keeper.GetLastTotalPower(ctx)
+	require.True(expTotalPower.Equal(resTotalPower))
 }
 
 func TestKeeperTestSuite(t *testing.T) {
