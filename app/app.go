@@ -50,8 +50,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
+	sdkdistr "github.com/cosmos/cosmos-sdk/x/distribution"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/evidence"
 	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
@@ -107,6 +106,8 @@ import (
 
 	v1 "github.com/titanlab/titan/app/upgrades/v1"
 	"github.com/titanlab/titan/docs"
+	distr "github.com/titanlab/titan/x/distribution"
+	distrkeeper "github.com/titanlab/titan/x/distribution/keeper"
 	"github.com/titanlab/titan/x/staking"
 	stakingkeeper "github.com/titanlab/titan/x/staking/keeper"
 	titanmodule "github.com/titanlab/titan/x/titan"
@@ -158,7 +159,7 @@ var (
 		bank.AppModuleBasic{},
 		capability.AppModuleBasic{},
 		sdkstaking.AppModuleBasic{},
-		distr.AppModuleBasic{},
+		sdkdistr.AppModuleBasic{},
 		gov.NewAppModuleBasic(getGovProposalHandlers()),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
