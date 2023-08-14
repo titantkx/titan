@@ -4,19 +4,23 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	"github.com/cosmos/cosmos-sdk/x/staking/types"
+	sdkstakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"github.com/titanlab/titan/x/staking/types"
 )
 
 type Keeper struct {
 	*stakingkeeper.Keeper
+	distkeeper types.DistributionKeeper
 }
 
 // NewKeeper creates a new staking Keeper instance
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	key storetypes.StoreKey,
-	ak types.AccountKeeper,
-	bk types.BankKeeper,
+	ak sdkstakingtypes.AccountKeeper,
+	bk sdkstakingtypes.BankKeeper,
+	dk types.DistributionKeeper,
 	authority string,
 ) *Keeper {
 	return &Keeper{

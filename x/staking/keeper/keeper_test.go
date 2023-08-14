@@ -17,10 +17,11 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	sdkstakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	stakingtestutil "github.com/cosmos/cosmos-sdk/x/staking/testutil"
+	sdkstakingtestutil "github.com/cosmos/cosmos-sdk/x/staking/testutil"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	stakingkeeper "github.com/titanlab/titan/x/staking/keeper"
+	stakingtestutil "github.com/titanlab/titan/x/staking/testutil"
 )
 
 var (
@@ -34,8 +35,8 @@ type KeeperTestSuite struct {
 
 	ctx           sdk.Context
 	stakingKeeper *stakingkeeper.Keeper
-	bankKeeper    *stakingtestutil.MockBankKeeper
-	accountKeeper *stakingtestutil.MockAccountKeeper
+	bankKeeper    *sdkstakingtestutil.MockBankKeeper
+	accountKeeper *sdkstakingtestutil.MockAccountKeeper
 	queryClient   stakingtypes.QueryClient
 	msgServer     stakingtypes.MsgServer
 }
@@ -47,16 +48,18 @@ func (s *KeeperTestSuite) SetupTest() {
 	encCfg := moduletestutil.MakeTestEncodingConfig()
 
 	ctrl := gomock.NewController(s.T())
-	accountKeeper := stakingtestutil.NewMockAccountKeeper(ctrl)
+	accountKeeper := sdkstakingtestutil.NewMockAccountKeeper(ctrl)
 	accountKeeper.EXPECT().GetModuleAddress(stakingtypes.BondedPoolName).Return(bondedAcc.GetAddress())
 	accountKeeper.EXPECT().GetModuleAddress(stakingtypes.NotBondedPoolName).Return(notBondedAcc.GetAddress())
-	bankKeeper := stakingtestutil.NewMockBankKeeper(ctrl)
+	bankKeeper := sdkstakingtestutil.NewMockBankKeeper(ctrl)
+	distKeeper := stakingtestutil.NewMockDistributionKeeper(ctrl)
 
 	keeper := stakingkeeper.NewKeeper(
 		encCfg.Codec,
 		key,
 		accountKeeper,
 		bankKeeper,
+		distKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	keeper.SetParams(ctx, stakingtypes.DefaultParams())

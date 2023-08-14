@@ -10,6 +10,7 @@ DOCKER := $(shell which docker)
 PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 COSMOS_VERSION = v0.47.2
 IGNITE_VERSION = v0.27.1
+MOCKS_DIR = $(CURDIR)/tests/mocks
 
 # process build tags
 build_tags = netgo
@@ -145,6 +146,14 @@ clean:
 	rm -rf $(BUILDDIR)/
 
 .PHONY: clean
+
+mocks: $(MOCKS_DIR)
+	@go install github.com/golang/mock/mockgen@v1.6.0
+	sh ./scripts/mockgen.sh
+.PHONY: mocks
+
+$(MOCKS_DIR):
+	mkdir -p $(MOCKS_DIR)
 
 ###############################################################################
 ###                                Protobuf                                 ###
