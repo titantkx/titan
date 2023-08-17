@@ -373,7 +373,6 @@ func New(
 		keys[stakingtypes.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
-		app.DistrKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -392,6 +391,8 @@ func New(
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
+
+	app.StakingKeeper.SetDistributionKeeper(app.DistrKeeper)
 
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
 		appCodec,
