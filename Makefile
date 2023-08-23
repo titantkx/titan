@@ -232,8 +232,8 @@ golangci-lint:
 localnet-serve:
 # TODO : because ignite gen proto-go have different result with make proto-gen => so skip-proto
 # 			but we must findout why and sync 2 way to generate proto-go
-	@ignite chain serve --skip-proto
+	@ignite chain serve --skip-proto	-v
 
 
 localnet-serve-reset:
-	@ignite chain serve --skip-proto --reset-once
+	@ignite chain serve --skip-proto --reset-once -v
