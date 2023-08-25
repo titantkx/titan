@@ -8,9 +8,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
-	"github.com/titanlab/titan/testutil/sample"
-	titansimulation "github.com/titanlab/titan/x/titan/simulation"
-	"github.com/titanlab/titan/x/titan/types"
+	"github.com/tokenize-titan/titan/testutil/sample"
+	titansimulation "github.com/tokenize-titan/titan/x/titan/simulation"
+	"github.com/tokenize-titan/titan/x/titan/types"
 )
 
 // avoid unused import issue

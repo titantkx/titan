@@ -1,4 +1,4 @@
-module github.com/titanlab/titan
+module github.com/tokenize-titan/titan
 
 go 1.19
 

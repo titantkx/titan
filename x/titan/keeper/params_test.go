@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	testkeeper "github.com/titanlab/titan/testutil/keeper"
-	"github.com/titanlab/titan/x/titan/types"
+	testkeeper "github.com/tokenize-titan/titan/testutil/keeper"
+	"github.com/tokenize-titan/titan/x/titan/types"
 )
 
 func TestGetParams(t *testing.T) {

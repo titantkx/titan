@@ -5,7 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
 
-	"github.com/titanlab/titan/x/titan/types"
+	"github.com/tokenize-titan/titan/x/titan/types"
 )
 
 func CmdQueryParams() *cobra.Command {

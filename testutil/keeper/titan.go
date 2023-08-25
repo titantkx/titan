@@ -13,8 +13,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/stretchr/testify/require"
-	"github.com/titanlab/titan/x/titan/keeper"
-	"github.com/titanlab/titan/x/titan/types"
+	"github.com/tokenize-titan/titan/x/titan/keeper"
+	"github.com/tokenize-titan/titan/x/titan/types"
 )
 
 func TitanKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
