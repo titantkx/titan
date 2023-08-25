@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/titanlab/titan/x/titan/types"
+	"github.com/tokenize-titan/titan/x/titan/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {

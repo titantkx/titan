@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/titanlab/titan/x/titan/types"
+	"github.com/tokenize-titan/titan/x/titan/types"
 )
 
 type msgServer struct {

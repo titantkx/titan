@@ -39,8 +39,8 @@ import (
 
 	// this line is used by starport scaffolding # root/moduleImport
 
-	"github.com/titanlab/titan/app"
-	appparams "github.com/titanlab/titan/app/params"
+	"github.com/tokenize-titan/titan/app"
+	appparams "github.com/tokenize-titan/titan/app/params"
 )
 
 // NewRootCmd creates a new root command for a Cosmos SDK application

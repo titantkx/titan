@@ -6,8 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
-	"github.com/titanlab/titan/app"
-	"github.com/titanlab/titan/cmd/titand/cmd"
+	"github.com/tokenize-titan/titan/app"
+	"github.com/tokenize-titan/titan/cmd/titand/cmd"
 )
 
 func main() {

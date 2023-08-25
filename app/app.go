@@ -106,18 +106,18 @@ import (
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 	"github.com/spf13/cast"
 
-	v1 "github.com/titanlab/titan/app/upgrades/v1"
-	"github.com/titanlab/titan/docs"
-	titanmodule "github.com/titanlab/titan/x/titan"
-	titanmodulekeeper "github.com/titanlab/titan/x/titan/keeper"
-	titanmoduletypes "github.com/titanlab/titan/x/titan/types"
+	v1 "github.com/tokenize-titan/titan/app/upgrades/v1"
+	"github.com/tokenize-titan/titan/docs"
+	titanmodule "github.com/tokenize-titan/titan/x/titan"
+	titanmodulekeeper "github.com/tokenize-titan/titan/x/titan/keeper"
+	titanmoduletypes "github.com/tokenize-titan/titan/x/titan/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
-	appparams "github.com/titanlab/titan/app/params"
+	appparams "github.com/tokenize-titan/titan/app/params"
 
 	// unnamed import of statik for swagger UI support
-	_ "github.com/titanlab/titan/client/docs/statik"
+	_ "github.com/tokenize-titan/titan/client/docs/statik"
 )
 
 const (

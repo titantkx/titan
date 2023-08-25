@@ -36,7 +36,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/titanlab/titan/app"
+	"github.com/tokenize-titan/titan/app"
 )
 
 type storeKeysPrefixes struct {

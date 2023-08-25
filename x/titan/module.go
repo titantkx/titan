@@ -17,10 +17,10 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/titanlab/titan/x/titan/client/cli"
-	"github.com/titanlab/titan/x/titan/keeper"
-	cv1Types "github.com/titanlab/titan/x/titan/migrations/cv1/types"
-	"github.com/titanlab/titan/x/titan/types"
+	"github.com/tokenize-titan/titan/x/titan/client/cli"
+	"github.com/tokenize-titan/titan/x/titan/keeper"
+	cv1Types "github.com/tokenize-titan/titan/x/titan/migrations/cv1/types"
+	"github.com/tokenize-titan/titan/x/titan/types"
 )
 
 var (
