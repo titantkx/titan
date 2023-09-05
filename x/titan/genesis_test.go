@@ -4,10 +4,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	keepertest "github.com/titanlab/titan/testutil/keeper"
-	"github.com/titanlab/titan/testutil/nullify"
-	"github.com/titanlab/titan/x/titan"
-	"github.com/titanlab/titan/x/titan/types"
+	keepertest "github.com/tokenize-titan/titan/testutil/keeper"
+	"github.com/tokenize-titan/titan/testutil/nullify"
+	"github.com/tokenize-titan/titan/x/titan"
+	"github.com/tokenize-titan/titan/x/titan/types"
 )
 
 func TestGenesis(t *testing.T) {

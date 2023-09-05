@@ -2,8 +2,8 @@ package titan
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/titanlab/titan/x/titan/keeper"
-	"github.com/titanlab/titan/x/titan/types"
+	"github.com/tokenize-titan/titan/x/titan/keeper"
+	"github.com/tokenize-titan/titan/x/titan/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.

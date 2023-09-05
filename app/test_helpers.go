@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -16,19 +17,27 @@ import (
 
 	"cosmossdk.io/math"
 
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	"github.com/cosmos/cosmos-sdk/snapshots"
+	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
 	pruningtypes "github.com/cosmos/cosmos-sdk/store/pruning/types"
+	"github.com/cosmos/cosmos-sdk/testutil"
 	"github.com/cosmos/cosmos-sdk/testutil/mock"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/module/testutil"
+	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
+	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+
+	"github.com/tokenize-titan/titan/app/params"
 )
 
 // SetupOptions defines arguments that are passed into `Simapp` constructor.
@@ -38,22 +47,34 @@ type SetupOptions struct {
 	AppOpts servertypes.AppOptions
 }
 
-func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
+type SnapshotsConfig struct {
+	blocks             uint64
+	blockTxs           int
+	snapshotInterval   uint64
+	snapshotKeepRecent uint32
+	pruningOpts        pruningtypes.PruningOptions
+}
+
+func setup(withGenesis bool, invCheckPeriod uint, baseAppOptions ...func(*baseapp.BaseApp)) (*App, GenesisState, params.EncodingConfig) {
 	db := dbm.NewMemDB()
 
 	appOptions := make(simtestutil.AppOptionsMap, 0)
 	appOptions[flags.FlagHome] = DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = invCheckPeriod
 
+	encodingConfig := MakeEncodingConfig()
+
 	app := New(log.NewNopLogger(), db, nil, true, map[int64]bool{},
 		DefaultNodeHome,
 		0,
-		MakeEncodingConfig(),
-		appOptions)
+		encodingConfig,
+		appOptions,
+		baseAppOptions...,
+	)
 	if withGenesis {
-		return app, NewDefaultGenesisState(app.AppCodec())
+		return app, NewDefaultGenesisState(app.AppCodec()), encodingConfig
 	}
-	return app, GenesisState{}
+	return app, GenesisState{}, encodingConfig
 }
 
 // NewSimappWithCustomOptions initializes a new SimApp with custom options.
@@ -126,6 +147,117 @@ func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	return app, acc.GetAddress()
 }
 
+func setTxSignature(t *testing.T, builder client.TxBuilder, nonce uint64) {
+	privKey := secp256k1.GenPrivKeyFromSecret([]byte("test"))
+	pubKey := privKey.PubKey()
+	err := builder.SetSignatures(
+		signingtypes.SignatureV2{
+			PubKey:   pubKey,
+			Sequence: nonce,
+			Data:     &signingtypes.SingleSignatureData{},
+		},
+	)
+	require.NoError(t, err)
+}
+
+func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
+	valSet *tmtypes.ValidatorSet,
+	acc []authtypes.GenesisAccount,
+	balances ...banktypes.Balance,
+) *App {
+	t.Helper()
+
+	snapshotTimeout := 1 * time.Minute
+	snapshotStore, err := snapshots.NewStore(dbm.NewMemDB(), testutil.GetTempDir(t))
+	require.NoError(t, err)
+
+	app, genesisState, _ := setup(true, 5,
+		baseapp.SetSnapshot(snapshotStore, snapshottypes.NewSnapshotOptions(cfg.snapshotInterval, cfg.snapshotKeepRecent)),
+		baseapp.SetPruning(cfg.pruningOpts),
+	)
+	genesisStateWithValSet, err := simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, acc, balances...)
+	require.NoError(t, err)
+
+	stateBytes, err := json.MarshalIndent(genesisStateWithValSet, "", " ")
+	require.NoError(t, err)
+
+	// init chain will set the validator set and initialize the genesis accounts
+	app.InitChain(
+		abci.RequestInitChain{
+			Validators:      []abci.ValidatorUpdate{},
+			ConsensusParams: simtestutil.DefaultConsensusParams,
+			AppStateBytes:   stateBytes,
+		},
+	)
+
+	// commit genesis changes
+	// app.Commit()
+
+	// r := rand.New(rand.NewSource(3920758213583))
+	// keyCounter := 0
+
+	for height := int64(1); height <= int64(cfg.blocks); height++ {
+		currentBlockHeight := app.LastBlockHeight() + 1
+		app.Logger().Debug("Creating block", "height", currentBlockHeight)
+
+		app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
+			Height:             currentBlockHeight,
+			AppHash:            app.LastCommitID().Hash,
+			ValidatorsHash:     valSet.Hash(),
+			NextValidatorsHash: valSet.Hash(),
+		}})
+
+		for txNum := 0; txNum < cfg.blockTxs; txNum++ {
+			// msgs := []sdk.Msg{}
+			// for msgNum := 0; msgNum < 100; msgNum++ {
+			// 	key := []byte(fmt.Sprintf("%v", keyCounter))
+			// 	value := make([]byte, 10000)
+
+			// 	_, err := r.Read(value)
+			// 	require.NoError(t, err)
+
+			// 	msgs = append(msgs, &baseapptestutil.MsgKeyValue{Key: key, Value: value})
+			// 	keyCounter++
+			// }
+
+			// builder := encodingConfig.TxConfig.NewTxBuilder()
+			// builder.SetMsgs(msgs...)
+			// setTxSignature(t, builder, 0)
+
+			// txBytes, err := encodingConfig.TxConfig.TxEncoder()(builder.GetTx())
+			// require.NoError(t, err)
+
+			// resp := app.DeliverTx(abci.RequestDeliverTx{Tx: txBytes})
+			// require.True(t, resp.IsOK(), "%v", resp.String())
+		}
+
+		app.EndBlock(abci.RequestEndBlock{Height: currentBlockHeight})
+
+		app.Commit()
+
+		// wait for snapshot to be taken, since it happens asynchronously
+		if cfg.snapshotInterval > 0 && uint64(height)%cfg.snapshotInterval == 0 {
+			start := time.Now()
+			for {
+				if time.Since(start) > snapshotTimeout {
+					t.Errorf("timed out waiting for snapshot after %v", snapshotTimeout)
+				}
+
+				snapshot, err := snapshotStore.Get(uint64(height), snapshottypes.CurrentFormat)
+				require.NoError(t, err)
+
+				if snapshot != nil {
+					break
+				}
+
+				time.Sleep(100 * time.Millisecond)
+			}
+		}
+	}
+
+	return app
+}
+
 // SetupWithGenesisValSet initializes a new SimApp with a validator set and genesis accounts
 // that also act as delegators. For simplicity, each validator is bonded with a delegation
 // of one consensus engine unit in the default token of the simapp from first genesis
@@ -133,7 +265,7 @@ func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) *App {
 	t.Helper()
 
-	app, genesisState := setup(true, 5)
+	app, genesisState, _ := setup(true, 5)
 	genesisState, err := simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, genAccs, balances...)
 	require.NoError(t, err)
 
@@ -247,11 +379,44 @@ func NewTestNetworkFixture() network.TestFixture {
 	return network.TestFixture{
 		AppConstructor: appCtr,
 		GenesisState:   NewDefaultGenesisState(app.AppCodec()),
-		EncodingConfig: testutil.TestEncodingConfig{
+		EncodingConfig: moduletestutil.TestEncodingConfig{
 			InterfaceRegistry: app.InterfaceRegistry(),
 			Codec:             app.AppCodec(),
 			TxConfig:          app.TxConfig(),
 			Amino:             app.LegacyAmino(),
 		},
 	}
+}
+
+func PrintExported(exportedApp servertypes.ExportedApp) {
+	var doc tmtypes.GenesisDoc
+	doc.AppState = exportedApp.AppState
+	doc.Validators = exportedApp.Validators
+	doc.InitialHeight = exportedApp.Height
+	doc.ConsensusParams = &tmtypes.ConsensusParams{
+		Block: tmtypes.BlockParams{
+			MaxBytes: exportedApp.ConsensusParams.Block.MaxBytes,
+			MaxGas:   exportedApp.ConsensusParams.Block.MaxGas,
+		},
+		Evidence: tmtypes.EvidenceParams{
+			MaxAgeNumBlocks: exportedApp.ConsensusParams.Evidence.MaxAgeNumBlocks,
+			MaxAgeDuration:  exportedApp.ConsensusParams.Evidence.MaxAgeDuration,
+			MaxBytes:        exportedApp.ConsensusParams.Evidence.MaxBytes,
+		},
+		Validator: tmtypes.ValidatorParams{
+			PubKeyTypes: exportedApp.ConsensusParams.Validator.PubKeyTypes,
+		},
+	}
+
+	encoded, _ := tmjson.Marshal(doc)
+	out := encoded
+
+	var exportedGenDoc tmtypes.GenesisDoc
+	err := tmjson.Unmarshal(out, &exportedGenDoc)
+	if err != nil {
+		fmt.Println("err", err)
+	}
+	fmt.Println("exportedGenDoc")
+	genDocBytes, _ := tmjson.MarshalIndent(exportedGenDoc, "", "  ")
+	fmt.Println("genDocBytes", string(genDocBytes))
 }
