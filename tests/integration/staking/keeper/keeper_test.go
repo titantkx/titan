@@ -13,7 +13,7 @@ import (
 	sdkstakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/titanlab/titan/app"
+	"github.com/tokenize-titan/titan/app"
 )
 
 type IntegrationTestSuite struct {
