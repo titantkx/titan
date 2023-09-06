@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"time"
 
+	"cosmossdk.io/math"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -35,11 +36,14 @@ func (s *IntegrationTestSuite) bootstrapSlashTest(power int64) (*app.App, sdk.Co
 	s.app.AccountKeeper.SetModuleAccount(s.ctx, bondedPool)
 	require.NoError(s.app.BankKeeper.SendCoinsFromAccountToModule(s.ctx, s.genAddr, bondedPool.GetName(), bondedCoins))
 
-	for i := int64(0); i < numVals; i++ {
+	for i := int64(10); i < 10+numVals; i++ {
 		validator := testutil.NewValidator(s.T(), addrVals[i], PKs[i])
 		validator, _ = validator.AddTokensFromDel(amt)
 		validator = sdkstakingkeeper.TestingUpdateValidator(s.app.StakingKeeper.Keeper, s.ctx, validator, true)
 		s.app.StakingKeeper.SetValidatorByConsAddr(s.ctx, validator)
+		if err := s.app.StakingKeeper.Hooks().AfterValidatorCreated(s.ctx, validator.GetOperator()); err != nil {
+			require.NoError(err)
+		}
 	}
 
 	return s.app, s.ctx, addrDels, addrVals
@@ -97,4 +101,23 @@ func (s *IntegrationTestSuite) TestSlashUnbondingDelegation() {
 	// check community pool
 	newCommunityPoolBalance := app.DistrKeeper.GetFeePoolCommunityCoins(ctx).AmountOf(app.StakingKeeper.BondDenom(ctx))
 	require.Equal(sdk.NewDec(5), newCommunityPoolBalance)
+}
+
+func (s *IntegrationTestSuite) TestSlashAmount() {
+	require := s.Require()
+
+	app, ctx, _, _ := s.bootstrapSlashTest(10)
+	consAddr := sdk.ConsAddress(PKs[10].Address())
+	fraction := sdk.NewDecWithPrec(5, 1)
+	burnedCoins := app.StakingKeeper.Slash(ctx, consAddr, ctx.BlockHeight(), 10, fraction)
+	require.True(burnedCoins.GT(math.ZeroInt()))
+
+	// check community pool
+	communityPoolBalance := app.DistrKeeper.GetFeePoolCommunityCoins(ctx).AmountOf(app.StakingKeeper.BondDenom(ctx))
+	require.Equal(sdk.NewDecFromInt(burnedCoins), communityPoolBalance)
+
+	// test the case where the validator was not found, which should return no coins
+	_, addrVals := generateAddresses(app, ctx, s.genAddr, 100)
+	noBurned := app.StakingKeeper.Slash(ctx, sdk.ConsAddress(addrVals[10]), ctx.BlockHeight(), 10, fraction)
+	require.True(sdk.NewInt(0).Equal(noBurned))
 }
