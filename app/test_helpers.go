@@ -55,7 +55,26 @@ type SnapshotsConfig struct {
 	pruningOpts        pruningtypes.PruningOptions
 }
 
+func initSDKConfig() {
+	// // Set prefixes
+	// accountPubKeyPrefix := AccountAddressPrefix + "pub"
+	// validatorAddressPrefix := AccountAddressPrefix + "valoper"
+	// validatorPubKeyPrefix := AccountAddressPrefix + "valoperpub"
+	// consNodeAddressPrefix := AccountAddressPrefix + "valcons"
+	// consNodePubKeyPrefix := AccountAddressPrefix + "valconspub"
+
+	// // Set and seal config
+	// config := sdk.GetConfig()
+	// config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
+	// config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
+	// config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
+	// config.Seal()
+}
+
 func setup(withGenesis bool, invCheckPeriod uint, baseAppOptions ...func(*baseapp.BaseApp)) (*App, GenesisState, params.EncodingConfig) {
+	// Set config
+	initSDKConfig()
+
 	db := dbm.NewMemDB()
 
 	appOptions := make(simtestutil.AppOptionsMap, 0)
@@ -416,7 +435,6 @@ func PrintExported(exportedApp servertypes.ExportedApp) {
 	if err != nil {
 		fmt.Println("err", err)
 	}
-	fmt.Println("exportedGenDoc")
 	genDocBytes, _ := tmjson.MarshalIndent(exportedGenDoc, "", "  ")
-	fmt.Println("genDocBytes", string(genDocBytes))
+	fmt.Println("exportedGenDoc", string(genDocBytes))
 }

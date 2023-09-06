@@ -1,10 +1,14 @@
 package keeper_test
 
 import (
+	"time"
+
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/testutil"
 	sdkstakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/cosmos/cosmos-sdk/x/staking/testutil"
+	"github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/tokenize-titan/titan/app"
 )
@@ -19,7 +23,7 @@ func (s *IntegrationTestSuite) bootstrapSlashTest(power int64) (*app.App, sdk.Co
 	totalSupply := sdk.NewCoins(sdk.NewCoin(s.app.StakingKeeper.BondDenom(s.ctx), amt.MulRaw(int64(len(addrDels)))))
 
 	notBondedPool := s.app.StakingKeeper.GetNotBondedPool(s.ctx)
-	require.NoError(banktestutil.FundModuleAccount(s.app.BankKeeper, s.ctx, notBondedPool.GetName(), totalSupply))
+	require.NoError(s.app.BankKeeper.SendCoinsFromAccountToModule(s.ctx, s.genAddr, notBondedPool.GetName(), totalSupply))
 
 	s.app.AccountKeeper.SetModuleAccount(s.ctx, notBondedPool)
 
@@ -29,7 +33,7 @@ func (s *IntegrationTestSuite) bootstrapSlashTest(power int64) (*app.App, sdk.Co
 
 	// set bonded pool balance
 	s.app.AccountKeeper.SetModuleAccount(s.ctx, bondedPool)
-	require.NoError(banktestutil.FundModuleAccount(s.app.BankKeeper, s.ctx, bondedPool.GetName(), bondedCoins))
+	require.NoError(s.app.BankKeeper.SendCoinsFromAccountToModule(s.ctx, s.genAddr, bondedPool.GetName(), bondedCoins))
 
 	for i := int64(0); i < numVals; i++ {
 		validator := testutil.NewValidator(s.T(), addrVals[i], PKs[i])
@@ -43,46 +47,54 @@ func (s *IntegrationTestSuite) bootstrapSlashTest(power int64) (*app.App, sdk.Co
 
 // tests slashUnbondingDelegation
 func (s *IntegrationTestSuite) TestSlashUnbondingDelegation() {
-	// require := s.Require()
+	require := s.Require()
 
-	// app, ctx, addrDels, addrVals := s.bootstrapSlashTest(10)
+	app, ctx, addrDels, addrVals := s.bootstrapSlashTest(10)
 
-	// fraction := sdk.NewDecWithPrec(5, 1)
+	fraction := sdk.NewDecWithPrec(5, 1)
 
-	// // set an unbonding delegation with expiration timestamp (beyond which the
-	// // unbonding delegation shouldn't be slashed)
-	// ubd := types.NewUnbondingDelegation(addrDels[0], addrVals[0], 0,
-	// 	time.Unix(5, 0), sdk.NewInt(10), 0)
+	// set an unbonding delegation with expiration timestamp (beyond which the
+	// unbonding delegation shouldn't be slashed)
+	ubd := types.NewUnbondingDelegation(addrDels[0], addrVals[0], 0,
+		time.Unix(5, 0), sdk.NewInt(10), 0)
 
-	// app.StakingKeeper.SetUnbondingDelegation(ctx, ubd)
+	app.StakingKeeper.SetUnbondingDelegation(ctx, ubd)
 
-	// // unbonding started prior to the infraction height, stakw didn't contribute
-	// slashAmount := app.StakingKeeper.SlashUnbondingDelegation(ctx, ubd, 1, fraction)
-	// require.True(slashAmount.Equal(sdk.NewInt(0)))
+	// unbonding started prior to the infraction height, stakw didn't contribute
+	slashAmount := app.StakingKeeper.SlashUnbondingDelegation(ctx, ubd, 1, fraction)
+	require.True(slashAmount.Equal(sdk.NewInt(0)))
 
-	// // after the expiration time, no longer eligible for slashing
-	// ctx = ctx.WithBlockHeader(tmproto.Header{Time: time.Unix(10, 0)})
-	// app.StakingKeeper.SetUnbondingDelegation(ctx, ubd)
-	// slashAmount = app.StakingKeeper.SlashUnbondingDelegation(ctx, ubd, 0, fraction)
-	// require.True(slashAmount.Equal(sdk.NewInt(0)))
+	// after the expiration time, no longer eligible for slashing
+	ctx = ctx.WithBlockHeader(tmproto.Header{Time: time.Unix(10, 0)})
+	app.StakingKeeper.SetUnbondingDelegation(ctx, ubd)
+	slashAmount = app.StakingKeeper.SlashUnbondingDelegation(ctx, ubd, 0, fraction)
+	require.True(slashAmount.Equal(sdk.NewInt(0)))
 
-	// // test valid slash, before expiration timestamp and to which stake contributed
-	// notBondedPool := app.StakingKeeper.GetNotBondedPool(ctx)
-	// oldUnbondedPoolBalances := app.BankKeeper.GetAllBalances(ctx, notBondedPool.GetAddress())
-	// ctx = ctx.WithBlockHeader(tmproto.Header{Time: time.Unix(0, 0)})
-	// app.StakingKeeper.SetUnbondingDelegation(ctx, ubd)
-	// slashAmount = app.StakingKeeper.SlashUnbondingDelegation(ctx, ubd, 0, fraction)
-	// require.True(slashAmount.Equal(sdk.NewInt(5)))
-	// ubd, found := app.StakingKeeper.GetUnbondingDelegation(ctx, addrDels[0], addrVals[0])
-	// require.True(found)
-	// require.Len(ubd.Entries, 1)
+	// check community pool before slash
+	oldCommunityPoolBalance := app.DistrKeeper.GetFeePoolCommunityCoins(ctx).AmountOf(app.StakingKeeper.BondDenom(ctx))
+	require.Equal(sdk.NewDec(0), oldCommunityPoolBalance)
 
-	// // initial balance unchanged
-	// require.Equal(sdk.NewInt(10), ubd.Entries[0].InitialBalance)
+	// test valid slash, before expiration timestamp and to which stake contributed
+	notBondedPool := app.StakingKeeper.GetNotBondedPool(ctx)
+	oldUnbondedPoolBalances := app.BankKeeper.GetAllBalances(ctx, notBondedPool.GetAddress())
+	ctx = ctx.WithBlockHeader(tmproto.Header{Time: time.Unix(0, 0)})
+	app.StakingKeeper.SetUnbondingDelegation(ctx, ubd)
+	slashAmount = app.StakingKeeper.SlashUnbondingDelegation(ctx, ubd, 0, fraction)
+	require.True(slashAmount.Equal(sdk.NewInt(5)))
+	ubd, found := app.StakingKeeper.GetUnbondingDelegation(ctx, addrDels[0], addrVals[0])
+	require.True(found)
+	require.Len(ubd.Entries, 1)
 
-	// // balance decreased
-	// require.Equal(sdk.NewInt(5), ubd.Entries[0].Balance)
-	// newUnbondedPoolBalances := app.BankKeeper.GetAllBalances(ctx, notBondedPool.GetAddress())
-	// diffTokens := oldUnbondedPoolBalances.Sub(newUnbondedPoolBalances...)
-	// require.True(diffTokens.AmountOf(app.StakingKeeper.BondDenom(ctx)).Equal(sdk.NewInt(5)))
+	// initial balance unchanged
+	require.Equal(sdk.NewInt(10), ubd.Entries[0].InitialBalance)
+
+	// balance decreased
+	require.Equal(sdk.NewInt(5), ubd.Entries[0].Balance)
+	newUnbondedPoolBalances := app.BankKeeper.GetAllBalances(ctx, notBondedPool.GetAddress())
+	diffTokens := oldUnbondedPoolBalances.Sub(newUnbondedPoolBalances...)
+	require.True(diffTokens.AmountOf(app.StakingKeeper.BondDenom(ctx)).Equal(sdk.NewInt(5)))
+
+	// check community pool
+	newCommunityPoolBalance := app.DistrKeeper.GetFeePoolCommunityCoins(ctx).AmountOf(app.StakingKeeper.BondDenom(ctx))
+	require.Equal(sdk.NewDec(5), newCommunityPoolBalance)
 }

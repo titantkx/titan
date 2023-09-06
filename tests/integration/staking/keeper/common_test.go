@@ -40,18 +40,6 @@ func createValidators(t *testing.T, ctx sdk.Context, appIn *app.App, genAddr sdk
 	valAddrs := simtestutil.ConvertAddrsToValAddrs(addrs)
 	pks := simtestutil.CreateTestPubKeys(5)
 
-	// cdc := moduletestutil.MakeTestEncodingConfig().Codec
-
-	// appIn.StakingKeeper = keeper.NewKeeper(
-	// 	cdc,
-	// 	appIn.GetKey(types.StoreKey),
-	// 	appIn.AccountKeeper,
-	// 	appIn.BankKeeper,
-	// 	authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-	// )
-
-	// applyValidatorSetUpdates(t, ctx, appIn.StakingKeeper, -1)
-
 	currVals := appIn.StakingKeeper.GetAllValidators(ctx)
 	// print all validators addr and power
 	for _, val := range currVals {
