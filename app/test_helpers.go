@@ -36,7 +36,6 @@ import (
 	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 
 	"github.com/tokenize-titan/titan/app/params"
 )
@@ -56,7 +55,26 @@ type SnapshotsConfig struct {
 	pruningOpts        pruningtypes.PruningOptions
 }
 
+func initSDKConfig() {
+	// // Set prefixes
+	// accountPubKeyPrefix := AccountAddressPrefix + "pub"
+	// validatorAddressPrefix := AccountAddressPrefix + "valoper"
+	// validatorPubKeyPrefix := AccountAddressPrefix + "valoperpub"
+	// consNodeAddressPrefix := AccountAddressPrefix + "valcons"
+	// consNodePubKeyPrefix := AccountAddressPrefix + "valconspub"
+
+	// // Set and seal config
+	// config := sdk.GetConfig()
+	// config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
+	// config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
+	// config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
+	// config.Seal()
+}
+
 func setup(withGenesis bool, invCheckPeriod uint, baseAppOptions ...func(*baseapp.BaseApp)) (*App, GenesisState, params.EncodingConfig) {
+	// Set config
+	initSDKConfig()
+
 	db := dbm.NewMemDB()
 
 	appOptions := make(simtestutil.AppOptionsMap, 0)
@@ -123,8 +141,8 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 	return app
 }
 
-// Setup initializes a new SimApp. A Nop logger is set in SimApp.
-func Setup(t *testing.T, isCheckTx bool) *App {
+// Setup initializes a new SimApp. A Nop logger is set in SimApp. Return app and genesis address.
+func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	t.Helper()
 
 	privVal := mock.NewPV()
@@ -145,7 +163,7 @@ func Setup(t *testing.T, isCheckTx bool) *App {
 
 	app := SetupWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{acc}, balance)
 
-	return app
+	return app, acc.GetAddress()
 }
 
 func setTxSignature(t *testing.T, builder client.TxBuilder, nonce uint64) {
@@ -326,29 +344,25 @@ func GenesisStateWithSingleValidator(t *testing.T, app *App) GenesisState {
 
 // AddTestAddrsIncremental constructs and returns accNum amount of accounts with an
 // initial balance of accAmt in random order
-func AddTestAddrsIncremental(app *App, ctx sdk.Context, accNum int, accAmt math.Int) []sdk.AccAddress {
-	return addTestAddrs(app, ctx, accNum, accAmt, simtestutil.CreateIncrementalAccounts)
+func AddTestAddrsIncremental(app *App, ctx sdk.Context, genAddr sdk.AccAddress, accNum int, accAmt math.Int) []sdk.AccAddress {
+	return addTestAddrs(app, ctx, genAddr, accNum, accAmt, simtestutil.CreateIncrementalAccounts)
 }
 
-func addTestAddrs(app *App, ctx sdk.Context, accNum int, accAmt math.Int, strategy simtestutil.GenerateAccountStrategy) []sdk.AccAddress {
+func addTestAddrs(app *App, ctx sdk.Context, genAddr sdk.AccAddress, accNum int, accAmt math.Int, strategy simtestutil.GenerateAccountStrategy) []sdk.AccAddress {
 	testAddrs := strategy(accNum)
 
 	initCoins := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), accAmt))
 
 	for _, addr := range testAddrs {
-		initAccountWithCoins(app, ctx, addr, initCoins)
+		initAccountWithCoins(app, ctx, genAddr, addr, initCoins)
 	}
 
 	return testAddrs
 }
 
-func initAccountWithCoins(app *App, ctx sdk.Context, addr sdk.AccAddress, coins sdk.Coins) {
-	err := app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, coins)
-	if err != nil {
-		panic(err)
-	}
-
-	err = app.BankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, addr, coins)
+func initAccountWithCoins(app *App, ctx sdk.Context, genAccounts sdk.AccAddress, addr sdk.AccAddress, coins sdk.Coins) {
+	// send coin from genesis account to addr
+	err := app.BankKeeper.SendCoins(ctx, genAccounts, addr, coins)
 	if err != nil {
 		panic(err)
 	}
@@ -421,7 +435,6 @@ func PrintExported(exportedApp servertypes.ExportedApp) {
 	if err != nil {
 		fmt.Println("err", err)
 	}
-	fmt.Println("exportedGenDoc")
 	genDocBytes, _ := tmjson.MarshalIndent(exportedGenDoc, "", "  ")
-	fmt.Println("genDocBytes", string(genDocBytes))
+	fmt.Println("exportedGenDoc", string(genDocBytes))
 }
