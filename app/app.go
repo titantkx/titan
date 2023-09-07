@@ -61,9 +61,8 @@ import (
 	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
-	"github.com/cosmos/cosmos-sdk/x/gov"
+	sdkgov "github.com/cosmos/cosmos-sdk/x/gov"
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
-	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
@@ -109,6 +108,8 @@ import (
 	v1 "github.com/tokenize-titan/titan/app/upgrades/v1"
 	"github.com/tokenize-titan/titan/docs"
 	distrkeeper "github.com/tokenize-titan/titan/x/distribution/keeper"
+	gov "github.com/tokenize-titan/titan/x/gov"
+	govkeeper "github.com/tokenize-titan/titan/x/gov/keeper"
 	stakingkeeper "github.com/tokenize-titan/titan/x/staking/keeper"
 	titanmodule "github.com/tokenize-titan/titan/x/titan"
 	titanmodulekeeper "github.com/tokenize-titan/titan/x/titan/keeper"
@@ -160,7 +161,7 @@ var (
 		capability.AppModuleBasic{},
 		sdkstaking.AppModuleBasic{},
 		sdkdistr.AppModuleBasic{},
-		gov.NewAppModuleBasic(getGovProposalHandlers()),
+		sdkgov.NewAppModuleBasic(getGovProposalHandlers()),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
@@ -496,6 +497,7 @@ func New(
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.StakingKeeper,
+		app.DistrKeeper,
 		app.MsgServiceRouter(),
 		govConfig,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
@@ -509,11 +511,13 @@ func New(
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
 	govKeeper.SetLegacyRouter(govRouter)
 
-	app.GovKeeper = *govKeeper.SetHooks(
+	govKeeper.Keeper = govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(
 		// register the governance hooks
 		),
 	)
+
+	app.GovKeeper = *govKeeper
 
 	app.TitanKeeper = *titanmodulekeeper.NewKeeper(
 		appCodec,
