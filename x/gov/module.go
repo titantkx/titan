@@ -24,6 +24,7 @@ func NewAppModule(
 ) AppModule {
 	return AppModule{
 		AppModule: sdkgovmodule.NewAppModule(cdc, keeper.Keeper, ak, bk, ss),
+		keeper:    keeper,
 	}
 }
 
