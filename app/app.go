@@ -184,9 +184,9 @@ var (
 		authtypes.FeeCollectorName:     nil,
 		distrtypes.ModuleName:          nil,
 		icatypes.ModuleName:            nil,
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
+		stakingtypes.BondedPoolName:    {authtypes.Staking},
+		stakingtypes.NotBondedPoolName: {authtypes.Staking},
+		govtypes.ModuleName:            nil,
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
