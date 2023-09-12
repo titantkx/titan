@@ -55,26 +55,52 @@ type SnapshotsConfig struct {
 	pruningOpts        pruningtypes.PruningOptions
 }
 
-func initSDKConfig() {
-	// // Set prefixes
-	// accountPubKeyPrefix := AccountAddressPrefix + "pub"
-	// validatorAddressPrefix := AccountAddressPrefix + "valoper"
-	// validatorPubKeyPrefix := AccountAddressPrefix + "valoperpub"
-	// consNodeAddressPrefix := AccountAddressPrefix + "valcons"
-	// consNodePubKeyPrefix := AccountAddressPrefix + "valconspub"
+const (
+	// DisplayDenom defines the denomination displayed to users in client applications.
+	DisplayDenom = "tkx"
+	// BaseDenom defines to the default denomination used in titan (staking, governance, etc.)
+	BaseDenom = "utkx"
+	// BaseDenomUnit defines the base denomination unit for Titan.
+	// 1 tkx = 1x10^{BaseDenomUnit} utkx
+	BaseDenomUnit = 6
+)
 
-	// // Set and seal config
-	// config := sdk.GetConfig()
-	// config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
-	// config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
-	// config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
-	// config.Seal()
+func InitSDKConfig() {
+	// Set prefixes
+	accountPubKeyPrefix := AccountAddressPrefix + "pub"
+	validatorAddressPrefix := AccountAddressPrefix + "valoper"
+	validatorPubKeyPrefix := AccountAddressPrefix + "valoperpub"
+	consNodeAddressPrefix := AccountAddressPrefix + "valcons"
+	consNodePubKeyPrefix := AccountAddressPrefix + "valconspub"
+
+	config := sdk.GetConfig()
+
+	if sdk.GetConfig().GetBech32AccountAddrPrefix() != AccountAddressPrefix {
+		config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
+		config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
+		config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
+		config.Seal()
+	}
+}
+
+// RegisterDenoms registers the base and display denominations to the SDK.
+func RegisterDenoms() {
+	sdk.DefaultBondDenom = BaseDenom
+
+	if _, registed := sdk.GetDenomUnit(DisplayDenom); !registed {
+		if err := sdk.RegisterDenom(DisplayDenom, sdk.OneDec()); err != nil {
+			panic(err)
+		}
+	}
+
+	if _, registed := sdk.GetDenomUnit(BaseDenom); !registed {
+		if err := sdk.RegisterDenom(BaseDenom, sdk.NewDecWithPrec(1, BaseDenomUnit)); err != nil {
+			panic(err)
+		}
+	}
 }
 
 func setup(withGenesis bool, invCheckPeriod uint, baseAppOptions ...func(*baseapp.BaseApp)) (*App, GenesisState, params.EncodingConfig) {
-	// Set config
-	initSDKConfig()
-
 	db := dbm.NewMemDB()
 
 	appOptions := make(simtestutil.AppOptionsMap, 0)
@@ -96,9 +122,16 @@ func setup(withGenesis bool, invCheckPeriod uint, baseAppOptions ...func(*baseap
 	return app, GenesisState{}, encodingConfig
 }
 
+// Main Setup new App
+//
+//
+
 // NewSimappWithCustomOptions initializes a new SimApp with custom options.
 func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptions) *App {
 	t.Helper()
+
+	InitSDKConfig()
+	RegisterDenoms()
 
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
@@ -145,6 +178,9 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	t.Helper()
 
+	InitSDKConfig()
+	RegisterDenoms()
+
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
 	require.NoError(t, err)
@@ -185,6 +221,9 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 	balances ...banktypes.Balance,
 ) *App {
 	t.Helper()
+
+	InitSDKConfig()
+	RegisterDenoms()
 
 	snapshotTimeout := 1 * time.Minute
 	snapshotStore, err := snapshots.NewStore(dbm.NewMemDB(), testutil.GetTempDir(t))
@@ -276,6 +315,10 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 
 	return app
 }
+
+// Utility functions
+//
+//
 
 // SetupWithGenesisValSet initializes a new SimApp with a validator set and genesis accounts
 // that also act as delegators. For simplicity, each validator is bonded with a delegation
