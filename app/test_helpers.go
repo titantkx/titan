@@ -28,7 +28,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	"github.com/cosmos/cosmos-sdk/testutil/mock"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
-	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
+	sdksimtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
@@ -101,7 +101,7 @@ func RegisterDenoms() {
 func setup(withGenesis bool, invCheckPeriod uint, baseAppOptions ...func(*baseapp.BaseApp)) (*App, GenesisState, params.EncodingConfig) {
 	db := dbm.NewMemDB()
 
-	appOptions := make(simtestutil.AppOptionsMap, 0)
+	appOptions := make(sdksimtestutil.AppOptionsMap, 0)
 	appOptions[flags.FlagHome] = DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = invCheckPeriod
 
@@ -151,7 +151,7 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 		0,
 		MakeEncodingConfig(), options.AppOpts)
 	genesisState := NewDefaultGenesisState(app.AppCodec())
-	genesisState, err = simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, []authtypes.GenesisAccount{acc}, balance)
+	genesisState, err = sdksimtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, []authtypes.GenesisAccount{acc}, balance)
 	require.NoError(t, err)
 
 	if !isCheckTx {
@@ -163,7 +163,7 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 		app.InitChain(
 			abci.RequestInitChain{
 				Validators:      []abci.ValidatorUpdate{},
-				ConsensusParams: simtestutil.DefaultConsensusParams,
+				ConsensusParams: sdksimtestutil.DefaultConsensusParams,
 				AppStateBytes:   stateBytes,
 			},
 		)
@@ -231,7 +231,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 		baseapp.SetSnapshot(snapshotStore, snapshottypes.NewSnapshotOptions(cfg.snapshotInterval, cfg.snapshotKeepRecent)),
 		baseapp.SetPruning(cfg.pruningOpts),
 	)
-	genesisStateWithValSet, err := simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, acc, balances...)
+	genesisStateWithValSet, err := sdksimtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, acc, balances...)
 	require.NoError(t, err)
 
 	stateBytes, err := json.MarshalIndent(genesisStateWithValSet, "", " ")
@@ -241,7 +241,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 	app.InitChain(
 		abci.RequestInitChain{
 			Validators:      []abci.ValidatorUpdate{},
-			ConsensusParams: simtestutil.DefaultConsensusParams,
+			ConsensusParams: sdksimtestutil.DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
 		},
 	)
@@ -326,7 +326,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 	t.Helper()
 
 	app, genesisState, _ := setup(true, 5)
-	genesisState, err := simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, genAccs, balances...)
+	genesisState, err := sdksimtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, genAccs, balances...)
 	require.NoError(t, err)
 
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
@@ -336,7 +336,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 	app.InitChain(
 		abci.RequestInitChain{
 			Validators:      []abci.ValidatorUpdate{},
-			ConsensusParams: simtestutil.DefaultConsensusParams,
+			ConsensusParams: sdksimtestutil.DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
 		},
 	)
@@ -377,7 +377,7 @@ func GenesisStateWithSingleValidator(t *testing.T, app *App) GenesisState {
 	}
 
 	genesisState := NewDefaultGenesisState(app.AppCodec())
-	genesisState, err = simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, []authtypes.GenesisAccount{acc}, balances...)
+	genesisState, err = sdksimtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, []authtypes.GenesisAccount{acc}, balances...)
 	require.NoError(t, err)
 
 	return genesisState
@@ -394,7 +394,7 @@ func NewTestNetworkFixture() network.TestFixture {
 	app := New(log.NewNopLogger(), dbm.NewMemDB(), nil, true, map[int64]bool{},
 		DefaultNodeHome,
 		0,
-		MakeEncodingConfig(), simtestutil.NewAppOptionsWithFlagHome(dir))
+		MakeEncodingConfig(), sdksimtestutil.NewAppOptionsWithFlagHome(dir))
 
 	appCtr := func(val network.ValidatorI) servertypes.Application {
 		return New(
@@ -403,7 +403,7 @@ func NewTestNetworkFixture() network.TestFixture {
 			DefaultNodeHome,
 			0,
 			MakeEncodingConfig(),
-			simtestutil.NewAppOptionsWithFlagHome(val.GetCtx().Config.RootDir),
+			sdksimtestutil.NewAppOptionsWithFlagHome(val.GetCtx().Config.RootDir),
 			bam.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
 			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
 			bam.SetChainID(val.GetCtx().Viper.GetString(flags.FlagChainID)),
