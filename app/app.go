@@ -282,6 +282,7 @@ func New(
 	//				This value is used to calculate the voting power of validator.
 	// Re config `DefaultPowerReduction`
 	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
+	sdk.DefaultBondDenom = "utkx"
 
 	bApp := baseapp.NewBaseApp(
 		Name,

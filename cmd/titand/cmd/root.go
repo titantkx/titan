@@ -106,6 +106,7 @@ func initRootCmd(
 ) {
 	// Set config
 	initSDKConfig()
+	RegisterDenoms()
 
 	gentxModule := app.ModuleBasics[genutiltypes.ModuleName].(genutil.AppModuleBasic)
 	rootCmd.AddCommand(
