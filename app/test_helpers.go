@@ -15,8 +15,6 @@ import (
 	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/stretchr/testify/require"
 
-	"cosmossdk.io/math"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -383,32 +381,6 @@ func GenesisStateWithSingleValidator(t *testing.T, app *App) GenesisState {
 	require.NoError(t, err)
 
 	return genesisState
-}
-
-// AddTestAddrsIncremental constructs and returns accNum amount of accounts with an
-// initial balance of accAmt in random order
-func AddTestAddrsIncremental(app *App, ctx sdk.Context, genAddr sdk.AccAddress, accNum int, accAmt math.Int) []sdk.AccAddress {
-	return addTestAddrs(app, ctx, genAddr, accNum, accAmt, simtestutil.CreateIncrementalAccounts)
-}
-
-func addTestAddrs(app *App, ctx sdk.Context, genAddr sdk.AccAddress, accNum int, accAmt math.Int, strategy simtestutil.GenerateAccountStrategy) []sdk.AccAddress {
-	testAddrs := strategy(accNum)
-
-	initCoins := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), accAmt))
-
-	for _, addr := range testAddrs {
-		initAccountWithCoins(app, ctx, genAddr, addr, initCoins)
-	}
-
-	return testAddrs
-}
-
-func initAccountWithCoins(app *App, ctx sdk.Context, genAccounts sdk.AccAddress, addr sdk.AccAddress, coins sdk.Coins) {
-	// send coin from genesis account to addr
-	err := app.BankKeeper.SendCoins(ctx, genAccounts, addr, coins)
-	if err != nil {
-		panic(err)
-	}
 }
 
 // NewTestNetworkFixture returns a new simapp AppConstructor for network simulation tests
