@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	rosettaCmd "cosmossdk.io/tools/rosetta/cmd"
 	dbm "github.com/cometbft/cometbft-db"
 	tmcfg "github.com/cometbft/cometbft/config"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
@@ -17,7 +18,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/server"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
@@ -37,6 +37,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	ethermintclient "github.com/tokenize-titan/ethermint/client"
+	etherminthd "github.com/tokenize-titan/ethermint/crypto/hd"
+	ethermintserver "github.com/tokenize-titan/ethermint/server"
+	ethermintsrvflags "github.com/tokenize-titan/ethermint/server/flags"
+
 	// this line is used by starport scaffolding # root/moduleImport
 
 	"github.com/tokenize-titan/titan/app"
@@ -54,7 +59,9 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithHomeDir(app.DefaultNodeHome).
-		WithViper("") // TODO : env prefix, we need to config this
+		WithViper(""). // TODO : env prefix, we need to config this
+		// Ethermint
+		WithKeyringOptions(etherminthd.EthSecp256k1Option())
 
 	rootCmd := &cobra.Command{
 		Use:   app.Name + "d",
@@ -124,6 +131,11 @@ func initRootCmd(
 		tmcli.NewCompletionCmd(rootCmd, true),
 		debug.Cmd(),
 		config.Cmd(),
+		// Ethermint
+		ethermintclient.ValidateChainID(
+			genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
+		),
+		ethermintclient.NewTestnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		// this line is used by starport scaffolding # root/commands
 	)
 
@@ -131,22 +143,34 @@ func initRootCmd(
 		encodingConfig,
 	}
 
-	// add server commands
-	server.AddCommands(
-		rootCmd,
-		app.DefaultNodeHome,
-		a.newApp,
-		a.appExport,
-		addModuleInitFlags,
-	)
+	ethermintserver.AddCommands(rootCmd, ethermintserver.NewDefaultStartOptions(a.newApp, app.DefaultNodeHome), a.appExport, addModuleInitFlags)
+
+	// // add server commands
+	// server.AddCommands(
+	// 	rootCmd,
+	// 	app.DefaultNodeHome,
+	// 	a.newApp,
+	// 	a.appExport,
+	// 	addModuleInitFlags,
+	// )
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(app.DefaultNodeHome),
+		// keys.Commands(app.DefaultNodeHome),
+		// Ethermint
+		ethermintclient.KeyCommands(app.DefaultNodeHome),
 	)
+
+	rootCmd, err := ethermintsrvflags.AddTxFlags(rootCmd)
+	if err != nil {
+		panic(err)
+	}
+
+	// add rosetta
+	rootCmd.AddCommand(rosettaCmd.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Marshaler))
 }
 
 // queryCommand returns the sub-command to send queries to the app
