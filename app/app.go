@@ -104,6 +104,8 @@ import (
 	solomachine "github.com/cosmos/ibc-go/v7/modules/light-clients/06-solomachine"
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 	"github.com/spf13/cast"
+	"github.com/tokenize-titan/ethermint/x/evm"
+	"github.com/tokenize-titan/ethermint/x/feemarket"
 
 	v1 "github.com/tokenize-titan/titan/app/upgrades/v1"
 	"github.com/tokenize-titan/titan/docs"
@@ -176,6 +178,9 @@ var (
 		ica.AppModuleBasic{},
 		consensus.AppModuleBasic{},
 		titanmodule.AppModuleBasic{},
+		// Ethermint modules
+		evm.AppModuleBasic{},
+		feemarket.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
