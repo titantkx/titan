@@ -6,6 +6,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/std"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 
+	cryptocodec "github.com/tokenize-titan/ethermint/crypto/codec"
+	ethermint "github.com/tokenize-titan/ethermint/types"
+
 	"github.com/tokenize-titan/titan/app/params"
 )
 
@@ -31,5 +34,11 @@ func MakeEncodingConfig() params.EncodingConfig {
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+
+	// Ethermint
+	cryptocodec.RegisterCrypto(encodingConfig.Amino)
+	cryptocodec.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	ethermint.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+
 	return encodingConfig
 }
