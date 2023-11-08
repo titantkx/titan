@@ -103,7 +103,10 @@ import (
 	solomachine "github.com/cosmos/ibc-go/v7/modules/light-clients/06-solomachine"
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 	"github.com/spf13/cast"
+
 	"github.com/tokenize-titan/ethermint/app/ante"
+	ehtermintappparams "github.com/tokenize-titan/ethermint/app/params"
+	"github.com/tokenize-titan/ethermint/ethereum/eip712"
 	srvflags "github.com/tokenize-titan/ethermint/server/flags"
 	ethermint "github.com/tokenize-titan/ethermint/types"
 	"github.com/tokenize-titan/ethermint/x/evm"
@@ -294,6 +297,15 @@ func New(
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 	txConfig := encodingConfig.TxConfig
+
+	ethermintEncodingConfig := ehtermintappparams.EncodingConfig{
+		InterfaceRegistry: interfaceRegistry,
+		Marshaler:         appCodec,
+		TxConfig:          encodingConfig.TxConfig,
+		Amino:             cdc,
+	}
+
+	eip712.SetEncodingConfig(ethermintEncodingConfig)
 
 	// NOTE: set `DefaultPowerReduction`. This can be understand as minium stake amount of validator but not actually.
 	//				This value is used to calculate the voting power of validator.
