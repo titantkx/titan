@@ -15,8 +15,6 @@ import (
 	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/stretchr/testify/require"
 
-	"cosmossdk.io/math"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -30,7 +28,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	"github.com/cosmos/cosmos-sdk/testutil/mock"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
-	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
+	sdksimtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
@@ -55,29 +53,55 @@ type SnapshotsConfig struct {
 	pruningOpts        pruningtypes.PruningOptions
 }
 
-func initSDKConfig() {
-	// // Set prefixes
-	// accountPubKeyPrefix := AccountAddressPrefix + "pub"
-	// validatorAddressPrefix := AccountAddressPrefix + "valoper"
-	// validatorPubKeyPrefix := AccountAddressPrefix + "valoperpub"
-	// consNodeAddressPrefix := AccountAddressPrefix + "valcons"
-	// consNodePubKeyPrefix := AccountAddressPrefix + "valconspub"
+const (
+	// DisplayDenom defines the denomination displayed to users in client applications.
+	DisplayDenom = "tkx"
+	// BaseDenom defines to the default denomination used in titan (staking, governance, etc.)
+	BaseDenom = "utkx"
+	// BaseDenomUnit defines the base denomination unit for Titan.
+	// 1 tkx = 1x10^{BaseDenomUnit} utkx
+	BaseDenomUnit = 6
+)
 
-	// // Set and seal config
-	// config := sdk.GetConfig()
-	// config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
-	// config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
-	// config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
-	// config.Seal()
+func InitSDKConfig() {
+	// Set prefixes
+	accountPubKeyPrefix := AccountAddressPrefix + "pub"
+	validatorAddressPrefix := AccountAddressPrefix + "valoper"
+	validatorPubKeyPrefix := AccountAddressPrefix + "valoperpub"
+	consNodeAddressPrefix := AccountAddressPrefix + "valcons"
+	consNodePubKeyPrefix := AccountAddressPrefix + "valconspub"
+
+	config := sdk.GetConfig()
+
+	if sdk.GetConfig().GetBech32AccountAddrPrefix() != AccountAddressPrefix {
+		config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
+		config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
+		config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
+		config.Seal()
+	}
+}
+
+// RegisterDenoms registers the base and display denominations to the SDK.
+func RegisterDenoms() {
+	sdk.DefaultBondDenom = BaseDenom
+
+	if _, registed := sdk.GetDenomUnit(DisplayDenom); !registed {
+		if err := sdk.RegisterDenom(DisplayDenom, sdk.OneDec()); err != nil {
+			panic(err)
+		}
+	}
+
+	if _, registed := sdk.GetDenomUnit(BaseDenom); !registed {
+		if err := sdk.RegisterDenom(BaseDenom, sdk.NewDecWithPrec(1, BaseDenomUnit)); err != nil {
+			panic(err)
+		}
+	}
 }
 
 func setup(withGenesis bool, invCheckPeriod uint, baseAppOptions ...func(*baseapp.BaseApp)) (*App, GenesisState, params.EncodingConfig) {
-	// Set config
-	initSDKConfig()
-
 	db := dbm.NewMemDB()
 
-	appOptions := make(simtestutil.AppOptionsMap, 0)
+	appOptions := make(sdksimtestutil.AppOptionsMap, 0)
 	appOptions[flags.FlagHome] = DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = invCheckPeriod
 
@@ -96,9 +120,16 @@ func setup(withGenesis bool, invCheckPeriod uint, baseAppOptions ...func(*baseap
 	return app, GenesisState{}, encodingConfig
 }
 
+// Main Setup new App
+//
+//
+
 // NewSimappWithCustomOptions initializes a new SimApp with custom options.
 func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptions) *App {
 	t.Helper()
+
+	InitSDKConfig()
+	RegisterDenoms()
 
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
@@ -120,7 +151,7 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 		0,
 		MakeEncodingConfig(), options.AppOpts)
 	genesisState := NewDefaultGenesisState(app.AppCodec())
-	genesisState, err = simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, []authtypes.GenesisAccount{acc}, balance)
+	genesisState, err = sdksimtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, []authtypes.GenesisAccount{acc}, balance)
 	require.NoError(t, err)
 
 	if !isCheckTx {
@@ -132,7 +163,7 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 		app.InitChain(
 			abci.RequestInitChain{
 				Validators:      []abci.ValidatorUpdate{},
-				ConsensusParams: simtestutil.DefaultConsensusParams,
+				ConsensusParams: sdksimtestutil.DefaultConsensusParams,
 				AppStateBytes:   stateBytes,
 			},
 		)
@@ -144,6 +175,9 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 // Setup initializes a new SimApp. A Nop logger is set in SimApp. Return app and genesis address.
 func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	t.Helper()
+
+	InitSDKConfig()
+	RegisterDenoms()
 
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
@@ -186,6 +220,9 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 ) *App {
 	t.Helper()
 
+	InitSDKConfig()
+	RegisterDenoms()
+
 	snapshotTimeout := 1 * time.Minute
 	snapshotStore, err := snapshots.NewStore(dbm.NewMemDB(), testutil.GetTempDir(t))
 	require.NoError(t, err)
@@ -194,7 +231,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 		baseapp.SetSnapshot(snapshotStore, snapshottypes.NewSnapshotOptions(cfg.snapshotInterval, cfg.snapshotKeepRecent)),
 		baseapp.SetPruning(cfg.pruningOpts),
 	)
-	genesisStateWithValSet, err := simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, acc, balances...)
+	genesisStateWithValSet, err := sdksimtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, acc, balances...)
 	require.NoError(t, err)
 
 	stateBytes, err := json.MarshalIndent(genesisStateWithValSet, "", " ")
@@ -204,7 +241,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 	app.InitChain(
 		abci.RequestInitChain{
 			Validators:      []abci.ValidatorUpdate{},
-			ConsensusParams: simtestutil.DefaultConsensusParams,
+			ConsensusParams: sdksimtestutil.DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
 		},
 	)
@@ -277,6 +314,10 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 	return app
 }
 
+// Utility functions
+//
+//
+
 // SetupWithGenesisValSet initializes a new SimApp with a validator set and genesis accounts
 // that also act as delegators. For simplicity, each validator is bonded with a delegation
 // of one consensus engine unit in the default token of the simapp from first genesis
@@ -285,7 +326,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 	t.Helper()
 
 	app, genesisState, _ := setup(true, 5)
-	genesisState, err := simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, genAccs, balances...)
+	genesisState, err := sdksimtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, genAccs, balances...)
 	require.NoError(t, err)
 
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
@@ -295,7 +336,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 	app.InitChain(
 		abci.RequestInitChain{
 			Validators:      []abci.ValidatorUpdate{},
-			ConsensusParams: simtestutil.DefaultConsensusParams,
+			ConsensusParams: sdksimtestutil.DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
 		},
 	)
@@ -336,36 +377,10 @@ func GenesisStateWithSingleValidator(t *testing.T, app *App) GenesisState {
 	}
 
 	genesisState := NewDefaultGenesisState(app.AppCodec())
-	genesisState, err = simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, []authtypes.GenesisAccount{acc}, balances...)
+	genesisState, err = sdksimtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, []authtypes.GenesisAccount{acc}, balances...)
 	require.NoError(t, err)
 
 	return genesisState
-}
-
-// AddTestAddrsIncremental constructs and returns accNum amount of accounts with an
-// initial balance of accAmt in random order
-func AddTestAddrsIncremental(app *App, ctx sdk.Context, genAddr sdk.AccAddress, accNum int, accAmt math.Int) []sdk.AccAddress {
-	return addTestAddrs(app, ctx, genAddr, accNum, accAmt, simtestutil.CreateIncrementalAccounts)
-}
-
-func addTestAddrs(app *App, ctx sdk.Context, genAddr sdk.AccAddress, accNum int, accAmt math.Int, strategy simtestutil.GenerateAccountStrategy) []sdk.AccAddress {
-	testAddrs := strategy(accNum)
-
-	initCoins := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), accAmt))
-
-	for _, addr := range testAddrs {
-		initAccountWithCoins(app, ctx, genAddr, addr, initCoins)
-	}
-
-	return testAddrs
-}
-
-func initAccountWithCoins(app *App, ctx sdk.Context, genAccounts sdk.AccAddress, addr sdk.AccAddress, coins sdk.Coins) {
-	// send coin from genesis account to addr
-	err := app.BankKeeper.SendCoins(ctx, genAccounts, addr, coins)
-	if err != nil {
-		panic(err)
-	}
 }
 
 // NewTestNetworkFixture returns a new simapp AppConstructor for network simulation tests
@@ -379,7 +394,7 @@ func NewTestNetworkFixture() network.TestFixture {
 	app := New(log.NewNopLogger(), dbm.NewMemDB(), nil, true, map[int64]bool{},
 		DefaultNodeHome,
 		0,
-		MakeEncodingConfig(), simtestutil.NewAppOptionsWithFlagHome(dir))
+		MakeEncodingConfig(), sdksimtestutil.NewAppOptionsWithFlagHome(dir))
 
 	appCtr := func(val network.ValidatorI) servertypes.Application {
 		return New(
@@ -388,7 +403,7 @@ func NewTestNetworkFixture() network.TestFixture {
 			DefaultNodeHome,
 			0,
 			MakeEncodingConfig(),
-			simtestutil.NewAppOptionsWithFlagHome(val.GetCtx().Config.RootDir),
+			sdksimtestutil.NewAppOptionsWithFlagHome(val.GetCtx().Config.RootDir),
 			bam.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
 			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
 			bam.SetChainID(val.GetCtx().Viper.GetString(flags.FlagChainID)),

@@ -22,6 +22,8 @@ func TestABCI_ApplySnapshotChunk(t *testing.T) {
 	//
 	//
 
+	InitSDKConfig()
+
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
 	require.NoError(t, err)
