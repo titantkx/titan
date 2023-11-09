@@ -38,7 +38,7 @@ validators:
   config:
     moniker: "titan val1"
   client:
-    chain-id: "titan-1"
+    chain-id: "titan_90000-1"
     keyring-backend: "test"
 
 client:
@@ -50,7 +50,7 @@ faucet:
   coins: ['10000000utkx']
 
 genesis:
-  chain_id: titan-1
+  chain_id: titan_90000-1
   app_state:
     staking:
       params:
