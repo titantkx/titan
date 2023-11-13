@@ -60,7 +60,9 @@ const (
 	BaseDenom = "utkx"
 	// BaseDenomUnit defines the base denomination unit for Titan.
 	// 1 tkx = 1x10^{BaseDenomUnit} utkx
-	BaseDenomUnit = 6
+	BaseDenomUnit = 18
+
+	DefaultChainID = "titan_18888-1"
 )
 
 func InitSDKConfig() {
@@ -230,6 +232,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 	app, genesisState, _ := setup(true, 5,
 		baseapp.SetSnapshot(snapshotStore, snapshottypes.NewSnapshotOptions(cfg.snapshotInterval, cfg.snapshotKeepRecent)),
 		baseapp.SetPruning(cfg.pruningOpts),
+		baseapp.SetChainID(DefaultChainID),
 	)
 	genesisStateWithValSet, err := sdksimtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, acc, balances...)
 	require.NoError(t, err)
@@ -240,6 +243,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 	// init chain will set the validator set and initialize the genesis accounts
 	app.InitChain(
 		abci.RequestInitChain{
+			ChainId:         DefaultChainID,
 			Validators:      []abci.ValidatorUpdate{},
 			ConsensusParams: sdksimtestutil.DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
@@ -257,6 +261,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 		app.Logger().Debug("Creating block", "height", currentBlockHeight)
 
 		app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
+			ChainID:            DefaultChainID,
 			Height:             currentBlockHeight,
 			AppHash:            app.LastCommitID().Hash,
 			ValidatorsHash:     valSet.Hash(),
@@ -325,7 +330,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) *App {
 	t.Helper()
 
-	app, genesisState, _ := setup(true, 5)
+	app, genesisState, _ := setup(true, 5, baseapp.SetChainID(DefaultChainID))
 	genesisState, err := sdksimtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, genAccs, balances...)
 	require.NoError(t, err)
 
@@ -335,6 +340,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 	// init chain will set the validator set and initialize the genesis accounts
 	app.InitChain(
 		abci.RequestInitChain{
+			ChainId:         DefaultChainID,
 			Validators:      []abci.ValidatorUpdate{},
 			ConsensusParams: sdksimtestutil.DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
@@ -344,6 +350,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 	// commit genesis changes
 	app.Commit()
 	app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
+		ChainID:            DefaultChainID,
 		Height:             app.LastBlockHeight() + 1,
 		AppHash:            app.LastCommitID().Hash,
 		ValidatorsHash:     valSet.Hash(),
