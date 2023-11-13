@@ -34,6 +34,8 @@ import (
 	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	cmdcfg "github.com/tokenize-titan/ethermint/cmd/config"
+	"github.com/tokenize-titan/ethermint/crypto/ethsecp256k1"
 
 	"github.com/tokenize-titan/titan/app/params"
 )
@@ -79,6 +81,10 @@ func InitSDKConfig() {
 		config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
 		config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
 		config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
+
+		// Ethermint config coin type to 60
+		cmdcfg.SetBip44CoinType(config)
+
 		config.Seal()
 	}
 }
@@ -141,7 +147,8 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 	valSet := tmtypes.NewValidatorSet([]*tmtypes.Validator{validator})
 
 	// generate genesis account
-	senderPrivKey := secp256k1.GenPrivKey()
+	senderPrivKey, err := ethsecp256k1.GenerateKey()
+	require.NoError(t, err)
 	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
 		Address: acc.GetAddress().String(),
@@ -190,7 +197,9 @@ func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	valSet := tmtypes.NewValidatorSet([]*tmtypes.Validator{validator})
 
 	// generate genesis account
-	senderPrivKey := secp256k1.GenPrivKey()
+	senderPrivKey, err := ethsecp256k1.GenerateKey()
+	require.NoError(t, err)
+
 	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
 		Address: acc.GetAddress().String(),
@@ -374,7 +383,9 @@ func GenesisStateWithSingleValidator(t *testing.T, app *App) GenesisState {
 	valSet := tmtypes.NewValidatorSet([]*tmtypes.Validator{validator})
 
 	// generate genesis account
-	senderPrivKey := secp256k1.GenPrivKey()
+	senderPrivKey, err := ethsecp256k1.GenerateKey()
+	require.NoError(t, err)
+
 	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balances := []banktypes.Balance{
 		{
