@@ -15,7 +15,7 @@ const (
 	BaseDenom = "utkx"
 	// BaseDenomUnit defines the base denomination unit for Titan.
 	// 1 tkx = 1x10^{BaseDenomUnit} utkx
-	BaseDenomUnit = 6
+	BaseDenomUnit = 18
 )
 
 func initSDKConfig() {

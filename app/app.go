@@ -396,8 +396,11 @@ func New(
 	// Create Ethermint keepers
 	feeMarketSs := app.GetSubspace(feemarkettypes.ModuleName)
 	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
-		appCodec, authtypes.NewModuleAddress(govtypes.ModuleName),
-		keys[feemarkettypes.StoreKey], tkeys[feemarkettypes.TransientKey], feeMarketSs,
+		appCodec,
+		authtypes.NewModuleAddress(govtypes.ModuleName),
+		keys[feemarkettypes.StoreKey],
+		tkeys[feemarkettypes.TransientKey],
+		feeMarketSs,
 	)
 
 	tracer := cast.ToString(appOpts.Get(srvflags.EVMTracer))
@@ -405,9 +408,13 @@ func New(
 	// Set authority to x/gov module account to only expect the module account to update params
 	evmSs := app.GetSubspace(evmtypes.ModuleName)
 	app.EvmKeeper = evmkeeper.NewKeeper(
-		appCodec, keys[evmtypes.StoreKey], tkeys[evmtypes.TransientKey], authtypes.NewModuleAddress(govtypes.ModuleName),
+		appCodec,
+		keys[evmtypes.StoreKey],
+		tkeys[evmtypes.TransientKey],
+		authtypes.NewModuleAddress(govtypes.ModuleName),
 		app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.FeeMarketKeeper,
-		nil, geth.NewEVM, tracer, evmSs,
+		nil, geth.NewEVM, tracer,
+		evmSs,
 	)
 
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
@@ -635,6 +642,10 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		icaModule,
+		// Ethermint app modules
+		feemarket.NewAppModule(app.FeeMarketKeeper, feeMarketSs),
+		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper, evmSs),
+
 		titanModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 
@@ -711,8 +722,6 @@ func New(
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
 		govtypes.ModuleName,
-		crisistypes.ModuleName,
-		genutiltypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibcexported.ModuleName,
 		// evm module denomination is used by the feemarket module, in AnteHandle
@@ -720,6 +729,7 @@ func New(
 		// NOTE: feemarket need to be initialized before genutil module:
 		// gentx transactions use MinGasPriceDecorator.AnteHandle
 		feemarkettypes.ModuleName,
+		genutiltypes.ModuleName,
 		icatypes.ModuleName,
 		evidencetypes.ModuleName,
 		authz.ModuleName,
@@ -729,6 +739,7 @@ func New(
 		upgradetypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		titanmoduletypes.ModuleName,
+		crisistypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
