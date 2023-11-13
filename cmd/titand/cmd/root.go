@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	rosettaCmd "cosmossdk.io/tools/rosetta/cmd"
 	dbm "github.com/cometbft/cometbft-db"
@@ -40,12 +39,18 @@ import (
 	ethermintclient "github.com/tokenize-titan/ethermint/client"
 	etherminthd "github.com/tokenize-titan/ethermint/crypto/hd"
 	ethermintserver "github.com/tokenize-titan/ethermint/server"
+	ethermintserverconfig "github.com/tokenize-titan/ethermint/server/config"
 	ethermintsrvflags "github.com/tokenize-titan/ethermint/server/flags"
 
 	// this line is used by starport scaffolding # root/moduleImport
 
 	"github.com/tokenize-titan/titan/app"
 	appparams "github.com/tokenize-titan/titan/app/params"
+)
+
+const (
+	EnvPrefix      = "TITAN"
+	DefaultChainID = "titan_18888-1"
 )
 
 // NewRootCmd creates a new root command for a Cosmos SDK application
@@ -59,7 +64,7 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithHomeDir(app.DefaultNodeHome).
-		WithViper(""). // TODO : env prefix, we need to config this
+		WithViper(EnvPrefix).
 		// Ethermint
 		WithKeyringOptions(etherminthd.EthSecp256k1Option())
 
@@ -85,6 +90,7 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 
 			customAppTemplate, customAppConfig := initAppConfig()
 			customTMConfig := initTendermintConfig()
+
 			return server.InterceptConfigsPreRunHandler(
 				cmd, customAppTemplate, customAppConfig, customTMConfig,
 			)
@@ -93,7 +99,7 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 
 	initRootCmd(rootCmd, encodingConfig)
 	overwriteFlagDefaults(rootCmd, map[string]string{
-		flags.FlagChainID:        strings.ReplaceAll(app.Name, "-", ""),
+		flags.FlagChainID:        DefaultChainID,
 		flags.FlagKeyringBackend: "test",
 	})
 
@@ -369,6 +375,10 @@ func initAppConfig() (string, interface{}) {
 
 	type CustomAppConfig struct {
 		serverconfig.Config
+
+		EVM     ethermintserverconfig.EVMConfig     `mapstructure:"evm"`
+		JSONRPC ethermintserverconfig.JSONRPCConfig `mapstructure:"json-rpc"`
+		TLS     ethermintserverconfig.TLSConfig     `mapstructure:"tls"`
 	}
 
 	// Optionally allow the chain developer to overwrite the SDK's default
@@ -386,12 +396,16 @@ func initAppConfig() (string, interface{}) {
 	//   own app.toml to override, or use this default value.
 	//
 	// In simapp, we set the min gas prices to 0.
-	srvCfg.MinGasPrices = "0stake"
+	srvCfg.MinGasPrices = "0utkx"
 
 	customAppConfig := CustomAppConfig{
 		Config: *srvCfg,
+
+		EVM:     *ethermintserverconfig.DefaultEVMConfig(),
+		JSONRPC: *ethermintserverconfig.DefaultJSONRPCConfig(),
+		TLS:     *ethermintserverconfig.DefaultTLSConfig(),
 	}
-	customAppTemplate := serverconfig.DefaultConfigTemplate
+	customAppTemplate := serverconfig.DefaultConfigTemplate + ethermintserverconfig.DefaultConfigTemplate
 
 	return customAppTemplate, customAppConfig
 }
