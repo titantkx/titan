@@ -2,7 +2,7 @@ version: 1
 
 accounts:
 - name: faucet
-  coins: ['1000000000000000tkx']
+  coins: ['99994990tkx']
   # titan1xnpqgn3hz2xvg054w4cc5d5r9dh00nvj9cmkte
   mnemonic: object depart submit ritual civil culture garment rubber they laundry expose strike proud mushroom curious
 - name: test
