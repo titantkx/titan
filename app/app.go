@@ -393,30 +393,6 @@ func New(
 		app.AccountKeeper,
 	)
 
-	// Create Ethermint keepers
-	feeMarketSs := app.GetSubspace(feemarkettypes.ModuleName)
-	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
-		appCodec,
-		authtypes.NewModuleAddress(govtypes.ModuleName),
-		keys[feemarkettypes.StoreKey],
-		tkeys[feemarkettypes.TransientKey],
-		feeMarketSs,
-	)
-
-	tracer := cast.ToString(appOpts.Get(srvflags.EVMTracer))
-
-	// Set authority to x/gov module account to only expect the module account to update params
-	evmSs := app.GetSubspace(evmtypes.ModuleName)
-	app.EvmKeeper = evmkeeper.NewKeeper(
-		appCodec,
-		keys[evmtypes.StoreKey],
-		tkeys[evmtypes.TransientKey],
-		authtypes.NewModuleAddress(govtypes.ModuleName),
-		app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.FeeMarketKeeper,
-		nil, geth.NewEVM, tracer,
-		evmSs,
-	)
-
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec,
 		keys[banktypes.StoreKey],
@@ -450,6 +426,30 @@ func New(
 	)
 
 	app.StakingKeeper.SetDistributionKeeper(app.DistrKeeper)
+
+	// Create Ethermint keepers
+	feeMarketSs := app.GetSubspace(feemarkettypes.ModuleName)
+	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
+		appCodec,
+		authtypes.NewModuleAddress(govtypes.ModuleName),
+		keys[feemarkettypes.StoreKey],
+		tkeys[feemarkettypes.TransientKey],
+		feeMarketSs,
+	)
+
+	tracer := cast.ToString(appOpts.Get(srvflags.EVMTracer))
+
+	// Set authority to x/gov module account to only expect the module account to update params
+	evmSs := app.GetSubspace(evmtypes.ModuleName)
+	app.EvmKeeper = evmkeeper.NewKeeper(
+		appCodec,
+		keys[evmtypes.StoreKey],
+		tkeys[evmtypes.TransientKey],
+		authtypes.NewModuleAddress(govtypes.ModuleName),
+		app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.FeeMarketKeeper,
+		nil, geth.NewEVM, tracer,
+		evmSs,
+	)
 
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
 		appCodec,
