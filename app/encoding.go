@@ -4,7 +4,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/std"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
+
+	ethermintcryptocodec "github.com/tokenize-titan/ethermint/crypto/codec"
+	ethermint "github.com/tokenize-titan/ethermint/types"
 
 	"github.com/tokenize-titan/titan/app/params"
 )
@@ -27,9 +31,27 @@ func makeEncodingConfig() params.EncodingConfig {
 // MakeEncodingConfig creates an EncodingConfig for testing
 func MakeEncodingConfig() params.EncodingConfig {
 	encodingConfig := makeEncodingConfig()
-	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+
+	// Register legacyAmino codec
+	//
+
+	sdk.RegisterLegacyAminoCodec(encodingConfig.Amino)
+	// cryptocodec.RegisterCrypto(encodingConfig.Amino)
+	codec.RegisterEvidences(encodingConfig.Amino)
+	// Ethermint
+	ethermintcryptocodec.RegisterCrypto(encodingConfig.Amino)
+
 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
+
+	// Register interfaces
+	//
+
+	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	// Ethermint
+	ethermintcryptocodec.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	ethermint.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+
 	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+
 	return encodingConfig
 }

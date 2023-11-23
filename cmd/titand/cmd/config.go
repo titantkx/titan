@@ -3,6 +3,8 @@ package cmd
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	cmdcfg "github.com/tokenize-titan/ethermint/cmd/config"
+
 	"github.com/tokenize-titan/titan/app"
 )
 
@@ -13,7 +15,7 @@ const (
 	BaseDenom = "utkx"
 	// BaseDenomUnit defines the base denomination unit for Titan.
 	// 1 tkx = 1x10^{BaseDenomUnit} utkx
-	BaseDenomUnit = 6
+	BaseDenomUnit = 18
 )
 
 func initSDKConfig() {
@@ -29,6 +31,10 @@ func initSDKConfig() {
 	config.SetBech32PrefixForAccount(app.AccountAddressPrefix, accountPubKeyPrefix)
 	config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
 	config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
+
+	// Ethermint config coin type to 60
+	cmdcfg.SetBip44CoinType(config)
+
 	config.Seal()
 }
 

@@ -2,33 +2,33 @@ version: 1
 
 accounts:
 - name: faucet
-  coins: ['1000000000000000000000utkx']
-  # titan1wnf77kl35faq6hhmzud9g8c3xk9ytqsrlxmcy8
+  coins: ['99994990tkx']
+  # titan1xnpqgn3hz2xvg054w4cc5d5r9dh00nvj9cmkte
   mnemonic: object depart submit ritual civil culture garment rubber they laundry expose strike proud mushroom curious
 - name: test
-  # titan10xu7x72hj4l63m7msgwy3253py9ldmr0atnnyp
-  coins: ['1000000000utkx']
+  # titan1k0v4rq689uq2s8yhttpmk0a26es8nrmqqkfh0p
+  coins: ['1000tkx']
   mnemonic: envelope confirm theory tennis noodle monitor poet car lady rely salt latin border bounce knock
 - name: test2
-  # titan19j75snylen63v9fmqkdu4sw4d9tyuqf0nlasjx
-  coins: ['1000001000utkx']
+  # titan1ka0ycn78zm5zz326zf7aw3r7gpnwjwm8qn3agn
+  coins: ['1001tkx']
   mnemonic: orient city dad visual junk accuse arch muscle tag fatal clump tube swarm unusual erosion
 - name: val1
-  # titan1nz0pc6s0lhgl5x2reyevg5ev0j9xqhxd6yvcq0
-  coins: ['1000002000utkx']
+  # titan1rn4kdmg3qm6ga279kvlqa2n8mf4rheexq0ugt5
+  coins: ['1002tkx']
   mnemonic: seek depth rigid improve wear able below whisper reward survey effort rescue unveil daring skate
 - name: val2
-  # titan1ey390szmxp62p0ld9tz75tzmnfkqww9ap2pmg7
-  coins: ['1000003000utkx']
+  # titan1rsyy9ewhtzdj0v0jc6zj92j9dsmtll665ak0vc
+  coins: ['1003tkx']
   mnemonic: health adapt wheel wheat caught inherit august dynamic ecology wheat ice magnet physical swap tower
 - name: val3
-  # titan1up8x8fj4pvhhlmlpghf3nwpgfwnqr6lhm2ay37
-  coins: ['1000004000utkx']
+  # titan1w6hnaps2tyr20pcp9gkt38m2srflsk7ctkmfee
+  coins: ['1004tkx']
   mnemonic: federal gate food arrest three yard fence furnace cousin source toast expose perfect toward maid
 
 validators:
 - name: val1
-  bonded: 1000000utkx
+  bonded: 1tkx
   home: "local_test_data/.titan_val1"
   app:
     minimum-gas-prices: 0utkx
@@ -38,7 +38,7 @@ validators:
   config:
     moniker: "titan val1"
   client:
-    chain-id: "titan-1"
+    chain-id: "titan_18888-1"
     keyring-backend: "test"
 
 client:
@@ -47,20 +47,23 @@ client:
 
 faucet:
   name: faucet
-  coins: ['10000000utkx']
+  coins: ['10tkx']
 
 genesis:
-  chain_id: titan-1
+  chain_id: titan_18888-1
   app_state:
     staking:
       params:
         bond_denom: "utkx"
     crisis:
       constant_fee:
-        denom: "utkx"
-        amount: "1000000"
+        denom: "tkx"
+        amount: "1"
     gov:
       params:
         min_deposit:
-        - denom: "utkx"
-          amount: "1000000"    
+        - denom: "tkx"
+          amount: "1"   
+    evm:
+      params:
+        evm_denom: "utkx"

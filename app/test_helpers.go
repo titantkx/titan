@@ -34,6 +34,8 @@ import (
 	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	cmdcfg "github.com/tokenize-titan/ethermint/cmd/config"
+	"github.com/tokenize-titan/ethermint/crypto/ethsecp256k1"
 
 	"github.com/tokenize-titan/titan/app/params"
 )
@@ -60,7 +62,9 @@ const (
 	BaseDenom = "utkx"
 	// BaseDenomUnit defines the base denomination unit for Titan.
 	// 1 tkx = 1x10^{BaseDenomUnit} utkx
-	BaseDenomUnit = 6
+	BaseDenomUnit = 18
+
+	DefaultChainID = "titan_18888-1"
 )
 
 func InitSDKConfig() {
@@ -77,6 +81,10 @@ func InitSDKConfig() {
 		config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
 		config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
 		config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
+
+		// Ethermint config coin type to 60
+		cmdcfg.SetBip44CoinType(config)
+
 		config.Seal()
 	}
 }
@@ -139,7 +147,8 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 	valSet := tmtypes.NewValidatorSet([]*tmtypes.Validator{validator})
 
 	// generate genesis account
-	senderPrivKey := secp256k1.GenPrivKey()
+	senderPrivKey, err := ethsecp256k1.GenerateKey()
+	require.NoError(t, err)
 	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
 		Address: acc.GetAddress().String(),
@@ -188,7 +197,9 @@ func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	valSet := tmtypes.NewValidatorSet([]*tmtypes.Validator{validator})
 
 	// generate genesis account
-	senderPrivKey := secp256k1.GenPrivKey()
+	senderPrivKey, err := ethsecp256k1.GenerateKey()
+	require.NoError(t, err)
+
 	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
 		Address: acc.GetAddress().String(),
@@ -230,6 +241,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 	app, genesisState, _ := setup(true, 5,
 		baseapp.SetSnapshot(snapshotStore, snapshottypes.NewSnapshotOptions(cfg.snapshotInterval, cfg.snapshotKeepRecent)),
 		baseapp.SetPruning(cfg.pruningOpts),
+		baseapp.SetChainID(DefaultChainID),
 	)
 	genesisStateWithValSet, err := sdksimtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, acc, balances...)
 	require.NoError(t, err)
@@ -240,6 +252,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 	// init chain will set the validator set and initialize the genesis accounts
 	app.InitChain(
 		abci.RequestInitChain{
+			ChainId:         DefaultChainID,
 			Validators:      []abci.ValidatorUpdate{},
 			ConsensusParams: sdksimtestutil.DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
@@ -257,6 +270,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 		app.Logger().Debug("Creating block", "height", currentBlockHeight)
 
 		app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
+			ChainID:            DefaultChainID,
 			Height:             currentBlockHeight,
 			AppHash:            app.LastCommitID().Hash,
 			ValidatorsHash:     valSet.Hash(),
@@ -325,7 +339,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) *App {
 	t.Helper()
 
-	app, genesisState, _ := setup(true, 5)
+	app, genesisState, _ := setup(true, 5, baseapp.SetChainID(DefaultChainID))
 	genesisState, err := sdksimtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, genAccs, balances...)
 	require.NoError(t, err)
 
@@ -335,6 +349,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 	// init chain will set the validator set and initialize the genesis accounts
 	app.InitChain(
 		abci.RequestInitChain{
+			ChainId:         DefaultChainID,
 			Validators:      []abci.ValidatorUpdate{},
 			ConsensusParams: sdksimtestutil.DefaultConsensusParams,
 			AppStateBytes:   stateBytes,
@@ -344,6 +359,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 	// commit genesis changes
 	app.Commit()
 	app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
+		ChainID:            DefaultChainID,
 		Height:             app.LastBlockHeight() + 1,
 		AppHash:            app.LastCommitID().Hash,
 		ValidatorsHash:     valSet.Hash(),
@@ -367,7 +383,9 @@ func GenesisStateWithSingleValidator(t *testing.T, app *App) GenesisState {
 	valSet := tmtypes.NewValidatorSet([]*tmtypes.Validator{validator})
 
 	// generate genesis account
-	senderPrivKey := secp256k1.GenPrivKey()
+	senderPrivKey, err := ethsecp256k1.GenerateKey()
+	require.NoError(t, err)
+
 	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balances := []banktypes.Balance{
 		{
