@@ -69,7 +69,7 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 		WithKeyringOptions(etherminthd.EthSecp256k1Option())
 
 	rootCmd := &cobra.Command{
-		Use:   app.Name + "d",
+		Use:   app.Name,
 		Short: "Start titan node",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			// set the default command outputs
