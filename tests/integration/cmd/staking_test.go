@@ -4,15 +4,9 @@ import (
 	"testing"
 
 	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd/bank"
 	"github.com/tokenize-titan/titan/testutil/cmd/keys"
 	"github.com/tokenize-titan/titan/testutil/cmd/staking"
 )
-
-func MustAcquireMoney(t testing.TB, address string, amount string) {
-	faucet := keys.MustGetAddress(t, "faucet")
-	bank.MustSend(t, faucet, address, amount)
-}
 
 func createValidator(t testing.TB) staking.Validator {
 	// Generate a fake public key for the validator node
