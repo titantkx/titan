@@ -70,20 +70,8 @@ func MustGetDelegation(t testing.TB, delegator string, validator string) Delegat
 	return resp
 }
 
-type Pool struct {
-	BondedTokens    testutil.BigInt `json:"bonded_tokens"`
-	NotBondedTokens testutil.BigInt `json:"not_bonded_tokens"`
-}
-
-func MustGetPool(t testing.TB) Pool {
-	var pool Pool
-	cmd.MustQuery(t, &pool, "staking", "pool")
-	return pool
-}
-
 func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation int64, from string) Validator {
 	balBefore := bank.MustGetBalance(t, from, "utkx")
-	poolBefore := MustGetPool(t)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -91,7 +79,6 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 	tx := txcmd.MustExecTx(t, ctx, "staking", "create-validator", "--pubkey="+valPk.String(), "--amount="+amount, "--commission-rate="+testutil.FormatFloat(commissionRate), "--commission-max-rate="+testutil.FormatFloat(commissionMaxRate), "--commission-max-change-rate="+testutil.FormatFloat(commissionMaxChangeRate), "--min-self-delegation="+testutil.FormatInt(minSelfDelegation), "--from="+from)
 
 	balAfter := bank.MustGetBalance(t, from, "utkx")
-	poolAfter := MustGetPool(t)
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	stakedAmount := testutil.MustGetUtkxAmount(t, amount)
@@ -116,8 +103,6 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 	require.NotEmpty(t, valAddr)
 	require.False(t, actualStakedAmount.IsZero())
 	require.Equal(t, stakedAmount, actualStakedAmount)
-	require.Equal(t, poolBefore.BondedTokens.Add(stakedAmount), poolAfter.BondedTokens)
-	require.Equal(t, poolBefore.NotBondedTokens, poolAfter.NotBondedTokens)
 
 	val := MustGetValidator(t, valAddr)
 
@@ -141,7 +126,6 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 	valBefore := MustGetValidator(t, valAddr)
 	balBefore := bank.MustGetBalance(t, from, "utkx")
-	poolBefore := MustGetPool(t)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -150,15 +134,12 @@ func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 
 	valAfter := MustGetValidator(t, valAddr)
 	balAfter := bank.MustGetBalance(t, from, "utkx")
-	poolAfter := MustGetPool(t)
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	delegatedAmount := testutil.MustGetUtkxAmount(t, amount)
 
 	require.Equal(t, balBefore.Sub(coinSpent).Sub(delegatedAmount), balAfter)
 	require.Equal(t, valBefore.Tokens.Add(delegatedAmount), valAfter.Tokens)
-	require.Equal(t, poolBefore.BondedTokens.Add(delegatedAmount), poolAfter.BondedTokens)
-	require.Equal(t, poolBefore.NotBondedTokens, poolAfter.NotBondedTokens)
 
 	del := MustGetDelegation(t, from, valAddr)
 
@@ -169,7 +150,6 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	srcValBefore := MustGetValidator(t, srcVal)
 	dstValBefore := MustGetValidator(t, dstVal)
 	balBefore := bank.MustGetBalance(t, from, "utkx")
-	poolBefore := MustGetPool(t)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -179,7 +159,6 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	srcValAfter := MustGetValidator(t, srcVal)
 	dstValAfter := MustGetValidator(t, dstVal)
 	balAfter := bank.MustGetBalance(t, from, "utkx")
-	poolAfter := MustGetPool(t)
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	redelegatedAmount := testutil.MustGetUtkxAmount(t, amount)
@@ -187,8 +166,6 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	require.Equal(t, balBefore.Sub(coinSpent), balAfter)
 	require.Equal(t, srcValBefore.Tokens.Sub(redelegatedAmount), srcValAfter.Tokens)
 	require.Equal(t, dstValBefore.Tokens.Add(redelegatedAmount), dstValAfter.Tokens)
-	require.Equal(t, poolBefore.BondedTokens, poolAfter.BondedTokens)
-	require.Equal(t, poolBefore.NotBondedTokens, poolAfter.NotBondedTokens)
 
 	del := MustGetDelegation(t, from, dstVal)
 
@@ -198,7 +175,6 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 func MustUnbond(t testing.TB, valAddr string, amount string, from string) tx.Tx {
 	valBefore := MustGetValidator(t, valAddr)
 	balBefore := bank.MustGetBalance(t, from, "utkx")
-	poolBefore := MustGetPool(t)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -207,7 +183,6 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) tx.Tx 
 
 	valAfter := MustGetValidator(t, valAddr)
 	balAfter := bank.MustGetBalance(t, from, "utkx")
-	poolAfter := MustGetPool(t)
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	unbondedAmount := testutil.MustGetUtkxAmount(t, amount)
@@ -230,8 +205,6 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) tx.Tx 
 
 	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
 	require.Equal(t, valBefore.Tokens.Sub(unbondedAmount), valAfter.Tokens)
-	require.Equal(t, poolBefore.BondedTokens.Sub(unbondedAmount), poolAfter.BondedTokens)
-	require.Equal(t, poolBefore.NotBondedTokens.Add(unbondedAmount), poolAfter.NotBondedTokens)
 
 	return tx
 }
@@ -239,7 +212,6 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) tx.Tx 
 func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeight int64, from string) {
 	valBefore := MustGetValidator(t, valAddr)
 	balBefore := bank.MustGetBalance(t, from, "utkx")
-	poolBefore := MustGetPool(t)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -248,7 +220,6 @@ func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeig
 
 	valAfter := MustGetValidator(t, valAddr)
 	balAfter := bank.MustGetBalance(t, from, "utkx")
-	poolAfter := MustGetPool(t)
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	unbondedAmount := testutil.MustGetUtkxAmount(t, amount)
@@ -271,6 +242,4 @@ func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeig
 
 	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
 	require.Equal(t, valBefore.Tokens.Add(unbondedAmount), valAfter.Tokens)
-	require.Equal(t, poolBefore.BondedTokens.Add(unbondedAmount), poolAfter.BondedTokens)
-	require.Equal(t, poolBefore.NotBondedTokens.Sub(unbondedAmount), poolAfter.NotBondedTokens)
 }

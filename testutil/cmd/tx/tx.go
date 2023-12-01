@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"regexp"
 	"testing"
 	"time"
@@ -40,14 +40,19 @@ type Attribute struct {
 
 func ParseTx(buf []byte) (*Tx, error) {
 	s := bufio.NewScanner(bytes.NewBuffer(buf))
-	if !s.Scan() || !s.Scan() {
-		return nil, errors.New("cannot parse Tx")
+	for s.Scan() {
+		b := s.Bytes()
+		if b[0] != '{' || b[len(b)-1] != '}' {
+			continue
+		}
+		var tx Tx
+		if err := json.Unmarshal(b, &tx); err != nil {
+			fmt.Println(string(buf))
+			return nil, err
+		}
+		return &tx, nil
 	}
-	var tx Tx
-	if err := json.Unmarshal(s.Bytes(), &tx); err != nil {
-		return nil, err
-	}
-	return &tx, nil
+	return nil, fmt.Errorf("cannot parse Tx: %s", string(buf))
 }
 
 func QueryTx(ctx context.Context, txHash string) (*Tx, error) {

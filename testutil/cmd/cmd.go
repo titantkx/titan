@@ -29,6 +29,10 @@ type ExecError struct {
 	output []byte
 }
 
+func MakeExecError(err error, output []byte) ExecError {
+	return ExecError{err, output}
+}
+
 func (err ExecError) Error() string {
 	var sb strings.Builder
 	fmt.Fprintf(&sb, "[ERR] %s\n", err.err)
@@ -50,16 +54,14 @@ func Exec(name string, args ...string) ([]byte, error) {
 	fmt.Println("[CMD]", cmd)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return output, ExecError{err, output}
+		return output, MakeExecError(err, output)
 	}
 	return output, nil
 }
 
 func MustExec(t testing.TB, name string, args ...string) []byte {
 	output, err := Exec(name, args...)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	return output
 }
 
