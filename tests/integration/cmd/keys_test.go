@@ -117,8 +117,8 @@ func TestRenameKey(t *testing.T) {
 
 	require.Equal(t, oldKey.Type, newKey.Type)
 	require.Equal(t, oldKey.Address, newKey.Address)
-	require.Equal(t, oldKey.PK.Type, newKey.PK.Type)
-	require.Equal(t, oldKey.PK.Key, newKey.PK.Key)
+	require.Equal(t, oldKey.PubKey.Type, newKey.PubKey.Type)
+	require.Equal(t, oldKey.PubKey.Key, newKey.PubKey.Key)
 }
 
 func TestRenameKeyNotFound(t *testing.T) {
@@ -175,8 +175,8 @@ func TestListKeys(t *testing.T) {
 	require.Equal(t, expectedKey.Name, actualKey.Name)
 	require.Equal(t, expectedKey.Type, actualKey.Type)
 	require.Equal(t, expectedKey.Address, actualKey.Address)
-	require.Equal(t, expectedKey.PK.Type, actualKey.PK.Type)
-	require.Equal(t, expectedKey.PK.Key, actualKey.PK.Key)
+	require.Equal(t, expectedKey.PubKey.Type, actualKey.PubKey.Type)
+	require.Equal(t, expectedKey.PubKey.Key, actualKey.PubKey.Key)
 }
 
 func exportKey(t testing.TB, password string, w io.Writer) keys.Key {
@@ -220,6 +220,6 @@ func TestImportKey(t *testing.T) {
 
 	require.Equal(t, exportedKey.Type, importedKey.Type)
 	require.Equal(t, exportedKey.Address, importedKey.Address)
-	require.Equal(t, exportedKey.PK.Type, importedKey.PK.Type)
-	require.Equal(t, exportedKey.PK.Key, importedKey.PK.Key)
+	require.Equal(t, exportedKey.PubKey.Type, importedKey.PubKey.Type)
+	require.Equal(t, exportedKey.PubKey.Key, importedKey.PubKey.Key)
 }

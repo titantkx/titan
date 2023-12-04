@@ -17,7 +17,7 @@ type Key struct {
 	Name     string    `json:"name"`
 	Type     string    `json:"type"`
 	Address  string    `json:"address"`
-	PK       PublicKey `json:"pubkey"`
+	PubKey   PublicKey `json:"pubkey"`
 	Mnemonic string    `json:"mnemonic"`
 }
 
@@ -45,8 +45,8 @@ func MustShow(t testing.TB, name string) Key {
 	require.Contains(t, []string{key.Name, key.Address}, name)
 	require.Equal(t, "local", key.Type)
 	require.NotEmpty(t, key.Address)
-	require.Equal(t, "/ethermint.crypto.v1.ethsecp256k1.PubKey", key.PK.Type)
-	require.NotEmpty(t, key.PK.Key)
+	require.Equal(t, "/ethermint.crypto.v1.ethsecp256k1.PubKey", key.PubKey.Type)
+	require.NotEmpty(t, key.PubKey.Key)
 	require.Empty(t, key.Mnemonic)
 	return key
 }
@@ -60,8 +60,8 @@ func MustAdd(t testing.TB, name string) Key {
 	require.Equal(t, name, key.Name)
 	require.Equal(t, "local", key.Type)
 	require.NotEmpty(t, key.Address)
-	require.Equal(t, "/ethermint.crypto.v1.ethsecp256k1.PubKey", key.PK.Type)
-	require.NotEmpty(t, key.PK.Key)
+	require.Equal(t, "/ethermint.crypto.v1.ethsecp256k1.PubKey", key.PubKey.Type)
+	require.NotEmpty(t, key.PubKey.Key)
 	require.NotEmpty(t, key.Mnemonic)
 	return key
 }

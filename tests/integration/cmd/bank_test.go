@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/tokenize-titan/titan/testutil"
+	"github.com/tokenize-titan/titan/testutil/cmd/auth"
 	"github.com/tokenize-titan/titan/testutil/cmd/bank"
 	"github.com/tokenize-titan/titan/testutil/cmd/keys"
 	txcmd "github.com/tokenize-titan/titan/testutil/cmd/tx"
@@ -19,6 +20,29 @@ func MustAcquireMoney(t testing.TB, address string, amount string) {
 	faucetMtx.Lock()
 	defer faucetMtx.Unlock()
 	bank.MustSend(t, faucet, address, amount)
+}
+
+func TestTotalBalanceNotChanged(t *testing.T) {
+	totalBal := testutil.MakeBigInt(0)
+	accounts := auth.MustGetAccounts(t)
+
+	var mtx sync.Mutex
+	var wg sync.WaitGroup
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for account := range accounts {
+				bal := bank.MustGetBalance(t, account.GetAddress(), "utkx")
+				mtx.Lock()
+				totalBal = totalBal.Add(bal)
+				mtx.Unlock()
+			}
+		}()
+	}
+	wg.Wait()
+
+	require.Equal(t, testutil.MakeBigIntFromString("100000000000000000000000000"), totalBal)
 }
 
 func TestSend(t *testing.T) {

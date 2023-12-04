@@ -65,6 +65,17 @@ func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.Tx
 	return tx
 }
 
+func GetBalance(address string, denom string) (testutil.BigInt, error) {
+	var data struct {
+		Amount testutil.BigInt `json:"amount"`
+	}
+	err := cmd.Query(&data, "bank", "balances", address, "--denom="+denom)
+	if err != nil {
+		return testutil.BigInt{}, err
+	}
+	return data.Amount, nil
+}
+
 func MustGetBalance(t testing.TB, address string, denom string) testutil.BigInt {
 	var data struct {
 		Amount testutil.BigInt `json:"amount"`

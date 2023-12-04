@@ -70,6 +70,10 @@ func (n BigInt) Format(s fmt.State, r rune) {
 	n.v.Format(s, r)
 }
 
+func (n BigInt) Cmp(i BigInt) int {
+	return n.v.Cmp(i.v)
+}
+
 func (n BigInt) Neg() BigInt {
 	return BigInt{new(big.Int).Neg(n.v)}
 }
@@ -138,6 +142,10 @@ func (n BigFloat) String() string {
 
 func (n BigFloat) Format(s fmt.State, r rune) {
 	n.v.Format(s, r)
+}
+
+func (n BigFloat) Cmp(f BigFloat) int {
+	return n.v.Cmp(f.v)
 }
 
 func (n BigFloat) Neg() BigFloat {

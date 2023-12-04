@@ -65,10 +65,17 @@ func MustExec(t testing.TB, name string, args ...string) []byte {
 	return output
 }
 
-func MustQuery(t testing.TB, v any, args ...string) {
+func Query(v any, args ...string) error {
 	args = append([]string{"query"}, args...)
 	args = append(args, "--output=json")
-	output := MustExec(t, "titand", args...)
-	err := json.Unmarshal(output, v)
+	output, err := Exec("titand", args...)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(output, v)
+}
+
+func MustQuery(t testing.TB, v any, args ...string) {
+	err := Query(v, args...)
 	require.NoError(t, err)
 }
