@@ -32,6 +32,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
@@ -111,8 +112,8 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
-	"github.com/tokenize-titan/ethermint/app/ante"
-	ehtermintappparams "github.com/tokenize-titan/ethermint/app/params"
+	ethermintante "github.com/tokenize-titan/ethermint/app/ante"
+	ethermintappparams "github.com/tokenize-titan/ethermint/app/params"
 	"github.com/tokenize-titan/ethermint/ethereum/eip712"
 	srvflags "github.com/tokenize-titan/ethermint/server/flags"
 	ethermint "github.com/tokenize-titan/ethermint/types"
@@ -124,6 +125,7 @@ import (
 	feemarketkeeper "github.com/tokenize-titan/ethermint/x/feemarket/keeper"
 	feemarkettypes "github.com/tokenize-titan/ethermint/x/feemarket/types"
 
+	"github.com/tokenize-titan/titan/app/ante"
 	v1 "github.com/tokenize-titan/titan/app/upgrades/v1"
 	"github.com/tokenize-titan/titan/docs"
 	distrkeeper "github.com/tokenize-titan/titan/x/distribution/keeper"
@@ -310,7 +312,7 @@ func New(
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 	txConfig := encodingConfig.TxConfig
 
-	ethermintEncodingConfig := ehtermintappparams.EncodingConfig{
+	ethermintEncodingConfig := ethermintappparams.EncodingConfig{
 		InterfaceRegistry: interfaceRegistry,
 		Marshaler:         appCodec,
 		TxConfig:          encodingConfig.TxConfig,
@@ -843,7 +845,7 @@ func New(
 	// }
 
 	// app.SetAnteHandler(anteHandler)
-	app.setAnteHandler(encodingConfig.TxConfig, cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted)))
+	app.setAnteHandler(encodingConfig.TxConfig, cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted)), wasmConfig, keys[wasmtypes.StoreKey])
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
@@ -884,22 +886,28 @@ func New(
 }
 
 // use Ethermint's custom AnteHandler
-func (app *App) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64) {
+func (app *App) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64, wasmConfig wasmtypes.WasmConfig, txCounterStoreKey storetypes.StoreKey) {
 	anteHandler, err := ante.NewAnteHandler(ante.HandlerOptions{
+		HandlerOptions: authante.HandlerOptions{
+			SignModeHandler: txConfig.SignModeHandler(),
+			FeegrantKeeper:  app.FeeGrantKeeper,
+			SigGasConsumer:  ethermintante.DefaultSigVerificationGasConsumer,
+		},
 		AccountKeeper:          app.AccountKeeper,
 		BankKeeper:             app.BankKeeper,
-		SignModeHandler:        txConfig.SignModeHandler(),
-		FeegrantKeeper:         app.FeeGrantKeeper,
-		SigGasConsumer:         ante.DefaultSigVerificationGasConsumer,
 		IBCKeeper:              app.IBCKeeper,
 		EvmKeeper:              app.EvmKeeper,
 		FeeMarketKeeper:        app.FeeMarketKeeper,
 		MaxTxGasWanted:         maxGasWanted,
 		ExtensionOptionChecker: ethermint.HasDynamicFeeExtensionOption,
-		TxFeeChecker:           ante.NewDynamicFeeChecker(app.EvmKeeper),
+		TxFeeChecker:           ethermintante.NewDynamicFeeChecker(app.EvmKeeper),
 		DisabledAuthzMsgs: []string{
 			sdk.MsgTypeURL(&evmtypes.MsgEthereumTx{}),
 		},
+
+		WasmConfig:        &wasmConfig,
+		TXCounterStoreKey: txCounterStoreKey,
+		WasmKeeper:        &app.WasmKeeper,
 	})
 	if err != nil {
 		panic(err)
