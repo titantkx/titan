@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"testing"
@@ -15,7 +16,7 @@ import (
 	"github.com/tokenize-titan/titan/testutil/cmd"
 )
 
-var rpcErrPattern = regexp.MustCompile("RPC\\serror\\s(-?[\\d]+)")
+var rpcErrPattern = regexp.MustCompile(`RPC\serror\s(-?[\d]+)`)
 
 type Tx struct {
 	Height    testutil.Int    `json:"height"`
@@ -95,6 +96,9 @@ func ExecTx(ctx context.Context, args ...string) (*Tx, error) {
 	tx, err := ParseTx(output)
 	if err != nil {
 		return nil, err
+	}
+	if tx.Code != 0 {
+		return nil, errors.New(tx.RawLog)
 	}
 	return QueryTx(ctx, tx.Hash)
 }

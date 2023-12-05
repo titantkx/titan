@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var coinPattern = regexp.MustCompile("((?:[\\d]+\\.)?[\\d]+)([\\w]+)")
+var coinPattern = regexp.MustCompile(`((?:[\d]+\.)?[\d]+)([\w]+)`)
 
 type Coin struct {
 	Amount BigFloat `json:"amount"`
