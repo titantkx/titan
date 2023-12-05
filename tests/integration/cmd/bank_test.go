@@ -10,6 +10,7 @@ import (
 	"github.com/tokenize-titan/titan/testutil/cmd/auth"
 	"github.com/tokenize-titan/titan/testutil/cmd/bank"
 	"github.com/tokenize-titan/titan/testutil/cmd/keys"
+	"github.com/tokenize-titan/titan/testutil/cmd/status"
 	txcmd "github.com/tokenize-titan/titan/testutil/cmd/tx"
 )
 
@@ -22,9 +23,13 @@ func MustAcquireMoney(t testing.TB, address string, amount string) {
 	bank.MustSend(t, faucet, address, amount)
 }
 
-func TestTotalBalanceNotChanged(t *testing.T) {
+func MustGetTotalBalance(t testing.TB, height int64) testutil.BigInt {
+	if height <= 0 {
+		height = status.MustGetStatus(t).SyncInfo.LatestBlockHeight.Int64()
+	}
+
+	accounts := auth.MustGetAccounts(t, height)
 	totalBal := testutil.MakeBigInt(0)
-	accounts := auth.MustGetAccounts(t)
 
 	var mtx sync.Mutex
 	var wg sync.WaitGroup
@@ -33,7 +38,7 @@ func TestTotalBalanceNotChanged(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for account := range accounts {
-				bal := bank.MustGetBalance(t, account.GetAddress(), "utkx")
+				bal := bank.MustGetBalance(t, account.GetAddress(), "utkx", height)
 				mtx.Lock()
 				totalBal = totalBal.Add(bal)
 				mtx.Unlock()
@@ -41,6 +46,14 @@ func TestTotalBalanceNotChanged(t *testing.T) {
 		}()
 	}
 	wg.Wait()
+
+	return totalBal
+}
+
+func TestTotalBalanceNotChanged(t *testing.T) {
+	t.Parallel()
+
+	totalBal := MustGetTotalBalance(t, 0)
 
 	require.Equal(t, testutil.MakeBigIntFromString("100000000000000000000000000"), totalBal)
 }
@@ -82,8 +95,8 @@ func TestSendLowBalance(t *testing.T) {
 	defer keys.MustDelete(t, receiverName)
 	receiver := keys.MustAdd(t, receiverName)
 	// Attempt to send 2tkx
-	senderBalBefore := bank.MustGetBalance(t, sender.Address, "utkx")
-	receiverBalBefore := bank.MustGetBalance(t, receiver.Address, "utkx")
+	senderBalBefore := bank.MustGetBalance(t, sender.Address, "utkx", 0)
+	receiverBalBefore := bank.MustGetBalance(t, receiver.Address, "utkx", 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -94,8 +107,8 @@ func TestSendLowBalance(t *testing.T) {
 	require.Error(t, err)
 	require.ErrorContains(t, err, "insufficient funds")
 
-	senderBalAfter := bank.MustGetBalance(t, sender.Address, "utkx")
-	receiverBalAfter := bank.MustGetBalance(t, receiver.Address, "utkx")
+	senderBalAfter := bank.MustGetBalance(t, sender.Address, "utkx", 0)
+	receiverBalAfter := bank.MustGetBalance(t, receiver.Address, "utkx", 0)
 
 	require.Equal(t, senderBalBefore, senderBalAfter)
 	require.Equal(t, receiverBalBefore, receiverBalAfter)
@@ -146,9 +159,9 @@ func TestMultiSendLowBalance(t *testing.T) {
 	defer keys.MustDelete(t, receiver2Name)
 	receiver2 := keys.MustAdd(t, receiver2Name)
 	// Attempt to send 0.6tkx to each receiver
-	senderBalBefore := bank.MustGetBalance(t, sender1.Address, "utkx")
-	receiver1BalBefore := bank.MustGetBalance(t, receiver1.Address, "utkx")
-	receiver2BalBefore := bank.MustGetBalance(t, receiver2.Address, "utkx")
+	senderBalBefore := bank.MustGetBalance(t, sender1.Address, "utkx", 0)
+	receiver1BalBefore := bank.MustGetBalance(t, receiver1.Address, "utkx", 0)
+	receiver2BalBefore := bank.MustGetBalance(t, receiver2.Address, "utkx", 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -159,9 +172,9 @@ func TestMultiSendLowBalance(t *testing.T) {
 	require.Error(t, err)
 	require.ErrorContains(t, err, "insufficient funds")
 
-	senderBalAfter := bank.MustGetBalance(t, sender1.Address, "utkx")
-	receiver1BalAfter := bank.MustGetBalance(t, receiver1.Address, "utkx")
-	receiver2BalAfter := bank.MustGetBalance(t, receiver2.Address, "utkx")
+	senderBalAfter := bank.MustGetBalance(t, sender1.Address, "utkx", 0)
+	receiver1BalAfter := bank.MustGetBalance(t, receiver1.Address, "utkx", 0)
+	receiver2BalAfter := bank.MustGetBalance(t, receiver2.Address, "utkx", 0)
 
 	require.Equal(t, senderBalBefore, senderBalAfter)
 	require.Equal(t, receiver1BalBefore, receiver1BalAfter)

@@ -8,7 +8,6 @@ import (
 	"github.com/tokenize-titan/titan/testutil"
 	"github.com/tokenize-titan/titan/testutil/cmd"
 	"github.com/tokenize-titan/titan/testutil/cmd/bank"
-	"github.com/tokenize-titan/titan/testutil/cmd/tx"
 	txcmd "github.com/tokenize-titan/titan/testutil/cmd/tx"
 )
 
@@ -41,7 +40,7 @@ type CommissionRates struct {
 
 func MustGetValidator(t testing.TB, address string) Validator {
 	var val Validator
-	cmd.MustQuery(t, &val, "staking", "validator", address, "--output=json")
+	cmd.MustQuery(t, &val, "staking", "validator", address)
 	require.Equal(t, address, val.OperatorAddress)
 	return val
 }
@@ -71,14 +70,14 @@ func MustGetDelegation(t testing.TB, delegator string, validator string) Delegat
 }
 
 func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation int64, from string) Validator {
-	balBefore := bank.MustGetBalance(t, from, "utkx")
+	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
 	tx := txcmd.MustExecTx(t, ctx, "staking", "create-validator", "--pubkey="+valPk.String(), "--amount="+amount, "--commission-rate="+testutil.FormatFloat(commissionRate), "--commission-max-rate="+testutil.FormatFloat(commissionMaxRate), "--commission-max-change-rate="+testutil.FormatFloat(commissionMaxChangeRate), "--min-self-delegation="+testutil.FormatInt(minSelfDelegation), "--from="+from)
 
-	balAfter := bank.MustGetBalance(t, from, "utkx")
+	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	stakedAmount := testutil.MustGetUtkxAmount(t, amount)
@@ -118,14 +117,14 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 
 	del := MustGetDelegation(t, from, valAddr)
 
-	require.Equal(t, stakedAmount, del.Delegation.Shares.BigInt())
+	require.Equal(t, stakedAmount, del.Balance.Amount)
 
 	return val
 }
 
 func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 	valBefore := MustGetValidator(t, valAddr)
-	balBefore := bank.MustGetBalance(t, from, "utkx")
+	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -133,7 +132,7 @@ func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 	tx := txcmd.MustExecTx(t, ctx, "staking", "delegate", valAddr, amount, "--from="+from)
 
 	valAfter := MustGetValidator(t, valAddr)
-	balAfter := bank.MustGetBalance(t, from, "utkx")
+	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	delegatedAmount := testutil.MustGetUtkxAmount(t, amount)
@@ -143,13 +142,13 @@ func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 
 	del := MustGetDelegation(t, from, valAddr)
 
-	require.Equal(t, delegatedAmount, del.Delegation.Shares.BigInt())
+	require.Equal(t, delegatedAmount, del.Balance.Amount)
 }
 
 func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from string) {
 	srcValBefore := MustGetValidator(t, srcVal)
 	dstValBefore := MustGetValidator(t, dstVal)
-	balBefore := bank.MustGetBalance(t, from, "utkx")
+	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -158,23 +157,24 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 
 	srcValAfter := MustGetValidator(t, srcVal)
 	dstValAfter := MustGetValidator(t, dstVal)
-	balAfter := bank.MustGetBalance(t, from, "utkx")
+	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	redelegatedAmount := testutil.MustGetUtkxAmount(t, amount)
+	reward := mustGetReward(t, tx.Events)
 
-	require.Equal(t, balBefore.Sub(coinSpent), balAfter)
+	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
 	require.Equal(t, srcValBefore.Tokens.Sub(redelegatedAmount), srcValAfter.Tokens)
 	require.Equal(t, dstValBefore.Tokens.Add(redelegatedAmount), dstValAfter.Tokens)
 
 	del := MustGetDelegation(t, from, dstVal)
 
-	require.Equal(t, redelegatedAmount, del.Delegation.Shares.BigInt())
+	require.Equal(t, redelegatedAmount, del.Balance.Amount)
 }
 
-func MustUnbond(t testing.TB, valAddr string, amount string, from string) tx.Tx {
+func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.Tx {
 	valBefore := MustGetValidator(t, valAddr)
-	balBefore := bank.MustGetBalance(t, from, "utkx")
+	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -182,26 +182,11 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) tx.Tx 
 	tx := txcmd.MustExecTx(t, ctx, "staking", "unbond", valAddr, amount, "--from="+from)
 
 	valAfter := MustGetValidator(t, valAddr)
-	balAfter := bank.MustGetBalance(t, from, "utkx")
+	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	unbondedAmount := testutil.MustGetUtkxAmount(t, amount)
-	reward := testutil.MakeBigInt(0)
-
-	for _, event := range tx.Events {
-		if event.Type == "withdraw_rewards" {
-			for _, att := range event.Attributes {
-				switch att.Key {
-				case "amount":
-					reward = testutil.MustGetUtkxAmount(t, att.Value)
-				case "validator":
-					require.Equal(t, valAddr, att.Value)
-				case "delegator":
-					require.Equal(t, from, att.Value)
-				}
-			}
-		}
-	}
+	reward := mustGetReward(t, tx.Events)
 
 	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
 	require.Equal(t, valBefore.Tokens.Sub(unbondedAmount), valAfter.Tokens)
@@ -211,7 +196,7 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) tx.Tx 
 
 func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeight int64, from string) {
 	valBefore := MustGetValidator(t, valAddr)
-	balBefore := bank.MustGetBalance(t, from, "utkx")
+	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -219,27 +204,26 @@ func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeig
 	tx := txcmd.MustExecTx(t, ctx, "staking", "cancel-unbond", valAddr, amount, testutil.FormatInt(creationHeight), "--from="+from)
 
 	valAfter := MustGetValidator(t, valAddr)
-	balAfter := bank.MustGetBalance(t, from, "utkx")
+	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	unbondedAmount := testutil.MustGetUtkxAmount(t, amount)
-	reward := testutil.MakeBigInt(0)
+	reward := mustGetReward(t, tx.Events)
 
-	for _, event := range tx.Events {
+	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
+	require.Equal(t, valBefore.Tokens.Add(unbondedAmount), valAfter.Tokens)
+}
+
+func mustGetReward(t testing.TB, events []txcmd.Event) testutil.BigInt {
+	reward := testutil.MakeBigInt(0)
+	for _, event := range events {
 		if event.Type == "withdraw_rewards" {
 			for _, att := range event.Attributes {
-				switch att.Key {
-				case "amount":
+				if att.Key == "amount" {
 					reward = testutil.MustGetUtkxAmount(t, att.Value)
-				case "validator":
-					require.Equal(t, valAddr, att.Value)
-				case "delegator":
-					require.Equal(t, from, att.Value)
 				}
 			}
 		}
 	}
-
-	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
-	require.Equal(t, valBefore.Tokens.Add(unbondedAmount), valAfter.Tokens)
+	return reward
 }

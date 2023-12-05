@@ -53,3 +53,11 @@ func TestMustGetUtkxAmount(t *testing.T) {
 		require.Equal(t, test.Expected, actual)
 	}
 }
+
+func Test1(t *testing.T) {
+	i := testutil.MakeBigIntFromString("1000000000000000")
+	f := testutil.MakeBigFloatFromString("1").Sub(testutil.MakeBigFloatFromString("0.01"))
+	t.Log(i)
+	t.Log(f)
+	t.Log(i.BigFloat().Mul(f))
+}

@@ -95,7 +95,7 @@ func (n BigInt) Div(i BigInt) BigInt {
 }
 
 func (n BigInt) BigFloat() BigFloat {
-	return BigFloat{new(big.Float).SetInt(n.v)}
+	return BigFloat{new(big.Float).SetPrec(100).SetInt(n.v)}
 }
 
 func (n BigInt) MarshalText() ([]byte, error) {
@@ -120,11 +120,11 @@ type BigFloat struct {
 }
 
 func MakeBigFloat(f float64) BigFloat {
-	return BigFloat{big.NewFloat(f)}
+	return BigFloat{new(big.Float).SetPrec(100).SetFloat64(f)}
 }
 
 func MakeBigFloatFromString(s string) BigFloat {
-	f, ok := new(big.Float).SetString(s)
+	f, ok := new(big.Float).SetPrec(100).SetString(s)
 	if !ok {
 		panic(fmt.Sprintf("invalid float: %s", s))
 	}
@@ -177,7 +177,7 @@ func (n *BigFloat) UnmarshalText(txt []byte) error {
 	if len(txt) > 2 && txt[0] == '"' && txt[len(txt)-1] == '"' {
 		txt = txt[1 : len(txt)-1]
 	}
-	f := big.NewFloat(0)
+	f := new(big.Float).SetPrec(100)
 	err := f.UnmarshalText(txt)
 	if err != nil {
 		return err

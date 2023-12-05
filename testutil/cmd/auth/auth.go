@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -59,21 +60,30 @@ type BaseAccount struct {
 }
 
 type Pagination struct {
-	NextKey string `json:"next_key"`
+	NextKey string       `json:"next_key"`
+	Total   testutil.Int `json:"total"`
 }
 
-func MustGetAccounts(t testing.TB) <-chan Account {
+func MustGetAccounts(t testing.TB, height int64) <-chan Account {
 	ch := make(chan Account, 100)
 	go func() {
 		defer close(ch)
-		var nextKey string
+		limit := 100
+		offset := 0
 		for {
-			var resp AccountsResponse
-			if nextKey == "" {
-				cmd.MustQuery(t, &resp, "auth", "accounts", "--output=json")
-			} else {
-				cmd.MustQuery(t, &resp, "auth", "accounts", "--page-key="+nextKey, "--output=json")
+			args := []string{
+				"auth",
+				"accounts",
+				"--limit=" + strconv.Itoa(limit),
+				"--offset=" + strconv.Itoa(offset),
 			}
+			if height > 0 {
+				args = append(args, "--height="+testutil.FormatInt(height))
+			}
+
+			var resp AccountsResponse
+			cmd.MustQuery(t, &resp, args...)
+
 			for _, account := range resp.Accounts {
 				require.NotEmpty(t, account.Type)
 				require.NotEmpty(t, account.GetAddress())
@@ -85,10 +95,11 @@ func MustGetAccounts(t testing.TB) <-chan Account {
 				require.GreaterOrEqual(t, account.GetSequence(), int64(0))
 				ch <- account
 			}
-			nextKey = resp.Pagination.NextKey
-			if nextKey == "" {
+
+			if resp.Pagination.NextKey == "" {
 				break
 			}
+			offset += limit
 		}
 	}()
 	return ch

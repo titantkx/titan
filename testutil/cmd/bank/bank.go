@@ -12,16 +12,16 @@ import (
 )
 
 func MustSend(t testing.TB, from string, to string, amount string) tx.Tx {
-	fromBalBefore := MustGetBalance(t, from, "utkx")
-	toBalBefore := MustGetBalance(t, to, "utkx")
+	fromBalBefore := MustGetBalance(t, from, "utkx", 0)
+	toBalBefore := MustGetBalance(t, to, "utkx", 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
 	tx := txcmd.MustExecTx(t, ctx, "bank", "send", from, to, amount)
 
-	fromBalAfter := MustGetBalance(t, from, "utkx")
-	toBalAfter := MustGetBalance(t, to, "utkx")
+	fromBalAfter := MustGetBalance(t, from, "utkx", 0)
+	toBalAfter := MustGetBalance(t, to, "utkx", 0)
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	sentAmount := testutil.MustGetUtkxAmount(t, amount)
@@ -33,10 +33,10 @@ func MustSend(t testing.TB, from string, to string, amount string) tx.Tx {
 }
 
 func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.Tx {
-	fromBalBefore := MustGetBalance(t, from, "utkx")
+	fromBalBefore := MustGetBalance(t, from, "utkx", 0)
 	var toBalBefore []testutil.BigInt
 	for i := range to {
-		toBalBefore = append(toBalBefore, MustGetBalance(t, to[i], "utkx"))
+		toBalBefore = append(toBalBefore, MustGetBalance(t, to[i], "utkx", 0))
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
@@ -47,10 +47,10 @@ func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.Tx
 	args = append(args, amount)
 	tx := txcmd.MustExecTx(t, ctx, args...)
 
-	fromBalAfter := MustGetBalance(t, from, "utkx")
+	fromBalAfter := MustGetBalance(t, from, "utkx", 0)
 	var toBalAfter []testutil.BigInt
 	for i := range to {
-		toBalAfter = append(toBalAfter, MustGetBalance(t, to[i], "utkx"))
+		toBalAfter = append(toBalAfter, MustGetBalance(t, to[i], "utkx", 0))
 	}
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
@@ -65,21 +65,19 @@ func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.Tx
 	return tx
 }
 
-func GetBalance(address string, denom string) (testutil.BigInt, error) {
+func MustGetBalance(t testing.TB, address string, denom string, height int64) testutil.BigInt {
+	args := []string{
+		"bank",
+		"balances",
+		address,
+		"--denom=" + denom,
+	}
+	if height > 0 {
+		args = append(args, "--height="+testutil.FormatInt(height))
+	}
 	var data struct {
 		Amount testutil.BigInt `json:"amount"`
 	}
-	err := cmd.Query(&data, "bank", "balances", address, "--denom="+denom)
-	if err != nil {
-		return testutil.BigInt{}, err
-	}
-	return data.Amount, nil
-}
-
-func MustGetBalance(t testing.TB, address string, denom string) testutil.BigInt {
-	var data struct {
-		Amount testutil.BigInt `json:"amount"`
-	}
-	cmd.MustQuery(t, &data, "bank", "balances", address, "--denom="+denom)
+	cmd.MustQuery(t, &data, args...)
 	return data.Amount
 }

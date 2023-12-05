@@ -1,7 +1,6 @@
 package testutil
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 	"testing"
@@ -12,29 +11,24 @@ import (
 var coinPattern = regexp.MustCompile("((?:[\\d]+\\.)?[\\d]+)([\\w]+)")
 
 type Coin struct {
-	Amount BigFloat
-	Denom  string
+	Amount BigFloat `json:"amount"`
+	Denom  string   `json:"denom"`
 }
 
-func (c *Coin) UnmarshalText(txt []byte) error {
-	matches := coinPattern.FindStringSubmatch(string(txt))
-	if len(matches) != 3 {
-		return fmt.Errorf("invalid coin: %s", string(txt))
-	}
-	err := c.Amount.UnmarshalText([]byte(matches[1]))
-	if err != nil {
-		return fmt.Errorf("invalid coin: %s", string(txt))
-	}
-	c.Denom = matches[2]
-	return nil
+func MustParseCoin(t testing.TB, txt string) Coin {
+	var coin Coin
+	matches := coinPattern.FindStringSubmatch(txt)
+	require.Len(t, matches, 3)
+	err := coin.Amount.UnmarshalText([]byte(matches[1]))
+	require.NoError(t, err)
+	coin.Denom = matches[2]
+	return coin
 }
 
 func MustParseAmount(t testing.TB, amount string) []Coin {
 	var coins []Coin
 	for _, txt := range strings.Split(amount, ",") {
-		var coin Coin
-		err := coin.UnmarshalText([]byte(txt))
-		require.NoError(t, err)
+		coin := MustParseCoin(t, txt)
 		coins = append(coins, coin)
 	}
 	return coins
