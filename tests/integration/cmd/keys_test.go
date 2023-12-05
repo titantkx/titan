@@ -11,26 +11,27 @@ import (
 	"github.com/tokenize-titan/titan/testutil/cmd/keys"
 )
 
+func MustAddKey(t testing.TB) keys.Key {
+	name := testutil.GetName()
+	t.Cleanup(func() {
+		defer keys.MustDelete(t, name)
+		testutil.PutName(name)
+	})
+	return keys.MustAdd(t, name)
+}
+
 func TestAddKey(t *testing.T) {
 	t.Parallel()
 
-	name := testutil.GetName()
-	defer testutil.PutName(name)
-
-	defer keys.MustDelete(t, name)
-	keys.MustAdd(t, name)
+	MustAddKey(t)
 }
 
 func TestAddKeyDuplicatedName(t *testing.T) {
 	t.Parallel()
 
-	name := testutil.GetName()
-	defer testutil.PutName(name)
+	key := MustAddKey(t)
 
-	defer keys.MustDelete(t, name)
-	keys.MustAdd(t, name)
-
-	_, err := cmd.Exec("titand", "keys", "add", name)
+	_, err := cmd.Exec("titand", "keys", "add", key.Name)
 
 	require.Error(t, err)
 	require.ErrorContains(t, err, "Error: EOF")
@@ -39,26 +40,18 @@ func TestAddKeyDuplicatedName(t *testing.T) {
 func TestShowKey(t *testing.T) {
 	t.Parallel()
 
-	name := testutil.GetName()
-	defer testutil.PutName(name)
+	key := MustAddKey(t)
 
-	defer keys.MustDelete(t, name)
-	key := keys.MustAdd(t, name)
-
-	keys.MustShow(t, name)
+	keys.MustShow(t, key.Name)
 	keys.MustShow(t, key.Address)
 }
 
 func TestShowKeyAddress(t *testing.T) {
 	t.Parallel()
 
-	name := testutil.GetName()
-	defer testutil.PutName(name)
+	key := MustAddKey(t)
 
-	defer keys.MustDelete(t, name)
-	key := keys.MustAdd(t, name)
-
-	address := keys.MustShowAddress(t, name)
+	address := keys.MustShowAddress(t, key.Name)
 
 	require.Equal(t, key.Address, address)
 }
@@ -138,17 +131,10 @@ func TestRenameKeyNotFound(t *testing.T) {
 func TestRenameKeyToExistingKey(t *testing.T) {
 	t.Parallel()
 
-	oldName := testutil.GetName()
-	defer testutil.PutName(oldName)
-	existingName := testutil.GetName()
-	defer testutil.PutName(existingName)
+	key1 := MustAddKey(t)
+	key2 := MustAddKey(t)
 
-	defer keys.MustDelete(t, oldName)
-	keys.MustAdd(t, oldName)
-	defer keys.MustDelete(t, existingName)
-	keys.MustAdd(t, existingName)
-
-	_, err := cmd.Exec("titand", "keys", "rename", oldName, existingName)
+	_, err := cmd.Exec("titand", "keys", "rename", key1.Name, key2.Name)
 
 	require.Error(t, err)
 	require.ErrorContains(t, err, "Error: EOF")
@@ -157,17 +143,13 @@ func TestRenameKeyToExistingKey(t *testing.T) {
 func TestListKeys(t *testing.T) {
 	t.Parallel()
 
-	name := testutil.GetName()
-	defer testutil.PutName(name)
-
-	defer keys.MustDelete(t, name)
-	expectedKey := keys.MustAdd(t, name)
+	expectedKey := MustAddKey(t)
 
 	keyList := keys.MustList(t)
 
 	var actualKey keys.Key
 	for _, key := range keyList {
-		if key.Name == name {
+		if key.Name == expectedKey.Name {
 			actualKey = key
 		}
 	}

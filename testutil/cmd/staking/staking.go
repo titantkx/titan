@@ -8,6 +8,7 @@ import (
 	"github.com/tokenize-titan/titan/testutil"
 	"github.com/tokenize-titan/titan/testutil/cmd"
 	"github.com/tokenize-titan/titan/testutil/cmd/bank"
+	"github.com/tokenize-titan/titan/testutil/cmd/slashing"
 	txcmd "github.com/tokenize-titan/titan/testutil/cmd/tx"
 )
 
@@ -136,9 +137,10 @@ func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	delegatedAmount := testutil.MustGetUtkxAmount(t, amount)
+	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 
 	require.Equal(t, balBefore.Sub(coinSpent).Sub(delegatedAmount), balAfter)
-	require.Equal(t, valBefore.Tokens.Add(delegatedAmount), valAfter.Tokens)
+	require.Equal(t, valBefore.Tokens.Sub(slashedAmount).Add(delegatedAmount), valAfter.Tokens)
 
 	del := MustGetDelegation(t, from, valAddr)
 
@@ -159,13 +161,15 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	dstValAfter := MustGetValidator(t, dstVal)
 	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
+	reward := mustGetReward(t, tx.Events)
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	redelegatedAmount := testutil.MustGetUtkxAmount(t, amount)
-	reward := mustGetReward(t, tx.Events)
+	srcSlashedAmount := mustGetSlashedAmount(t, srcValBefore, srcValAfter)
+	dstSlashedAmount := mustGetSlashedAmount(t, dstValBefore, dstValAfter)
 
 	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
-	require.Equal(t, srcValBefore.Tokens.Sub(redelegatedAmount), srcValAfter.Tokens)
-	require.Equal(t, dstValBefore.Tokens.Add(redelegatedAmount), dstValAfter.Tokens)
+	require.Equal(t, srcValBefore.Tokens.Sub(srcSlashedAmount).Sub(redelegatedAmount), srcValAfter.Tokens)
+	require.Equal(t, dstValBefore.Tokens.Sub(dstSlashedAmount).Add(redelegatedAmount), dstValAfter.Tokens)
 
 	del := MustGetDelegation(t, from, dstVal)
 
@@ -184,12 +188,13 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.
 	valAfter := MustGetValidator(t, valAddr)
 	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
+	reward := mustGetReward(t, tx.Events)
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	unbondedAmount := testutil.MustGetUtkxAmount(t, amount)
-	reward := mustGetReward(t, tx.Events)
+	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 
 	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
-	require.Equal(t, valBefore.Tokens.Sub(unbondedAmount), valAfter.Tokens)
+	require.Equal(t, valBefore.Tokens.Sub(slashedAmount).Sub(unbondedAmount), valAfter.Tokens)
 
 	return tx
 }
@@ -206,12 +211,13 @@ func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeig
 	valAfter := MustGetValidator(t, valAddr)
 	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
+	reward := mustGetReward(t, tx.Events)
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	unbondedAmount := testutil.MustGetUtkxAmount(t, amount)
-	reward := mustGetReward(t, tx.Events)
+	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 
 	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
-	require.Equal(t, valBefore.Tokens.Add(unbondedAmount), valAfter.Tokens)
+	require.Equal(t, valBefore.Tokens.Sub(slashedAmount).Add(unbondedAmount), valAfter.Tokens)
 }
 
 func mustGetReward(t testing.TB, events []txcmd.Event) testutil.BigInt {
@@ -226,4 +232,12 @@ func mustGetReward(t testing.TB, events []txcmd.Event) testutil.BigInt {
 		}
 	}
 	return reward
+}
+
+func mustGetSlashedAmount(t testing.TB, valBefore Validator, valAfter Validator) testutil.BigInt {
+	if valBefore.Jailed || !valAfter.Jailed {
+		return testutil.MakeBigInt(0)
+	}
+	params := slashing.MustGetParams(t)
+	return valBefore.Tokens.BigFloat().Mul(params.SlashFractionDowntime).BigInt()
 }

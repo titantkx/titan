@@ -23,6 +23,14 @@ func MustAcquireMoney(t testing.TB, address string, amount string) {
 	bank.MustSend(t, faucet, address, amount)
 }
 
+func MustCreateAccount(t testing.TB, balance string) keys.Key {
+	key := MustAddKey(t)
+	if balance != "" {
+		MustAcquireMoney(t, key.Address, balance)
+	}
+	return key
+}
+
 func MustGetTotalBalance(t testing.TB, height int64) testutil.BigInt {
 	if height <= 0 {
 		height = status.MustGetStatus(t).SyncInfo.LatestBlockHeight.Int64()
@@ -33,7 +41,7 @@ func MustGetTotalBalance(t testing.TB, height int64) testutil.BigInt {
 
 	var mtx sync.Mutex
 	var wg sync.WaitGroup
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -61,39 +69,18 @@ func TestTotalBalanceNotChanged(t *testing.T) {
 func TestSend(t *testing.T) {
 	t.Parallel()
 
-	senderName := testutil.GetName()
-	defer testutil.PutName(senderName)
-	receiverName := testutil.GetName()
-	defer testutil.PutName(receiverName)
+	sender := MustCreateAccount(t, "1tkx")
+	receiver := MustCreateAccount(t, "")
 
-	// Create sender account
-	defer keys.MustDelete(t, senderName)
-	sender := keys.MustAdd(t, senderName)
-	// Ask for 1tkx from the faucet
-	MustAcquireMoney(t, sender.Address, "1tkx")
-	// Create receiver account
-	defer keys.MustDelete(t, receiverName)
-	receiver := keys.MustAdd(t, receiverName)
-	// Send 0.5tkx
 	bank.MustSend(t, sender.Address, receiver.Address, "0.5tkx")
 }
 
 func TestSendLowBalance(t *testing.T) {
 	t.Parallel()
 
-	senderName := testutil.GetName()
-	defer testutil.PutName(senderName)
-	receiverName := testutil.GetName()
-	defer testutil.PutName(receiverName)
+	sender := MustCreateAccount(t, "1tkx")
+	receiver := MustCreateAccount(t, "")
 
-	// Create sender account
-	defer keys.MustDelete(t, senderName)
-	sender := keys.MustAdd(t, senderName)
-	// Ask for 1tkx from the faucet
-	MustAcquireMoney(t, sender.Address, "1tkx")
-	// Create receiver account
-	defer keys.MustDelete(t, receiverName)
-	receiver := keys.MustAdd(t, receiverName)
 	// Attempt to send 2tkx
 	senderBalBefore := bank.MustGetBalance(t, sender.Address, "utkx", 0)
 	receiverBalBefore := bank.MustGetBalance(t, receiver.Address, "utkx", 0)
@@ -117,62 +104,35 @@ func TestSendLowBalance(t *testing.T) {
 func TestMultiSend(t *testing.T) {
 	t.Parallel()
 
-	senderName := testutil.GetName()
-	defer testutil.PutName(senderName)
-	receiver1Name := testutil.GetName()
-	defer testutil.PutName(receiver1Name)
-	receiver2Name := testutil.GetName()
-	defer testutil.PutName(receiver2Name)
+	sender := MustCreateAccount(t, "1tkx")
+	receiver1 := MustCreateAccount(t, "")
+	receiver2 := MustCreateAccount(t, "")
 
-	// Create sender account
-	defer keys.MustDelete(t, senderName)
-	sender := keys.MustAdd(t, senderName)
-	// Ask for 1tkx from the faucet
-	MustAcquireMoney(t, sender.Address, "1tkx")
-	// Create receiver accounts
-	defer keys.MustDelete(t, receiver1Name)
-	receiver1 := keys.MustAdd(t, receiver1Name)
-	defer keys.MustDelete(t, receiver2Name)
-	receiver2 := keys.MustAdd(t, receiver2Name)
-	// Send 0.3tkx to each receiver
 	bank.MustMultiSend(t, sender.Address, "0.3tkx", receiver1.Address, receiver2.Address)
 }
 
 func TestMultiSendLowBalance(t *testing.T) {
 	t.Parallel()
 
-	senderName := testutil.GetName()
-	defer testutil.PutName(senderName)
-	receiver1Name := testutil.GetName()
-	defer testutil.PutName(receiver1Name)
-	receiver2Name := testutil.GetName()
-	defer testutil.PutName(receiver2Name)
+	sender := MustCreateAccount(t, "1tkx")
+	receiver1 := MustCreateAccount(t, "")
+	receiver2 := MustCreateAccount(t, "")
 
-	// Create sender account
-	defer keys.MustDelete(t, senderName)
-	sender1 := keys.MustAdd(t, senderName)
-	// Ask for 1tkx from the faucet
-	MustAcquireMoney(t, sender1.Address, "1tkx")
-	// Create receiver accounts
-	defer keys.MustDelete(t, receiver1Name)
-	receiver1 := keys.MustAdd(t, receiver1Name)
-	defer keys.MustDelete(t, receiver2Name)
-	receiver2 := keys.MustAdd(t, receiver2Name)
 	// Attempt to send 0.6tkx to each receiver
-	senderBalBefore := bank.MustGetBalance(t, sender1.Address, "utkx", 0)
+	senderBalBefore := bank.MustGetBalance(t, sender.Address, "utkx", 0)
 	receiver1BalBefore := bank.MustGetBalance(t, receiver1.Address, "utkx", 0)
 	receiver2BalBefore := bank.MustGetBalance(t, receiver2.Address, "utkx", 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
-	tx, err := txcmd.ExecTx(ctx, "bank", "multi-send", sender1.Address, receiver1.Address, receiver2.Address, "0.6tkx")
+	tx, err := txcmd.ExecTx(ctx, "bank", "multi-send", sender.Address, receiver1.Address, receiver2.Address, "0.6tkx")
 
 	require.Nil(t, tx)
 	require.Error(t, err)
 	require.ErrorContains(t, err, "insufficient funds")
 
-	senderBalAfter := bank.MustGetBalance(t, sender1.Address, "utkx", 0)
+	senderBalAfter := bank.MustGetBalance(t, sender.Address, "utkx", 0)
 	receiver1BalAfter := bank.MustGetBalance(t, receiver1.Address, "utkx", 0)
 	receiver2BalAfter := bank.MustGetBalance(t, receiver2.Address, "utkx", 0)
 

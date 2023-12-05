@@ -102,6 +102,6 @@ func ExecTx(ctx context.Context, args ...string) (*Tx, error) {
 func MustExecTx(t testing.TB, ctx context.Context, args ...string) Tx {
 	tx, err := ExecTx(ctx, args...)
 	require.NoError(t, err)
-	require.Equal(t, 0, tx.Code)
+	require.Equal(t, 0, tx.Code, tx.RawLog)
 	return *tx
 }
