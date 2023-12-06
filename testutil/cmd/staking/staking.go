@@ -167,6 +167,13 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	dstValBefore := MustGetValidator(t, dstVal)
 	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
 	srcDelBefore := MustGetDelegation(t, from, srcVal)
+	dstDelBefore, err := GetDelegation(from, dstVal)
+
+	if err != nil {
+		require.ErrorContains(t, err, "NotFound")
+	} else {
+		require.NotNil(t, dstDelBefore)
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -191,13 +198,27 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	srcValAfter.DelegatorShares.RequireEqual(t, srcValBefore.DelegatorShares.Sub(unbondedShares))
 	dstValAfter.DelegatorShares.RequireEqual(t, dstValBefore.DelegatorShares.Add(newShares))
 
-	srcDelAfter := MustGetDelegation(t, from, srcVal)
-	dstDel := MustGetDelegation(t, from, dstVal)
+	srcDelAfter, err := GetDelegation(from, srcVal)
 
-	require.Equal(t, srcDelBefore.Balance.Amount.Sub(redelegatedAmount), srcDelAfter.Balance.Amount)
-	require.Equal(t, redelegatedAmount, dstDel.Balance.Amount)
-	srcDelAfter.Delegation.Shares.RequireEqual(t, srcDelBefore.Delegation.Shares.Sub(unbondedShares))
-	dstDel.Delegation.Shares.RequireEqual(t, newShares)
+	if redelegatedAmount.Cmp(srcDelBefore.Balance.Amount) == 0 {
+		require.Error(t, err)
+		require.ErrorContains(t, err, "NotFound")
+	} else {
+		require.NoError(t, err)
+		require.NotNil(t, srcDelAfter)
+		require.Equal(t, srcDelBefore.Balance.Amount.Sub(redelegatedAmount), srcDelAfter.Balance.Amount)
+		srcDelAfter.Delegation.Shares.RequireEqual(t, srcDelBefore.Delegation.Shares.Sub(unbondedShares))
+	}
+
+	dstDelAfter := MustGetDelegation(t, from, dstVal)
+
+	if dstDelBefore == nil {
+		require.Equal(t, redelegatedAmount, dstDelAfter.Balance.Amount)
+		dstDelAfter.Delegation.Shares.RequireEqual(t, newShares)
+	} else {
+		require.Equal(t, dstDelBefore.Balance.Amount.Add(redelegatedAmount), dstDelAfter.Balance.Amount)
+		dstDelAfter.Delegation.Shares.RequireEqual(t, dstDelBefore.Delegation.Shares.Add(newShares))
+	}
 }
 
 func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.Tx {
@@ -284,7 +305,7 @@ func mustGetReward(t testing.TB, events []txcmd.Event) testutil.BigInt {
 		if event.Type == "withdraw_rewards" {
 			for _, att := range event.Attributes {
 				if att.Key == "amount" {
-					reward = testutil.MustGetUtkxAmount(t, att.Value)
+					reward = reward.Add(testutil.MustGetUtkxAmount(t, att.Value))
 				}
 			}
 		}

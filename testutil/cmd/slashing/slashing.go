@@ -19,7 +19,6 @@ type Params struct {
 
 func MustGetParams(t testing.TB) Params {
 	var params Params
-	params.DowntimeJailDuration.UnmarshalText(nil)
 	cmd.MustQuery(t, &params, "slashing", "params")
 	require.Greater(t, params.DowntimeJailDuration.StdDuration(), 0*time.Second)
 	require.False(t, params.MinSignedPerWindow.IsZero())

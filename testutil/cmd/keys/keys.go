@@ -40,7 +40,7 @@ func MustShow(t testing.TB, name string) Key {
 	output := cmd.MustExec(t, "titand", "keys", "show", name, "--output=json")
 	require.NotNil(t, output)
 	var key Key
-	err := json.Unmarshal(output, &key)
+	err := cmd.UnmarshalJSON(output, &key)
 	require.NoError(t, err)
 	require.Contains(t, []string{key.Name, key.Address}, name)
 	require.Equal(t, "local", key.Type)
@@ -55,7 +55,7 @@ func MustAdd(t testing.TB, name string) Key {
 	output := cmd.MustExec(t, "titand", "keys", "add", name, "--output=json")
 	require.NotNil(t, output)
 	var key Key
-	err := json.Unmarshal(output, &key)
+	err := cmd.UnmarshalJSON(output, &key)
 	require.NoError(t, err)
 	require.Equal(t, name, key.Name)
 	require.Equal(t, "local", key.Type)
@@ -78,7 +78,7 @@ func MustList(t testing.TB) []Key {
 	output := cmd.MustExec(t, "titand", "keys", "list", "--output=json")
 	require.NotNil(t, output)
 	var keys []Key
-	err := json.Unmarshal(output, &keys)
+	err := cmd.UnmarshalJSON(output, &keys)
 	require.NoError(t, err)
 	return keys
 }

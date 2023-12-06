@@ -1,10 +1,13 @@
 package cmd
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -78,4 +81,16 @@ func Query(v any, args ...string) error {
 func MustQuery(t testing.TB, v any, args ...string) {
 	err := Query(v, args...)
 	require.NoError(t, err)
+}
+
+// Scan for the first line that contains JSON object and unmarshal
+func UnmarshalJSON(data []byte, v any) error {
+	s := bufio.NewScanner(bytes.NewBuffer(data))
+	for s.Scan() {
+		b := s.Bytes()
+		if (b[0] == '[' && b[len(b)-1] == ']') || (b[0] == '{' && b[len(b)-1] == '}') {
+			return json.Unmarshal(b, v)
+		}
+	}
+	return fmt.Errorf("cannot unmarshal %s from: %s", reflect.TypeOf(v), string(data))
 }

@@ -37,6 +37,7 @@ func TestRedelegate(t *testing.T) {
 
 	staking.MustDelegate(t, val1.OperatorAddress, "0.001tkx", del.Address)
 	staking.MustRedelegate(t, val1.OperatorAddress, val2.OperatorAddress, "0.0005tkx", del.Address)
+	staking.MustRedelegate(t, val1.OperatorAddress, val2.OperatorAddress, "0.0005tkx", del.Address) // Redelegate all
 }
 
 func TestUnbond(t *testing.T) {

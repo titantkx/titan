@@ -71,11 +71,7 @@ func (n BigInt) String() string {
 }
 
 func (n BigInt) Format(s fmt.State, r rune) {
-	if r == 's' {
-		io.WriteString(s, n.String())
-	} else {
-		n.v.Format(s, r)
-	}
+	n.v.Format(s, r)
 }
 
 func (n BigInt) Cmp(i BigInt) int {

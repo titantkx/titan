@@ -1,12 +1,8 @@
 package tx
 
 import (
-	"bufio"
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"regexp"
 	"testing"
 	"time"
@@ -39,26 +35,7 @@ type Attribute struct {
 	Index bool   `json:"index"`
 }
 
-func ParseTx(buf []byte) (*Tx, error) {
-	s := bufio.NewScanner(bytes.NewBuffer(buf))
-	for s.Scan() {
-		b := s.Bytes()
-		if b[0] != '{' || b[len(b)-1] != '}' {
-			continue
-		}
-		var tx Tx
-		if err := json.Unmarshal(b, &tx); err != nil {
-			fmt.Println(string(buf))
-			return nil, err
-		}
-		return &tx, nil
-	}
-	return nil, fmt.Errorf("cannot parse Tx: %s", string(buf))
-}
-
 func QueryTx(ctx context.Context, txHash string) (*Tx, error) {
-	tick := time.NewTicker(1 * time.Second)
-	defer tick.Stop()
 	for {
 		output, err := cmd.Exec("titand", "query", "tx", txHash, "--output=json")
 		if err != nil {
@@ -66,7 +43,7 @@ func QueryTx(ctx context.Context, txHash string) (*Tx, error) {
 			if len(matches) == 2 && matches[1] == "-32603" {
 				// Transaction not found, wait until it is delivered or timeout
 				select {
-				case <-tick.C:
+				case <-time.After(1 * time.Second):
 					continue
 				case <-ctx.Done():
 					if err == nil {
@@ -78,7 +55,7 @@ func QueryTx(ctx context.Context, txHash string) (*Tx, error) {
 			return nil, err
 		}
 		var tx Tx
-		if err := json.Unmarshal(output, &tx); err != nil {
+		if err := cmd.UnmarshalJSON(output, &tx); err != nil {
 			return nil, err
 		}
 		return &tx, nil
@@ -92,8 +69,8 @@ func ExecTx(ctx context.Context, args ...string) (*Tx, error) {
 	if err != nil {
 		return nil, err
 	}
-	tx, err := ParseTx(output)
-	if err != nil {
+	var tx Tx
+	if err := cmd.UnmarshalJSON(output, &tx); err != nil {
 		return nil, err
 	}
 	if tx.Code != 0 {
