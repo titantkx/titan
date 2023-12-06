@@ -11,9 +11,9 @@ func TestMustParseAmount(t *testing.T) {
 	coins := testutil.MustParseAmount(t, "100tkx,0.5eth")
 
 	require.Len(t, coins, 2)
-	require.Equal(t, testutil.MakeBigFloat(100), coins[0].Amount)
+	coins[0].Amount.RequireEqual(t, testutil.MakeBigFloat(100))
 	require.Equal(t, "tkx", coins[0].Denom)
-	require.Equal(t, testutil.MakeBigFloat(0.5), coins[1].Amount)
+	coins[1].Amount.RequireEqual(t, testutil.MakeBigFloat(0.5))
 	require.Equal(t, "eth", coins[1].Denom)
 }
 
@@ -52,12 +52,4 @@ func TestMustGetUtkxAmount(t *testing.T) {
 		actual := testutil.MustGetUtkxAmount(t, test.Amount)
 		require.Equal(t, test.Expected, actual)
 	}
-}
-
-func Test1(t *testing.T) {
-	i := testutil.MakeBigIntFromString("1000000000000000")
-	f := testutil.MakeBigFloatFromString("1").Sub(testutil.MakeBigFloatFromString("0.01"))
-	t.Log(i)
-	t.Log(f)
-	t.Log(i.BigFloat().Mul(f))
 }

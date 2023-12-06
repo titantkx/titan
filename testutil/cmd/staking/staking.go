@@ -62,6 +62,15 @@ type Balance struct {
 	Amount testutil.BigInt `json:"amount"`
 }
 
+func GetDelegation(delegator string, validator string) (*DelegationResponse, error) {
+	var resp DelegationResponse
+	err := cmd.Query(&resp, "staking", "delegation", delegator, validator)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 func MustGetDelegation(t testing.TB, delegator string, validator string) DelegationResponse {
 	var resp DelegationResponse
 	cmd.MustQuery(t, &resp, "staking", "delegation", delegator, validator)
@@ -82,6 +91,7 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	stakedAmount := testutil.MustGetUtkxAmount(t, amount)
+	sharedAmount := stakedAmount.BigFloat()
 
 	require.Equal(t, balBefore.Sub(coinSpent).Sub(stakedAmount), balAfter)
 
@@ -115,10 +125,12 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 	require.False(t, val.Jailed)
 	require.Equal(t, val.Status, BOND_STATUS_BONDED)
 	require.Equal(t, stakedAmount, val.Tokens)
+	val.DelegatorShares.RequireEqual(t, sharedAmount)
 
 	del := MustGetDelegation(t, from, valAddr)
 
 	require.Equal(t, stakedAmount, del.Balance.Amount)
+	del.Delegation.Shares.RequireEqual(t, sharedAmount)
 
 	return val
 }
@@ -138,19 +150,23 @@ func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	delegatedAmount := testutil.MustGetUtkxAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
+	sharedAmount := valBefore.DelegatorShares.Mul(delegatedAmount.DivFloat(valBefore.Tokens))
 
 	require.Equal(t, balBefore.Sub(coinSpent).Sub(delegatedAmount), balAfter)
 	require.Equal(t, valBefore.Tokens.Sub(slashedAmount).Add(delegatedAmount), valAfter.Tokens)
+	valAfter.DelegatorShares.RequireEqual(t, valBefore.DelegatorShares.Add(sharedAmount))
 
 	del := MustGetDelegation(t, from, valAddr)
 
 	require.Equal(t, delegatedAmount, del.Balance.Amount)
+	del.Delegation.Shares.RequireEqual(t, sharedAmount)
 }
 
 func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from string) {
 	srcValBefore := MustGetValidator(t, srcVal)
 	dstValBefore := MustGetValidator(t, dstVal)
 	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
+	srcDelBefore := MustGetDelegation(t, from, srcVal)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -166,19 +182,28 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	redelegatedAmount := testutil.MustGetUtkxAmount(t, amount)
 	srcSlashedAmount := mustGetSlashedAmount(t, srcValBefore, srcValAfter)
 	dstSlashedAmount := mustGetSlashedAmount(t, dstValBefore, dstValAfter)
+	unbondedShares := srcValBefore.DelegatorShares.Mul(redelegatedAmount.DivFloat(srcValBefore.Tokens))
+	newShares := dstValBefore.DelegatorShares.Mul(redelegatedAmount.DivFloat(dstValBefore.Tokens))
 
 	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
 	require.Equal(t, srcValBefore.Tokens.Sub(srcSlashedAmount).Sub(redelegatedAmount), srcValAfter.Tokens)
 	require.Equal(t, dstValBefore.Tokens.Sub(dstSlashedAmount).Add(redelegatedAmount), dstValAfter.Tokens)
+	srcValAfter.DelegatorShares.RequireEqual(t, srcValBefore.DelegatorShares.Sub(unbondedShares))
+	dstValAfter.DelegatorShares.RequireEqual(t, dstValBefore.DelegatorShares.Add(newShares))
 
-	del := MustGetDelegation(t, from, dstVal)
+	srcDelAfter := MustGetDelegation(t, from, srcVal)
+	dstDel := MustGetDelegation(t, from, dstVal)
 
-	require.Equal(t, redelegatedAmount, del.Balance.Amount)
+	require.Equal(t, srcDelBefore.Balance.Amount.Sub(redelegatedAmount), srcDelAfter.Balance.Amount)
+	require.Equal(t, redelegatedAmount, dstDel.Balance.Amount)
+	srcDelAfter.Delegation.Shares.RequireEqual(t, srcDelBefore.Delegation.Shares.Sub(unbondedShares))
+	dstDel.Delegation.Shares.RequireEqual(t, newShares)
 }
 
 func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.Tx {
 	valBefore := MustGetValidator(t, valAddr)
 	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
+	delBefore := MustGetDelegation(t, from, valAddr)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -192,9 +217,23 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	unbondedAmount := testutil.MustGetUtkxAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
+	unbondedShares := valBefore.DelegatorShares.Mul(unbondedAmount.DivFloat(valBefore.Tokens))
 
 	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
 	require.Equal(t, valBefore.Tokens.Sub(slashedAmount).Sub(unbondedAmount), valAfter.Tokens)
+	valAfter.DelegatorShares.RequireEqual(t, valBefore.DelegatorShares.Sub(unbondedShares))
+
+	delAfter, err := GetDelegation(from, valAddr)
+
+	if unbondedAmount.Cmp(delBefore.Balance.Amount) == 0 {
+		require.Error(t, err)
+		require.ErrorContains(t, err, "NotFound")
+	} else {
+		require.NoError(t, err)
+		require.NotNil(t, delAfter)
+		require.Equal(t, delBefore.Balance.Amount.Sub(unbondedAmount), delAfter.Balance.Amount)
+		delAfter.Delegation.Shares.RequireEqual(t, delBefore.Delegation.Shares.Sub(unbondedShares))
+	}
 
 	return tx
 }
@@ -202,6 +241,13 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.
 func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeight int64, from string) {
 	valBefore := MustGetValidator(t, valAddr)
 	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
+	delBefore, err := GetDelegation(from, valAddr)
+
+	if err != nil {
+		require.ErrorContains(t, err, "NotFound")
+	} else {
+		require.NotNil(t, delBefore)
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -215,9 +261,21 @@ func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeig
 	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
 	unbondedAmount := testutil.MustGetUtkxAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
+	unbondedShares := valBefore.DelegatorShares.Mul(unbondedAmount.DivFloat(valBefore.Tokens))
 
 	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
 	require.Equal(t, valBefore.Tokens.Sub(slashedAmount).Add(unbondedAmount), valAfter.Tokens)
+	valAfter.DelegatorShares.RequireEqual(t, valBefore.DelegatorShares.Add(unbondedShares))
+
+	delAfter := MustGetDelegation(t, from, valAddr)
+
+	if delBefore == nil {
+		require.Equal(t, unbondedAmount, delAfter.Balance.Amount)
+		delAfter.Delegation.Shares.RequireEqual(t, unbondedShares)
+	} else {
+		require.Equal(t, delBefore.Balance.Amount.Add(unbondedAmount), delAfter.Balance.Amount)
+		delAfter.Delegation.Shares.RequireEqual(t, delBefore.Delegation.Shares.Add(unbondedShares))
+	}
 }
 
 func mustGetReward(t testing.TB, events []txcmd.Event) testutil.BigInt {

@@ -2,8 +2,12 @@ package testutil
 
 import (
 	"fmt"
+	"io"
 	"math/big"
 	"strconv"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 type Int int64
@@ -67,7 +71,11 @@ func (n BigInt) String() string {
 }
 
 func (n BigInt) Format(s fmt.State, r rune) {
-	n.v.Format(s, r)
+	if r == 's' {
+		io.WriteString(s, n.String())
+	} else {
+		n.v.Format(s, r)
+	}
 }
 
 func (n BigInt) Cmp(i BigInt) int {
@@ -92,6 +100,10 @@ func (n BigInt) Mul(i BigInt) BigInt {
 
 func (n BigInt) Div(i BigInt) BigInt {
 	return BigInt{new(big.Int).Div(n.v, i.v)}
+}
+
+func (n BigInt) DivFloat(i BigInt) BigFloat {
+	return n.BigFloat().Quo(i.BigFloat())
 }
 
 func (n BigInt) BigFloat() BigFloat {
@@ -137,11 +149,23 @@ func (n BigFloat) IsZero() bool {
 }
 
 func (n BigFloat) String() string {
-	return n.String()
+	return n.v.String()
 }
 
 func (n BigFloat) Format(s fmt.State, r rune) {
-	n.v.Format(s, r)
+	if r == 's' {
+		io.WriteString(s, n.String())
+	} else {
+		n.v.Format(s, r)
+	}
+}
+
+func (n BigFloat) RequireEqual(t testing.TB, expected BigFloat) {
+	require.Conditionf(
+		t,
+		func() bool { return n.Cmp(expected) == 0 },
+		"Not equal:\nexpected: %s\nactual  : %s", expected, n,
+	)
 }
 
 func (n BigFloat) Cmp(f BigFloat) int {
@@ -162,6 +186,10 @@ func (n BigFloat) Sub(f BigFloat) BigFloat {
 
 func (n BigFloat) Mul(f BigFloat) BigFloat {
 	return BigFloat{new(big.Float).Mul(n.v, f.v)}
+}
+
+func (n BigFloat) Quo(f BigFloat) BigFloat {
+	return BigFloat{new(big.Float).Quo(n.v, f.v)}
 }
 
 func (b BigFloat) BigInt() BigInt {

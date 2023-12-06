@@ -47,6 +47,7 @@ func TestUnbond(t *testing.T) {
 
 	staking.MustDelegate(t, val.OperatorAddress, "0.001tkx", del.Address)
 	staking.MustUnbond(t, val.OperatorAddress, "0.0005tkx", del.Address)
+	staking.MustUnbond(t, val.OperatorAddress, "0.0005tkx", del.Address) // Unbond all
 }
 
 func TestCancelUnbound(t *testing.T) {
@@ -56,6 +57,10 @@ func TestCancelUnbound(t *testing.T) {
 	val := MustCreateValidator(t)
 
 	staking.MustDelegate(t, val.OperatorAddress, "0.001tkx", del.Address)
-	tx := staking.MustUnbond(t, val.OperatorAddress, "0.0005tkx", del.Address)
-	staking.MustCancelUnbound(t, val.OperatorAddress, "0.0002tkx", tx.Height.Int64(), del.Address)
+
+	tx1 := staking.MustUnbond(t, val.OperatorAddress, "0.0005tkx", del.Address)
+	staking.MustCancelUnbound(t, val.OperatorAddress, "0.0002tkx", tx1.Height.Int64(), del.Address)
+
+	tx2 := staking.MustUnbond(t, val.OperatorAddress, "0.0007tkx", del.Address) // Unbond all
+	staking.MustCancelUnbound(t, val.OperatorAddress, "0.0007tkx", tx2.Height.Int64(), del.Address)
 }
