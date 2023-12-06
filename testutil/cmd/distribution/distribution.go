@@ -8,16 +8,7 @@ import (
 )
 
 type Pool struct {
-	Pool []testutil.Coin `json:"pool"`
-}
-
-func (p Pool) GetUtkxAmount() testutil.BigInt {
-	for _, coin := range p.Pool {
-		if coin.Denom == "utkx" {
-			return coin.Amount.BigInt()
-		}
-	}
-	return testutil.MakeBigInt(0)
+	Pool testutil.Coins `json:"pool"`
 }
 
 func MustGetCommunityPool(t testing.TB) Pool {

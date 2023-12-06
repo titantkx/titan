@@ -38,5 +38,5 @@ func TestValidatorInactive(t *testing.T) {
 	distPoolAfter := distribution.MustGetCommunityPool(t)
 
 	require.Equal(t, totalBalBefore, totalBalAfter)
-	require.Equal(t, distPoolBefore.GetUtkxAmount().Add(slashedAmount), distPoolAfter.GetUtkxAmount())
+	require.Equal(t, distPoolBefore.Pool.GetUtkxAmount().Add(slashedAmount), distPoolAfter.Pool.GetUtkxAmount())
 }

@@ -89,7 +89,7 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 
 	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
-	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
+	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetUtkxAmount()
 	stakedAmount := testutil.MustGetUtkxAmount(t, amount)
 	sharedAmount := stakedAmount.BigFloat()
 
@@ -147,7 +147,7 @@ func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 	valAfter := MustGetValidator(t, valAddr)
 	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
-	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
+	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetUtkxAmount()
 	delegatedAmount := testutil.MustGetUtkxAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 	sharedAmount := valBefore.DelegatorShares.Mul(delegatedAmount.DivFloat(valBefore.Tokens))
@@ -185,7 +185,7 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
 	reward := mustGetReward(t, tx.Events)
-	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
+	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetUtkxAmount()
 	redelegatedAmount := testutil.MustGetUtkxAmount(t, amount)
 	srcSlashedAmount := mustGetSlashedAmount(t, srcValBefore, srcValAfter)
 	dstSlashedAmount := mustGetSlashedAmount(t, dstValBefore, dstValAfter)
@@ -221,7 +221,7 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	}
 }
 
-func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.Tx {
+func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.TxResponse {
 	valBefore := MustGetValidator(t, valAddr)
 	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
 	delBefore := MustGetDelegation(t, from, valAddr)
@@ -235,7 +235,7 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.
 	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
 	reward := mustGetReward(t, tx.Events)
-	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
+	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetUtkxAmount()
 	unbondedAmount := testutil.MustGetUtkxAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 	unbondedShares := valBefore.DelegatorShares.Mul(unbondedAmount.DivFloat(valBefore.Tokens))
@@ -279,7 +279,7 @@ func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeig
 	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
 
 	reward := mustGetReward(t, tx.Events)
-	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
+	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetUtkxAmount()
 	unbondedAmount := testutil.MustGetUtkxAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 	unbondedShares := valBefore.DelegatorShares.Mul(unbondedAmount.DivFloat(valBefore.Tokens))

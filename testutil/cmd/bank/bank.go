@@ -11,7 +11,7 @@ import (
 	txcmd "github.com/tokenize-titan/titan/testutil/cmd/tx"
 )
 
-func MustSend(t testing.TB, from string, to string, amount string) tx.Tx {
+func MustSend(t testing.TB, from string, to string, amount string) tx.TxResponse {
 	fromBalBefore := MustGetBalance(t, from, "utkx", 0)
 	toBalBefore := MustGetBalance(t, to, "utkx", 0)
 
@@ -23,7 +23,7 @@ func MustSend(t testing.TB, from string, to string, amount string) tx.Tx {
 	fromBalAfter := MustGetBalance(t, from, "utkx", 0)
 	toBalAfter := MustGetBalance(t, to, "utkx", 0)
 
-	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
+	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetUtkxAmount()
 	sentAmount := testutil.MustGetUtkxAmount(t, amount)
 
 	require.Equal(t, fromBalBefore.Sub(coinSpent).Sub(sentAmount), fromBalAfter)
@@ -32,7 +32,7 @@ func MustSend(t testing.TB, from string, to string, amount string) tx.Tx {
 	return tx
 }
 
-func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.Tx {
+func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.TxResponse {
 	fromBalBefore := MustGetBalance(t, from, "utkx", 0)
 	var toBalBefore []testutil.BigInt
 	for i := range to {
@@ -53,7 +53,7 @@ func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.Tx
 		toBalAfter = append(toBalAfter, MustGetBalance(t, to[i], "utkx", 0))
 	}
 
-	coinSpent := tx.GasWanted.Mul(testutil.MakeBigInt(10)) // Gas price == 10 utkx
+	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetUtkxAmount()
 	sentAmount := testutil.MustGetUtkxAmount(t, amount)
 	totalSentAmount := sentAmount.Mul(testutil.MakeBigInt(int64(len(to))))
 

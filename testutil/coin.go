@@ -15,6 +15,20 @@ type Coin struct {
 	Denom  string   `json:"denom"`
 }
 
+type Coins []Coin
+
+func (coins Coins) GetUtkxAmount() BigInt {
+	utkxAmount := MakeBigInt(0)
+	for _, coin := range coins {
+		if coin.Denom == "tkx" {
+			utkxAmount = utkxAmount.Add(coin.Amount.Mul(MakeBigFloat(1000_000_000_000_000_000)).BigInt())
+		} else if coin.Denom == "utkx" {
+			utkxAmount = utkxAmount.Add(coin.Amount.BigInt())
+		}
+	}
+	return utkxAmount
+}
+
 func MustParseCoin(t testing.TB, txt string) Coin {
 	var coin Coin
 	matches := coinPattern.FindStringSubmatch(txt)
@@ -25,8 +39,8 @@ func MustParseCoin(t testing.TB, txt string) Coin {
 	return coin
 }
 
-func MustParseAmount(t testing.TB, amount string) []Coin {
-	var coins []Coin
+func MustParseAmount(t testing.TB, amount string) Coins {
+	var coins Coins
 	for _, txt := range strings.Split(amount, ",") {
 		coin := MustParseCoin(t, txt)
 		coins = append(coins, coin)
@@ -35,14 +49,5 @@ func MustParseAmount(t testing.TB, amount string) []Coin {
 }
 
 func MustGetUtkxAmount(t testing.TB, amount string) BigInt {
-	coins := MustParseAmount(t, amount)
-	utkxAmount := MakeBigInt(0)
-	for _, coin := range coins {
-		if coin.Denom == "tkx" {
-			utkxAmount = utkxAmount.Add(coin.Amount.Mul(MakeBigFloat(1000_000_000_000_000_000)).BigInt())
-		} else if coin.Denom == "utkx" {
-			utkxAmount = utkxAmount.Add(coin.Amount.BigInt())
-		}
-	}
-	return utkxAmount
+	return MustParseAmount(t, amount).GetUtkxAmount()
 }
