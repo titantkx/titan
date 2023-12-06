@@ -42,6 +42,8 @@ import (
 	ethermintserverconfig "github.com/tokenize-titan/ethermint/server/config"
 	ethermintsrvflags "github.com/tokenize-titan/ethermint/server/flags"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
 	// this line is used by starport scaffolding # root/moduleImport
 
 	"github.com/tokenize-titan/titan/app"
@@ -379,6 +381,8 @@ func initAppConfig() (string, interface{}) {
 		EVM     ethermintserverconfig.EVMConfig     `mapstructure:"evm"`
 		JSONRPC ethermintserverconfig.JSONRPCConfig `mapstructure:"json-rpc"`
 		TLS     ethermintserverconfig.TLSConfig     `mapstructure:"tls"`
+
+		Wasm wasmtypes.WasmConfig `mapstructure:"wasm"`
 	}
 
 	// Optionally allow the chain developer to overwrite the SDK's default
@@ -404,8 +408,10 @@ func initAppConfig() (string, interface{}) {
 		EVM:     *ethermintserverconfig.DefaultEVMConfig(),
 		JSONRPC: *ethermintserverconfig.DefaultJSONRPCConfig(),
 		TLS:     *ethermintserverconfig.DefaultTLSConfig(),
+
+		Wasm: wasmtypes.DefaultWasmConfig(),
 	}
-	customAppTemplate := serverconfig.DefaultConfigTemplate + ethermintserverconfig.DefaultConfigTemplate
+	customAppTemplate := serverconfig.DefaultConfigTemplate + ethermintserverconfig.DefaultConfigTemplate + wasmtypes.DefaultConfigTemplate()
 
 	return customAppTemplate, customAppConfig
 }
