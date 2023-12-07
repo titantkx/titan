@@ -72,7 +72,7 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 
 	rootCmd := &cobra.Command{
 		Use:   app.Name,
-		Short: "Start titan node",
+		Short: "Titan node cli",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			// set the default command outputs
 			cmd.SetOut(cmd.OutOrStdout())
@@ -101,8 +101,7 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 
 	initRootCmd(rootCmd, encodingConfig)
 	overwriteFlagDefaults(rootCmd, map[string]string{
-		flags.FlagChainID:        DefaultChainID,
-		flags.FlagKeyringBackend: "test",
+		flags.FlagChainID: DefaultChainID,
 	})
 
 	return rootCmd, encodingConfig
