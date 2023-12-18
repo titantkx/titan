@@ -117,10 +117,6 @@ func initRootCmd(
 	rootCmd *cobra.Command,
 	encodingConfig appparams.EncodingConfig,
 ) {
-	// Set config
-	initSDKConfig()
-	RegisterDenoms()
-
 	gentxModule := app.ModuleBasics[genutiltypes.ModuleName].(genutil.AppModuleBasic)
 	rootCmd.AddCommand(
 		ethermintclient.ValidateChainID(

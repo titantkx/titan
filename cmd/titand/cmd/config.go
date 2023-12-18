@@ -18,7 +18,7 @@ const (
 	BaseDenomUnit = 18
 )
 
-func initSDKConfig() {
+func InitSDKConfig() {
 	// Set prefixes
 	accountPubKeyPrefix := app.AccountAddressPrefix + "pub"
 	validatorAddressPrefix := app.AccountAddressPrefix + "valoper"
