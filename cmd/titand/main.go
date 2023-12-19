@@ -11,6 +11,9 @@ import (
 )
 
 func main() {
+	setupConfig()
+	cmd.RegisterDenoms()
+
 	rootCmd, _ := cmd.NewRootCmd()
 	if err := svrcmd.Execute(rootCmd, "", app.DefaultNodeHome); err != nil {
 		switch e := err.(type) {
@@ -21,4 +24,9 @@ func main() {
 			os.Exit(1)
 		}
 	}
+}
+
+func setupConfig() {
+	// Set config
+	cmd.InitSDKConfig()
 }

@@ -9,6 +9,9 @@ import (
 )
 
 const (
+	MainnetChainID = "titan-18888"
+
+	TestnetChainID = "titan-18889"
 	// DisplayDenom defines the denomination displayed to users in client applications.
 	DisplayDenom = "tkx"
 	// BaseDenom defines to the default denomination used in titan (staking, governance, etc.)
@@ -18,7 +21,7 @@ const (
 	BaseDenomUnit = 18
 )
 
-func initSDKConfig() {
+func InitSDKConfig() {
 	// Set prefixes
 	accountPubKeyPrefix := app.AccountAddressPrefix + "pub"
 	validatorAddressPrefix := app.AccountAddressPrefix + "valoper"

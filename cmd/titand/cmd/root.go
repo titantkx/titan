@@ -40,7 +40,6 @@ import (
 	etherminthd "github.com/tokenize-titan/ethermint/crypto/hd"
 	ethermintserver "github.com/tokenize-titan/ethermint/server"
 	ethermintserverconfig "github.com/tokenize-titan/ethermint/server/config"
-	ethermintsrvflags "github.com/tokenize-titan/ethermint/server/flags"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
@@ -72,7 +71,7 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 
 	rootCmd := &cobra.Command{
 		Use:   app.Name,
-		Short: "Start titan node",
+		Short: "Titan node cli",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			// set the default command outputs
 			cmd.SetOut(cmd.OutOrStdout())
@@ -101,8 +100,7 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 
 	initRootCmd(rootCmd, encodingConfig)
 	overwriteFlagDefaults(rootCmd, map[string]string{
-		flags.FlagChainID:        DefaultChainID,
-		flags.FlagKeyringBackend: "test",
+		flags.FlagChainID: DefaultChainID,
 	})
 
 	return rootCmd, encodingConfig
@@ -119,15 +117,13 @@ func initRootCmd(
 	rootCmd *cobra.Command,
 	encodingConfig appparams.EncodingConfig,
 ) {
-	// Set config
-	initSDKConfig()
-	RegisterDenoms()
-
 	gentxModule := app.ModuleBasics[genutiltypes.ModuleName].(genutil.AppModuleBasic)
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
+		ethermintclient.ValidateChainID(
+			genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
+		),
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome, gentxModule.GenTxValidator),
-		genutilcli.MigrateGenesisCmd(),
+		MigrateGenesisCmd(),
 		genutilcli.GenTxCmd(
 			app.ModuleBasics,
 			encodingConfig.TxConfig,
@@ -139,10 +135,6 @@ func initRootCmd(
 		tmcli.NewCompletionCmd(rootCmd, true),
 		debug.Cmd(),
 		config.Cmd(),
-		// Ethermint
-		ethermintclient.ValidateChainID(
-			genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
-		),
 		ethermintclient.NewTestnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		// this line is used by starport scaffolding # root/commands
 	)
@@ -150,8 +142,6 @@ func initRootCmd(
 	a := appCreator{
 		encodingConfig,
 	}
-
-	ethermintserver.AddCommands(rootCmd, ethermintserver.NewDefaultStartOptions(a.newApp, app.DefaultNodeHome), a.appExport, addModuleInitFlags)
 
 	// // add server commands
 	// server.AddCommands(
@@ -161,6 +151,14 @@ func initRootCmd(
 	// 	a.appExport,
 	// 	addModuleInitFlags,
 	// )
+
+	// use custom commands from ethermint
+	ethermintserver.AddCommands(
+		rootCmd,
+		ethermintserver.NewDefaultStartOptions(a.newApp, app.DefaultNodeHome),
+		a.appExport,
+		addModuleInitFlags,
+	)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
@@ -172,13 +170,14 @@ func initRootCmd(
 		ethermintclient.KeyCommands(app.DefaultNodeHome),
 	)
 
-	rootCmd, err := ethermintsrvflags.AddTxFlags(rootCmd)
+	// add rosetta
+	rootCmd.AddCommand(rosettaCmd.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Marshaler))
+
+	// update flags description
+	rootCmd, err := UpdateFlags(rootCmd)
 	if err != nil {
 		panic(err)
 	}
-
-	// add rosetta
-	rootCmd.AddCommand(rosettaCmd.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Marshaler))
 }
 
 // queryCommand returns the sub-command to send queries to the app

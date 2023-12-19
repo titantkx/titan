@@ -52,7 +52,7 @@ func (err ExecError) Output() []byte {
 }
 
 func Exec(name string, args ...string) ([]byte, error) {
-	args = append(args, "--home="+HomeDir, "--keyring-backend=test")
+	args = append(args, "--home="+HomeDir)
 	cmd := exec.Command(name, args...)
 	fmt.Println("[CMD]", cmd)
 	output, err := cmd.CombinedOutput()
