@@ -56,6 +56,9 @@ type SnapshotsConfig struct {
 }
 
 const (
+	MainnetChainID = "titan-18888"
+
+	TestnetChainID = "titan-18889"
 	// DisplayDenom defines the denomination displayed to users in client applications.
 	DisplayDenom = "tkx"
 	// BaseDenom defines to the default denomination used in titan (staking, governance, etc.)
