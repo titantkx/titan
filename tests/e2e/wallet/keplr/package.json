@@ -23,9 +23,9 @@
   },
   "devDependencies": {
     "@keplr-wallet/types": "^0.12.48",
-    "@cosmjs/proto-signing": "npm:@tokenize-cosmjs/proto-signing@0.32.0",
-    "@cosmjs/stargate": "npm:@tokenize-cosmjs/stargate@0.32.0",
-    "@cosmjs/tendermint-rpc": "npm:@tokenize-cosmjs/tendermint-rpc@^0.32.0",
+    "@titan-cosmjs/proto-signing": "^0.32.1",
+    "@titan-cosmjs/stargate": "^0.32.1",
+    "@titan-cosmjs/tendermint-rpc": "^0.32.1",
     "react-app-rewired": "^2.2.1"
   },
   "scripts": {

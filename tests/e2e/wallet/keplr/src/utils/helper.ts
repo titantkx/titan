@@ -1,4 +1,4 @@
-import { Coin } from "@cosmjs/stargate";
+import { Coin } from "@titan-cosmjs/stargate";
 import { Decimal } from "decimal.js/decimal";
 
 export function validateCoin(amount: string): boolean {

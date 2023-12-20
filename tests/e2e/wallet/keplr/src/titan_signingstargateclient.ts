@@ -1,10 +1,14 @@
-import { GeneratedType, OfflineSigner, Registry } from "@cosmjs/proto-signing";
+import {
+  GeneratedType,
+  OfflineSigner,
+  Registry,
+} from "@titan-cosmjs/proto-signing";
 import {
   SigningStargateClient,
   SigningStargateClientOptions,
   defaultRegistryTypes,
-} from "@cosmjs/stargate";
-import { CometClient, connectComet } from "@cosmjs/tendermint-rpc";
+} from "@titan-cosmjs/stargate";
+import { CometClient, connectComet } from "@titan-cosmjs/tendermint-rpc";
 
 export const titanDefaultRegistryTypes: ReadonlyArray<[string, GeneratedType]> =
   [...defaultRegistryTypes];

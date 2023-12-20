@@ -1,4 +1,4 @@
-import { GasPrice } from "@cosmjs/stargate";
+import { GasPrice } from "@titan-cosmjs/stargate";
 import { Field, Form, Formik } from "formik";
 import { Button, FormGroup } from "react-bootstrap";
 import * as Yup from "yup";
