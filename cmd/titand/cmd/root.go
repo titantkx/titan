@@ -18,6 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/server"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -40,6 +41,7 @@ import (
 	etherminthd "github.com/tokenize-titan/ethermint/crypto/hd"
 	ethermintserver "github.com/tokenize-titan/ethermint/server"
 	ethermintserverconfig "github.com/tokenize-titan/ethermint/server/config"
+	etherminttypes "github.com/tokenize-titan/ethermint/types"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
@@ -84,6 +86,10 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 			if err != nil {
 				return err
 			}
+			initClientCtx, err = addDefaultKeyInfoKeyring(initClientCtx)
+			if err != nil {
+				return err
+			}
 
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
@@ -104,6 +110,30 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 	})
 
 	return rootCmd, encodingConfig
+}
+
+// if clientCtx.Keyring is `keyring.BackendMemory` and empty, add default key info
+// it will prevent error `cannot build signature for simulation, key records slice is empty` while running `--dry-run`
+func addDefaultKeyInfoKeyring(clientCtx client.Context) (client.Context, error) {
+	if clientCtx.Keyring != nil && clientCtx.Keyring.Backend() == keyring.BackendMemory {
+		kr := clientCtx.Keyring
+		records, _ := kr.List()
+		if len(records) == 0 {
+			// add default key info
+			_, _, err := kr.NewMnemonic("foo", keyring.English, etherminttypes.BIP44HDPath, keyring.DefaultBIP39Passphrase, etherminthd.EthSecp256k1)
+			if err != nil {
+				return clientCtx, err
+			}
+		}
+
+		records, _ = kr.List()
+
+		if len(records) == 0 {
+			return clientCtx, errors.New("Can not add default key info")
+		}
+	}
+
+	return clientCtx, nil
 }
 
 // initTendermintConfig helps to override default Tendermint Config values.
