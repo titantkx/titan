@@ -37,6 +37,11 @@ const chainInfo: ChainInfo = {
       coinDenom: "tkx",
       coinMinimalDenom: "utkx",
       coinDecimals: 18,
+      gasPriceStep: {
+        low: 0.001 * 1e10,
+        average: 0.025 * 1e10,
+        high: 0.04 * 1e10,
+      },
     },
   ],
   stakeCurrency: {
@@ -44,7 +49,7 @@ const chainInfo: ChainInfo = {
     coinMinimalDenom: "utkx",
     coinDecimals: 18,
   },
-  features: [],
+  features: ["eth-address-gen", "eth-key-sign"],
 };
 
 const KeplrView = () => {
