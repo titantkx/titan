@@ -1,9 +1,11 @@
 import { ChainInfo, Window as KeplrWindow } from "@keplr-wallet/types";
 import { useEffect, useState } from "react";
-import { Container, Row } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 import { TitanSigningStargateClient } from "../titan_signingstargateclient";
 import Send from "./Send";
 import Stake from "./Stake";
+import Unstake from "./Unstake";
+import WithdrawRewards from "./WithdrawRewards";
 
 declare global {
   interface Window extends KeplrWindow {}
@@ -80,16 +82,22 @@ const KeplrView = () => {
   }, []);
 
   return (
-    <Container fluid>
+    <Container fluid className="p-5">
       {client && (
-        <div>
-          <Row>
-            <Send client={client}></Send>
-          </Row>
-          <Row>
-            <Stake client={client}></Stake>
-          </Row>
-        </div>
+        <Row>
+          <Col>
+            <Send client={client} />
+          </Col>
+          <Col>
+            <Stake client={client} />
+          </Col>
+          <Col>
+            <Unstake client={client} />
+          </Col>
+          <Col>
+            <WithdrawRewards client={client} />
+          </Col>
+        </Row>
       )}
     </Container>
   );
