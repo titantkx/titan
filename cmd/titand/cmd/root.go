@@ -112,10 +112,10 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 	return rootCmd, encodingConfig
 }
 
-// if clientCtx.Keyring is `keyring.BackendMemory` and empty, add default key info
+// if in `--dry-run` mode and clientCtx.Keyring is `keyring.BackendMemory` and empty, add default key info
 // it will prevent error `cannot build signature for simulation, key records slice is empty` while running `--dry-run`
 func addDefaultKeyInfoKeyring(clientCtx client.Context) (client.Context, error) {
-	if clientCtx.Keyring != nil && clientCtx.Keyring.Backend() == keyring.BackendMemory {
+	if clientCtx.Simulate && clientCtx.Keyring != nil && clientCtx.Keyring.Backend() == keyring.BackendMemory {
 		kr := clientCtx.Keyring
 		records, _ := kr.List()
 		if len(records) == 0 {
