@@ -216,4 +216,4 @@ require (
 
 replace github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
-replace github.com/cosmos/cosmos-sdk => github.com/tokenize-titan/cosmos-sdk v0.47.7-titan.1
+replace github.com/cosmos/cosmos-sdk => github.com/tokenize-titan/cosmos-sdk v0.47.6-titan.1

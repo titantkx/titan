@@ -1050,8 +1050,8 @@ github.com/tklauser/go-sysconf v0.3.10/go.mod h1:C8XykCvCb+Gn0oNCWPIlcb0RuglQTYa
 github.com/tklauser/numcpus v0.4.0 h1:E53Dm1HjH1/R2/aoCtXtPgzmElmn51aOkhCFSuZq//o=
 github.com/tklauser/numcpus v0.4.0/go.mod h1:1+UI3pD8NW14VMwdgJNJ1ESk2UnwhAnz5hMwiKKqXCQ=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
-github.com/tokenize-titan/cosmos-sdk v0.47.7-titan.1 h1:npin2jTsPQ9YM9nlr9CnoYTzjlSBe59R0C7qyTvpe4A=
-github.com/tokenize-titan/cosmos-sdk v0.47.7-titan.1/go.mod h1:hljXsedSCJYge78hyaMYy+yzDQVGZtKAZBjZn5QMddk=
+github.com/tokenize-titan/cosmos-sdk v0.47.6-titan.1 h1:13nVrfZ6gBXGWUUsDHMurw1cU9wtjmIE/XgH0l7SGH4=
+github.com/tokenize-titan/cosmos-sdk v0.47.6-titan.1/go.mod h1:xTc1chW8HyUWCfrgGbjS5jNu9RzlPVrBNfbL9RmZUio=
 github.com/tokenize-titan/ethermint v0.23.0-rc.4 h1:QEUtIDq37QYraHUP7cBJ++U8WQC95MrKKI9skV9A+M4=
 github.com/tokenize-titan/ethermint v0.23.0-rc.4/go.mod h1:4YLq0Pt0tRXYrK1L77cVJsL7MwO1lRlhiWrtB9SkC3Y=
 github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926/go.mod h1:9ESjWnEqriFuLhtthL60Sar/7RFoluCcXsuvEwTV5KM=
