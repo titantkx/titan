@@ -90,7 +90,7 @@ func ExecTx(ctx context.Context, args ...string) (*TxResponse, error) {
 		return nil, err
 	}
 	args = append([]string{"tx"}, args...)
-	args = append(args, "--gas=auto", "--gas-adjustment=2", "--gas-prices="+gasPrice.String()+"utkx", "--output=json", "-y")
+	args = append(args, "--gas=auto", "--gas-adjustment=1.3", "--gas-prices="+gasPrice.String()+"utkx", "--output=json", "-y")
 	args = append(args, "--keyring-backend=test")
 	output, err := cmd.Exec("titand", args...)
 	if err != nil {
