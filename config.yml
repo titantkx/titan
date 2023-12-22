@@ -58,7 +58,7 @@ genesis:
   app_state:
     staking:
       params:
-        bond_denom: "utkx"
+        bond_denom: "atkx"
     crisis:
       constant_fee:
         denom: "tkx"
@@ -70,4 +70,4 @@ genesis:
           amount: "1"   
     evm:
       params:
-        evm_denom: "utkx"
+        evm_denom: "atkx"

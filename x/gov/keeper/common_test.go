@@ -23,7 +23,7 @@ import (
 	v1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	v1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/tokenize-titan/titan/app"
+	"github.com/tokenize-titan/titan/utils"
 	"github.com/tokenize-titan/titan/x/gov/keeper"
 	govtestutil "github.com/tokenize-titan/titan/x/gov/testutil"
 )
@@ -62,7 +62,7 @@ func setupGovKeeper(t *testing.T) (
 
 	// fmt.Println(addr.String(), genAddr.String(), govAcct.String())
 
-	app.RegisterDenoms()
+	utils.RegisterDenoms()
 
 	// tkx1 := sdk.NewCoin("tkx", sdk.NewInt(1))
 	// utkx1 := sdk.NewCoin("utkx", sdk.NewInt(1))

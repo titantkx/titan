@@ -34,10 +34,10 @@ import (
 	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	cmdcfg "github.com/tokenize-titan/ethermint/cmd/config"
 	"github.com/tokenize-titan/ethermint/crypto/ethsecp256k1"
 
 	"github.com/tokenize-titan/titan/app/params"
+	"github.com/tokenize-titan/titan/utils"
 )
 
 // SetupOptions defines arguments that are passed into `Simapp` constructor.
@@ -55,59 +55,7 @@ type SnapshotsConfig struct {
 	pruningOpts        pruningtypes.PruningOptions
 }
 
-const (
-	MainnetChainID = "titan-18888"
-
-	TestnetChainID = "titan-18889"
-	// DisplayDenom defines the denomination displayed to users in client applications.
-	DisplayDenom = "tkx"
-	// BaseDenom defines to the default denomination used in titan (staking, governance, etc.)
-	BaseDenom = "utkx"
-	// BaseDenomUnit defines the base denomination unit for Titan.
-	// 1 tkx = 1x10^{BaseDenomUnit} utkx
-	BaseDenomUnit = 18
-
-	DefaultChainID = "titan_18888-1"
-)
-
-func InitSDKConfig() {
-	// Set prefixes
-	accountPubKeyPrefix := AccountAddressPrefix + "pub"
-	validatorAddressPrefix := AccountAddressPrefix + "valoper"
-	validatorPubKeyPrefix := AccountAddressPrefix + "valoperpub"
-	consNodeAddressPrefix := AccountAddressPrefix + "valcons"
-	consNodePubKeyPrefix := AccountAddressPrefix + "valconspub"
-
-	config := sdk.GetConfig()
-
-	if sdk.GetConfig().GetBech32AccountAddrPrefix() != AccountAddressPrefix {
-		config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
-		config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
-		config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
-
-		// Ethermint config coin type to 60
-		cmdcfg.SetBip44CoinType(config)
-
-		config.Seal()
-	}
-}
-
-// RegisterDenoms registers the base and display denominations to the SDK.
-func RegisterDenoms() {
-	sdk.DefaultBondDenom = BaseDenom
-
-	if _, registed := sdk.GetDenomUnit(DisplayDenom); !registed {
-		if err := sdk.RegisterDenom(DisplayDenom, sdk.OneDec()); err != nil {
-			panic(err)
-		}
-	}
-
-	if _, registed := sdk.GetDenomUnit(BaseDenom); !registed {
-		if err := sdk.RegisterDenom(BaseDenom, sdk.NewDecWithPrec(1, BaseDenomUnit)); err != nil {
-			panic(err)
-		}
-	}
-}
+var DefaultChainID = fmt.Sprintf("%s-1", utils.MainnetChainID)
 
 func setup(withGenesis bool, invCheckPeriod uint, baseAppOptions ...func(*baseapp.BaseApp)) (*App, GenesisState, params.EncodingConfig) {
 	db := dbm.NewMemDB()
@@ -139,8 +87,8 @@ func setup(withGenesis bool, invCheckPeriod uint, baseAppOptions ...func(*baseap
 func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptions) *App {
 	t.Helper()
 
-	InitSDKConfig()
-	RegisterDenoms()
+	utils.InitSDKConfig()
+	utils.RegisterDenoms()
 
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
@@ -188,8 +136,8 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	t.Helper()
 
-	InitSDKConfig()
-	RegisterDenoms()
+	utils.InitSDKConfig()
+	utils.RegisterDenoms()
 
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
@@ -234,8 +182,8 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 ) *App {
 	t.Helper()
 
-	InitSDKConfig()
-	RegisterDenoms()
+	utils.InitSDKConfig()
+	utils.RegisterDenoms()
 
 	snapshotTimeout := 1 * time.Minute
 	snapshotStore, err := snapshots.NewStore(dbm.NewMemDB(), testutil.GetTempDir(t))

@@ -15,6 +15,8 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/tokenize-titan/ethermint/crypto/ethsecp256k1"
+
+	"github.com/tokenize-titan/titan/utils"
 )
 
 func TestABCI_ApplySnapshotChunk(t *testing.T) {
@@ -22,7 +24,7 @@ func TestABCI_ApplySnapshotChunk(t *testing.T) {
 	//
 	//
 
-	InitSDKConfig()
+	utils.InitSDKConfig()
 
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
