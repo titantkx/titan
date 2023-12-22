@@ -21,9 +21,9 @@ const (
 var (
 	// BaseDenom defines to the default denomination used in titan (staking, governance, etc.)
 	BaseDenom = fmt.Sprintf("a%s", DisplayDenom)
-	// utkx
+	// MicroDenom defines the micro denomination used in titan (1/1,000,000 of a tkx).
 	MicroDenom = fmt.Sprintf("u%s", DisplayDenom)
-	// mtkx
+	// MilliDenom defines the milli denomination used in titan (1/1,000 of a tkx).
 	MilliDenom = fmt.Sprintf("m%s", DisplayDenom)
 )
 
