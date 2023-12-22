@@ -43,7 +43,7 @@ func getTestProposal() []sdk.Msg {
 	}
 
 	return []sdk.Msg{
-		banktypes.NewMsgSend(govAcct, addr, sdk.NewCoins(sdk.NewCoin("utkx", sdk.NewInt(1000_000_000)))),
+		banktypes.NewMsgSend(govAcct, addr, sdk.NewCoins(sdk.NewCoin(utils.BaseDenom, sdk.NewInt(1000_000_000)))),
 		legacyProposalMsg,
 	}
 }
@@ -63,11 +63,6 @@ func setupGovKeeper(t *testing.T) (
 	// fmt.Println(addr.String(), genAddr.String(), govAcct.String())
 
 	utils.RegisterDenoms()
-
-	// tkx1 := sdk.NewCoin("tkx", sdk.NewInt(1))
-	// utkx1 := sdk.NewCoin("utkx", sdk.NewInt(1))
-
-	// fmt.Println(tkx1, utkx1)
 
 	key := sdk.NewKVStoreKey(govtypes.StoreKey)
 	testCtx := testutil.DefaultContextWithDB(t, key, sdk.NewTransientStoreKey("transient_test"))
@@ -118,7 +113,7 @@ func trackMockAccount(ctx sdk.Context, accKeeper *sdkgovtestutil.MockAccountKeep
 // locally tracks accounts balances (not modules balances).
 func trackMockBank(ctx sdk.Context, bankKeeper *sdkgovtestutil.MockBankKeeper) {
 	balances := make(map[string]sdk.Coins)
-	balances[genAddr.String()] = sdk.NewCoins(sdk.NewCoin("utkx", sdk.NewInt(1000_000_000_000_000_000)))
+	balances[genAddr.String()] = sdk.NewCoins(sdk.NewCoin(utils.BaseDenom, sdk.NewInt(1000_000_000_000_000_000)))
 
 	// We don't track module account balances.
 	bankKeeper.EXPECT().BurnCoins(gomock.Any(), govtypes.ModuleName, gomock.Any()).Times(0)
@@ -176,7 +171,7 @@ func trackMockStaking(ctx sdk.Context, stakingKeeper *sdkgovtestutil.MockStaking
 	stakingKeeper.EXPECT().TokensFromConsensusPower(ctx, gomock.Any()).DoAndReturn(func(ctx sdk.Context, power int64) math.Int {
 		return sdk.TokensFromConsensusPower(power, math.NewIntFromUint64(1000000))
 	}).AnyTimes()
-	stakingKeeper.EXPECT().BondDenom(ctx).Return("utkx").AnyTimes()
+	stakingKeeper.EXPECT().BondDenom(ctx).Return(utils.BaseDenom).AnyTimes()
 	stakingKeeper.EXPECT().IterateBondedValidatorsByPower(gomock.Any(), gomock.Any()).AnyTimes()
 	stakingKeeper.EXPECT().IterateDelegations(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes()
 	stakingKeeper.EXPECT().TotalBondedTokens(gomock.Any()).Return(math.NewInt(10000000)).AnyTimes()

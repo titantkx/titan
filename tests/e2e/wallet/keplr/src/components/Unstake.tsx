@@ -24,7 +24,7 @@ const Unstake = ({ client }: UnstakeProps) => {
     validator: "titanvaloper1rn4kdmg3qm6ga279kvlqa2n8mf4rheex7medn9",
     amount: "0.01tkx",
     gas: "auto",
-    gasPrice: "10utkx",
+    gasPrice: "10atkx",
   };
 
   const unstakeSchema = Yup.object().shape({

@@ -31,7 +31,7 @@ validators:
   bonded: 1tkx
   home: "local_test_data/.titan_val1"
   app:
-    minimum-gas-prices: 0utkx
+    minimum-gas-prices: 0atkx
     api.enable: true
     api.swagger: true
     api.enabled-unsafe-cors: true

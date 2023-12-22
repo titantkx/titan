@@ -30,14 +30,14 @@ const chainInfo: ChainInfo = {
   currencies: [
     {
       coinDenom: "tkx",
-      coinMinimalDenom: "utkx",
+      coinMinimalDenom: "atkx",
       coinDecimals: 18,
     },
   ],
   feeCurrencies: [
     {
       coinDenom: "tkx",
-      coinMinimalDenom: "utkx",
+      coinMinimalDenom: "atkx",
       coinDecimals: 18,
       gasPriceStep: {
         low: 0.001 * 1e10,
@@ -48,7 +48,7 @@ const chainInfo: ChainInfo = {
   ],
   stakeCurrency: {
     coinDenom: "tkx",
-    coinMinimalDenom: "utkx",
+    coinMinimalDenom: "atkx",
     coinDecimals: 18,
   },
   features: ["eth-address-gen", "eth-key-sign"],

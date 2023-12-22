@@ -16,7 +16,7 @@ export function validateGasPrice(price: string): boolean {
 export function normalizeCoin(coin: Coin): Coin {
   if (coin.denom === "tkx") {
     const amount = new Decimal(coin.amount).mul(new Decimal("1e+18"));
-    return { denom: "utkx", amount: amount.toString() };
+    return { denom: "atkx", amount: amount.toString() };
   }
   return coin;
 }

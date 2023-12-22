@@ -24,7 +24,7 @@ const Send = ({ client }: SendProps) => {
     receiver: "titan1zhxfglgt5ch2sls6gx346vvy4kn7w26jxy3xju",
     amount: "1tkx",
     gas: "auto",
-    gasPrice: "10utkx",
+    gasPrice: "10atkx",
   };
 
   const sendSchema = Yup.object().shape({
