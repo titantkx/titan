@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -49,6 +50,7 @@ import (
 
 	"github.com/tokenize-titan/titan/app"
 	appparams "github.com/tokenize-titan/titan/app/params"
+	"github.com/tokenize-titan/titan/utils"
 )
 
 const (
@@ -429,7 +431,7 @@ func initAppConfig() (string, interface{}) {
 	//   own app.toml to override, or use this default value.
 	//
 	// In simapp, we set the min gas prices to 0.
-	srvCfg.MinGasPrices = "0utkx"
+	srvCfg.MinGasPrices = fmt.Sprintf("0%s", utils.BaseDenom)
 
 	customAppConfig := CustomAppConfig{
 		Config: *srvCfg,
