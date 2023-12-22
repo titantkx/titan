@@ -72,16 +72,16 @@ func TestTotalBalanceNotChanged(t *testing.T) {
 func TestSend(t *testing.T) {
 	t.Parallel()
 
-	sender := MustCreateAccount(t, "1tkx")
+	sender := MustCreateAccount(t, "1"+utils.DisplayDenom)
 	receiver := MustCreateAccount(t, "")
 
-	bank.MustSend(t, sender.Address, receiver.Address, "0.5tkx")
+	bank.MustSend(t, sender.Address, receiver.Address, "0.5"+utils.DisplayDenom)
 }
 
 func TestSendLowBalance(t *testing.T) {
 	t.Parallel()
 
-	sender := MustCreateAccount(t, "1tkx")
+	sender := MustCreateAccount(t, "1"+utils.DisplayDenom)
 	receiver := MustCreateAccount(t, "")
 
 	// Attempt to send 2tkx
@@ -91,7 +91,7 @@ func TestSendLowBalance(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
-	tx, err := txcmd.ExecTx(ctx, "bank", "send", sender.Address, receiver.Address, "2tkx")
+	tx, err := txcmd.ExecTx(ctx, "bank", "send", sender.Address, receiver.Address, "2"+utils.DisplayDenom)
 
 	require.Nil(t, tx)
 	require.Error(t, err)
@@ -107,17 +107,17 @@ func TestSendLowBalance(t *testing.T) {
 func TestMultiSend(t *testing.T) {
 	t.Parallel()
 
-	sender := MustCreateAccount(t, "1tkx")
+	sender := MustCreateAccount(t, "1"+utils.DisplayDenom)
 	receiver1 := MustCreateAccount(t, "")
 	receiver2 := MustCreateAccount(t, "")
 
-	bank.MustMultiSend(t, sender.Address, "0.3tkx", receiver1.Address, receiver2.Address)
+	bank.MustMultiSend(t, sender.Address, "0.3"+utils.DisplayDenom, receiver1.Address, receiver2.Address)
 }
 
 func TestMultiSendLowBalance(t *testing.T) {
 	t.Parallel()
 
-	sender := MustCreateAccount(t, "1tkx")
+	sender := MustCreateAccount(t, "1"+utils.DisplayDenom)
 	receiver1 := MustCreateAccount(t, "")
 	receiver2 := MustCreateAccount(t, "")
 
@@ -129,7 +129,7 @@ func TestMultiSendLowBalance(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
-	tx, err := txcmd.ExecTx(ctx, "bank", "multi-send", sender.Address, receiver1.Address, receiver2.Address, "0.6tkx")
+	tx, err := txcmd.ExecTx(ctx, "bank", "multi-send", sender.Address, receiver1.Address, receiver2.Address, "0.6"+utils.DisplayDenom)
 
 	require.Nil(t, tx)
 	require.Error(t, err)

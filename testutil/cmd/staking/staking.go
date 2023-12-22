@@ -126,7 +126,7 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 	require.Equal(t, commissionMaxChangeRate, val.Commission.CommissionRates.MaxChangeRate.Float64())
 	require.Equal(t, minSelfDelegation, val.MinSelfDelegation.Int64())
 	require.False(t, val.Jailed)
-	require.Equal(t, val.Status, BOND_STATUS_BONDED)
+	require.Equal(t, BOND_STATUS_BONDED, val.Status)
 	require.Equal(t, stakedAmount, val.Tokens)
 	val.DelegatorShares.RequireEqual(t, sharedAmount)
 
