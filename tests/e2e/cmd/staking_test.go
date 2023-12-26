@@ -12,7 +12,7 @@ func MustCreateValidator(t testing.TB) staking.Validator {
 	valPk := testutil.MustGenerateEd25519PK(t)
 	del := MustAddKey(t)
 	MustAcquireMoney(t, del.Address, "1000"+utils.DisplayDenom)
-	return staking.MustCreateValidator(t, valPk, "1"+utils.DisplayDenom, 0.1, 0.2, 0.001, 1, del.Address)
+	return staking.MustCreateValidator(t, valPk, "2"+utils.DisplayDenom, 0.1, 0.2, 0.001, 1, del.Address)
 }
 
 func TestCreateValidator(t *testing.T) {
