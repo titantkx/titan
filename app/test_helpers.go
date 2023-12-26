@@ -103,7 +103,7 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
 		Address: acc.GetAddress().String(),
-		Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000000000000))),
+		Coins:   sdk.NewCoins(sdk.NewCoin(utils.BaseDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18)))),
 	}
 
 	app := New(options.Logger, options.DB, nil, true, map[int64]bool{},
@@ -151,15 +151,14 @@ func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	senderPrivKey, err := ethsecp256k1.GenerateKey()
 	require.NoError(t, err)
 
-	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
+	genAcc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
-		Address: acc.GetAddress().String(),
-		Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000000000000))),
+		Address: genAcc.GetAddress().String(),
+		Coins:   sdk.NewCoins(sdk.NewCoin(utils.BaseDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18)))),
 	}
+	app := SetupWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{genAcc}, balance)
 
-	app := SetupWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{acc}, balance)
-
-	return app, acc.GetAddress()
+	return app, genAcc.GetAddress()
 }
 
 func setTxSignature(t *testing.T, builder client.TxBuilder, nonce uint64) {
