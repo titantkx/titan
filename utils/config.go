@@ -11,9 +11,9 @@ import (
 const (
 	AccountAddressPrefix = "titan"
 
-	MainnetChainID = "titan-18888"
+	MainnetChainID = "titan_18888"
 
-	TestnetChainID = "titan-18889"
+	TestnetChainID = "titan_18889"
 	// DisplayDenom defines the denomination displayed to users in client applications.
 	DisplayDenom = "tkx"
 )
