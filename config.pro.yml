@@ -3,28 +3,28 @@ version: 1
 accounts:
 - name: faucet
   coins: ['99994990tkx']
-  # titan1xnpqgn3hz2xvg054w4cc5d5r9dh00nvj9cmkte
-  mnemonic: object depart submit ritual civil culture garment rubber they laundry expose strike proud mushroom curious
+  # titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr
+  mnemonic: hair banner wedding drive age force situate shield tortoise coffee lucky rubber
 - name: test
-  # titan1k0v4rq689uq2s8yhttpmk0a26es8nrmqqkfh0p
+  # titan1up5lnguhgpu2qdqz9hav34yyvs0kjw3pruzrh7
   coins: ['1000tkx']
-  mnemonic: envelope confirm theory tennis noodle monitor poet car lady rely salt latin border bounce knock
+  mnemonic: throw beef member notable devote begin extend possible vibrant original point table
 - name: test2
-  # titan1ka0ycn78zm5zz326zf7aw3r7gpnwjwm8qn3agn
+  # titan1ynme00xsfgugu4ucnumlxh30afzynqz95y0avt
   coins: ['1001tkx']
-  mnemonic: orient city dad visual junk accuse arch muscle tag fatal clump tube swarm unusual erosion
+  mnemonic: vague actress result stage connect little skin fragile gift chef exile trophy
 - name: val1
-  # titan1rn4kdmg3qm6ga279kvlqa2n8mf4rheexq0ugt5
+  # titan1cxjpv02d4cg7jp9qvh2her2lz5ljut0upv5gyv
   coins: ['1002tkx']
-  mnemonic: seek depth rigid improve wear able below whisper reward survey effort rescue unveil daring skate
+  mnemonic: tree text ghost clay fun asset audit focus carbon slab two aim
 - name: val2
-  # titan1rsyy9ewhtzdj0v0jc6zj92j9dsmtll665ak0vc
+  # titan12gxum5krnqerwdtpc32ypvuwxlnnaq2kwxexl9
   coins: ['1003tkx']
-  mnemonic: health adapt wheel wheat caught inherit august dynamic ecology wheat ice magnet physical swap tower
+  mnemonic: dignity include calm dinner frog clip bunker report grocery point actor home
 - name: val3
-  # titan1w6hnaps2tyr20pcp9gkt38m2srflsk7ctkmfee
+  # titan1j90sphl02kuc5s465m9c33qpa28hrlx07qvjdp
   coins: ['1004tkx']
-  mnemonic: federal gate food arrest three yard fence furnace cousin source toast expose perfect toward maid
+  mnemonic: merry strike spray access able edge rally bulk other butter involve situate
 
 validators:
 - name: val1

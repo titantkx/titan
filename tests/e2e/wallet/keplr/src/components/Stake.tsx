@@ -20,7 +20,7 @@ const Stake = ({ client }: StakeProps) => {
   }
 
   const initialValues: StakeInputs = {
-    delegator: "titan1xnpqgn3hz2xvg054w4cc5d5r9dh00nvj9cmkte",
+    delegator: "titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr",
     validator: "titanvaloper1rn4kdmg3qm6ga279kvlqa2n8mf4rheex7medn9",
     amount: "1tkx",
     gas: "auto",
