@@ -20,7 +20,7 @@ const Send = ({ client }: SendProps) => {
   }
 
   const initialValues: SendInputs = {
-    sender: "titan1xnpqgn3hz2xvg054w4cc5d5r9dh00nvj9cmkte",
+    sender: "titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr",
     receiver: "titan1zhxfglgt5ch2sls6gx346vvy4kn7w26jxy3xju",
     amount: "1tkx",
     gas: "auto",
