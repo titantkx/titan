@@ -1,10 +1,12 @@
 package testutil_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/tokenize-titan/titan/testutil"
+	"github.com/tokenize-titan/titan/utils"
 )
 
 func TestMustParseAmount(t *testing.T) {
@@ -17,21 +19,21 @@ func TestMustParseAmount(t *testing.T) {
 	require.Equal(t, "eth", coins[1].Denom)
 }
 
-func TestMustGetUtkxAmount(t *testing.T) {
+func TestMustGetBaseDenomAmount(t *testing.T) {
 	tests := []struct {
 		Amount   string
 		Expected testutil.BigInt
 	}{
 		{
-			Amount:   "100tkx",
+			Amount:   fmt.Sprintf("100%s", utils.DisplayDenom),
 			Expected: testutil.MakeBigIntFromString("100000000000000000000"),
 		},
 		{
-			Amount:   "0.5tkx",
+			Amount:   fmt.Sprintf("0.5%s", utils.DisplayDenom),
 			Expected: testutil.MakeBigIntFromString("500000000000000000"),
 		},
 		{
-			Amount:   "300utkx",
+			Amount:   fmt.Sprintf("300%s", utils.BaseDenom),
 			Expected: testutil.MakeBigIntFromString("300"),
 		},
 		{
@@ -39,17 +41,17 @@ func TestMustGetUtkxAmount(t *testing.T) {
 			Expected: testutil.MakeBigIntFromString("0"),
 		},
 		{
-			Amount:   "10utkx,1eth",
+			Amount:   fmt.Sprintf("10%s,1eth", utils.BaseDenom),
 			Expected: testutil.MakeBigIntFromString("10"),
 		},
 		{
-			Amount:   "0.1tkx,1eth",
+			Amount:   fmt.Sprintf("0.1%s,1eth", utils.DisplayDenom),
 			Expected: testutil.MakeBigIntFromString("100000000000000000"),
 		},
 	}
 
 	for _, test := range tests {
-		actual := testutil.MustGetUtkxAmount(t, test.Amount)
+		actual := testutil.MustGetBaseDenomAmount(t, test.Amount)
 		require.Equal(t, test.Expected, actual)
 	}
 }

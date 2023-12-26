@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/tokenize-titan/titan/utils"
 )
 
 var coinPattern = regexp.MustCompile(`((?:[\d]+\.)?[\d]+)([\w]+)`)
@@ -17,16 +19,16 @@ type Coin struct {
 
 type Coins []Coin
 
-func (coins Coins) GetUtkxAmount() BigInt {
-	utkxAmount := MakeBigInt(0)
+func (coins Coins) GetBaseDenomAmount() BigInt {
+	baseDenomAmount := MakeBigInt(0)
 	for _, coin := range coins {
 		if coin.Denom == "tkx" {
-			utkxAmount = utkxAmount.Add(coin.Amount.Mul(MakeBigFloat(1000_000_000_000_000_000)).BigInt())
-		} else if coin.Denom == "utkx" {
-			utkxAmount = utkxAmount.Add(coin.Amount.BigInt())
+			baseDenomAmount = baseDenomAmount.Add(coin.Amount.Mul(MakeBigFloat(1000_000_000_000_000_000)).BigInt())
+		} else if coin.Denom == utils.BaseDenom {
+			baseDenomAmount = baseDenomAmount.Add(coin.Amount.BigInt())
 		}
 	}
-	return utkxAmount
+	return baseDenomAmount
 }
 
 func MustParseCoin(t testing.TB, txt string) Coin {
@@ -48,6 +50,6 @@ func MustParseAmount(t testing.TB, amount string) Coins {
 	return coins
 }
 
-func MustGetUtkxAmount(t testing.TB, amount string) BigInt {
-	return MustParseAmount(t, amount).GetUtkxAmount()
+func MustGetBaseDenomAmount(t testing.TB, amount string) BigInt {
+	return MustParseAmount(t, amount).GetBaseDenomAmount()
 }

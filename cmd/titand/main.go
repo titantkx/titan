@@ -8,11 +8,12 @@ import (
 
 	"github.com/tokenize-titan/titan/app"
 	"github.com/tokenize-titan/titan/cmd/titand/cmd"
+	"github.com/tokenize-titan/titan/utils"
 )
 
 func main() {
-	setupConfig()
-	cmd.RegisterDenoms()
+	utils.InitSDKConfig()
+	utils.RegisterDenoms()
 
 	rootCmd, _ := cmd.NewRootCmd()
 	if err := svrcmd.Execute(rootCmd, "", app.DefaultNodeHome); err != nil {
@@ -24,9 +25,4 @@ func main() {
 			os.Exit(1)
 		}
 	}
-}
-
-func setupConfig() {
-	// Set config
-	cmd.InitSDKConfig()
 }

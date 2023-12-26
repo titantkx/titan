@@ -23,17 +23,23 @@ import (
 	v1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	v1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/tokenize-titan/titan/app"
+	"github.com/tokenize-titan/titan/utils"
 	"github.com/tokenize-titan/titan/x/gov/keeper"
 	govtestutil "github.com/tokenize-titan/titan/x/gov/testutil"
 )
 
 var (
-	_, _, addr    = testdata.KeyTestPubAddr()
-	_, _, genAddr = testdata.KeyTestPubAddr()
-	govAcct       = authtypes.NewModuleAddress(govtypes.ModuleName)
-	TestProposal  = getTestProposal()
+	_, _, addr                 = testdata.KeyTestPubAddr()
+	_, _, genAddr              = testdata.KeyTestPubAddr()
+	govAcct                    = sdk.AccAddress{}
+	TestProposal               = []sdk.Msg{}
+	MinDepositByConcensusPower = int64(100)
 )
+
+func initGlobalVars() {
+	govAcct = authtypes.NewModuleAddress(govtypes.ModuleName)
+	TestProposal = getTestProposal()
+}
 
 // getTestProposal creates and returns a test proposal message.
 func getTestProposal() []sdk.Msg {
@@ -43,7 +49,7 @@ func getTestProposal() []sdk.Msg {
 	}
 
 	return []sdk.Msg{
-		banktypes.NewMsgSend(govAcct, addr, sdk.NewCoins(sdk.NewCoin("utkx", sdk.NewInt(1000_000_000)))),
+		banktypes.NewMsgSend(govAcct, addr, sdk.NewCoins(sdk.NewCoin(utils.BaseDenom, sdk.NewInt(250).Mul(sdk.NewInt(1e18))))),
 		legacyProposalMsg,
 	}
 }
@@ -61,13 +67,12 @@ func setupGovKeeper(t *testing.T) (
 	t.Helper()
 
 	// fmt.Println(addr.String(), genAddr.String(), govAcct.String())
+	utils.InitSDKConfig()
+	utils.RegisterDenoms()
 
-	app.RegisterDenoms()
+	initGlobalVars()
 
-	// tkx1 := sdk.NewCoin("tkx", sdk.NewInt(1))
-	// utkx1 := sdk.NewCoin("utkx", sdk.NewInt(1))
-
-	// fmt.Println(tkx1, utkx1)
+	govAcct = authtypes.NewModuleAddress(govtypes.ModuleName)
 
 	key := sdk.NewKVStoreKey(govtypes.StoreKey)
 	testCtx := testutil.DefaultContextWithDB(t, key, sdk.NewTransientStoreKey("transient_test"))
@@ -99,7 +104,9 @@ func setupGovKeeper(t *testing.T) (
 	govRouter := v1beta1.NewRouter() // Also register legacy gov handlers to test them too.
 	govRouter.AddRoute(govtypes.RouterKey, v1beta1.ProposalHandler)
 	govKeeper.SetLegacyRouter(govRouter)
-	govKeeper.SetParams(ctx, v1.DefaultParams())
+	govParams := v1.DefaultParams()
+	govParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(MinDepositByConcensusPower).Mul(sdk.NewInt(1e18))))
+	govKeeper.SetParams(ctx, govParams)
 
 	// Register all handlers for the MegServiceRouter.
 	msr.SetInterfaceRegistry(encCfg.InterfaceRegistry)
@@ -118,7 +125,7 @@ func trackMockAccount(ctx sdk.Context, accKeeper *sdkgovtestutil.MockAccountKeep
 // locally tracks accounts balances (not modules balances).
 func trackMockBank(ctx sdk.Context, bankKeeper *sdkgovtestutil.MockBankKeeper) {
 	balances := make(map[string]sdk.Coins)
-	balances[genAddr.String()] = sdk.NewCoins(sdk.NewCoin("utkx", sdk.NewInt(1000_000_000_000_000_000)))
+	balances[genAddr.String()] = sdk.NewCoins(sdk.NewCoin(utils.BaseDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18))))
 
 	// We don't track module account balances.
 	bankKeeper.EXPECT().BurnCoins(gomock.Any(), govtypes.ModuleName, gomock.Any()).Times(0)
@@ -174,12 +181,12 @@ func trackMockBank(ctx sdk.Context, bankKeeper *sdkgovtestutil.MockBankKeeper) {
 
 func trackMockStaking(ctx sdk.Context, stakingKeeper *sdkgovtestutil.MockStakingKeeper) {
 	stakingKeeper.EXPECT().TokensFromConsensusPower(ctx, gomock.Any()).DoAndReturn(func(ctx sdk.Context, power int64) math.Int {
-		return sdk.TokensFromConsensusPower(power, math.NewIntFromUint64(1000000))
+		return sdk.TokensFromConsensusPower(power, sdk.DefaultPowerReduction)
 	}).AnyTimes()
-	stakingKeeper.EXPECT().BondDenom(ctx).Return("utkx").AnyTimes()
+	stakingKeeper.EXPECT().BondDenom(ctx).Return(utils.BaseDenom).AnyTimes()
 	stakingKeeper.EXPECT().IterateBondedValidatorsByPower(gomock.Any(), gomock.Any()).AnyTimes()
 	stakingKeeper.EXPECT().IterateDelegations(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes()
-	stakingKeeper.EXPECT().TotalBondedTokens(gomock.Any()).Return(math.NewInt(10000000)).AnyTimes()
+	stakingKeeper.EXPECT().TotalBondedTokens(gomock.Any()).Return(math.NewInt(1e3).Mul(math.NewInt(1e18))).AnyTimes()
 }
 
 func trackMockDistribution(ctx sdk.Context, distrKeeper *govtestutil.MockDistributionKeeper, bankKeeper *sdkgovtestutil.MockBankKeeper) {

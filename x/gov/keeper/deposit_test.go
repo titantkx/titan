@@ -9,6 +9,7 @@ import (
 	v1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
 	simtestutil "github.com/tokenize-titan/titan/testutil/sims"
+	"github.com/tokenize-titan/titan/utils"
 )
 
 const (
@@ -19,15 +20,15 @@ const (
 func TestDeposits(t *testing.T) {
 	govKeeper, _, bankKeeper, stakingKeeper, _, _, _, ctx := setupGovKeeper(t)
 
-	TestAddrs := simtestutil.AddTestAddrsIncremental(bankKeeper, ctx, genAddr, 2, sdk.NewInt(10_000_000), "utkx")
+	TestAddrs := simtestutil.AddTestAddrsIncremental(bankKeeper, ctx, genAddr, 2, stakingKeeper.TokensFromConsensusPower(ctx, 1000), utils.BaseDenom)
 
 	tp := TestProposal
 	proposal, err := govKeeper.SubmitProposal(ctx, tp, "", "title", "description", TestAddrs[0])
 	require.NoError(t, err)
 	proposalID := proposal.Id
 
-	fourStake := sdk.NewCoins(sdk.NewCoin("utkx", stakingKeeper.TokensFromConsensusPower(ctx, 4)))
-	fiveStake := sdk.NewCoins(sdk.NewCoin("utkx", stakingKeeper.TokensFromConsensusPower(ctx, 5)))
+	fourStake := sdk.NewCoins(sdk.NewCoin(utils.BaseDenom, stakingKeeper.TokensFromConsensusPower(ctx, 40)))
+	fiveStake := sdk.NewCoins(sdk.NewCoin(utils.BaseDenom, stakingKeeper.TokensFromConsensusPower(ctx, 50)))
 
 	addr0Initial := bankKeeper.GetAllBalances(ctx, TestAddrs[0])
 	addr1Initial := bankKeeper.GetAllBalances(ctx, TestAddrs[1])

@@ -11,6 +11,7 @@ import (
 	"github.com/tokenize-titan/titan/testutil"
 	"github.com/tokenize-titan/titan/testutil/cmd"
 	"github.com/tokenize-titan/titan/testutil/cmd/feemarket"
+	"github.com/tokenize-titan/titan/utils"
 )
 
 var rpcErrPattern = regexp.MustCompile(`RPC\serror\s(-?[\d]+)`)
@@ -90,7 +91,7 @@ func ExecTx(ctx context.Context, args ...string) (*TxResponse, error) {
 		return nil, err
 	}
 	args = append([]string{"tx"}, args...)
-	args = append(args, "--gas=auto", "--gas-adjustment=1.3", "--gas-prices="+gasPrice.String()+"utkx", "--output=json", "-y")
+	args = append(args, "--gas=auto", "--gas-adjustment=1.3", "--gas-prices="+gasPrice.String()+utils.BaseDenom, "--output=json", "-y")
 	args = append(args, "--keyring-backend=test")
 	output, err := cmd.Exec("titand", args...)
 	if err != nil {

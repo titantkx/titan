@@ -15,20 +15,20 @@ accounts:
   mnemonic: orient city dad visual junk accuse arch muscle tag fatal clump tube swarm unusual erosion
 - name: val1
   # titan1rn4kdmg3qm6ga279kvlqa2n8mf4rheexq0ugt5
-  coins: ['100002tkx']
+  coins: ['1002tkx']
   mnemonic: seek depth rigid improve wear able below whisper reward survey effort rescue unveil daring skate
 - name: val2
   # titan1rsyy9ewhtzdj0v0jc6zj92j9dsmtll665ak0vc
-  coins: ['100003tkx']
+  coins: ['1003tkx']
   mnemonic: health adapt wheel wheat caught inherit august dynamic ecology wheat ice magnet physical swap tower
 - name: val3
   # titan1w6hnaps2tyr20pcp9gkt38m2srflsk7ctkmfee
-  coins: ['100004tkx']
+  coins: ['1004tkx']
   mnemonic: federal gate food arrest three yard fence furnace cousin source toast expose perfect toward maid
 
 validators:
 - name: val1
-  bonded: 100000tkx
+  bonded: 1000tkx
   home: "local_test_data/.titan_val1"
   app:
     minimum-gas-prices: 0atkx
@@ -60,17 +60,17 @@ genesis:
     staking:
       params:
         bond_denom: "atkx"
-        unbonding_time: "120s"
-        max_validators: 8
+        unbonding_time: "2592000s"
+        max_validators: 188
     crisis:
       constant_fee:
         denom: "atkx"
         amount: "10000000000000000000"
     slashing:
       params:
-        signed_blocks_window: "100"
-        min_signed_per_window: "0.500000000000000000"
-        downtime_jail_duration: "60s"
+        signed_blocks_window: "10000"
+        min_signed_per_window: "0.050000000000000000"
+        downtime_jail_duration: "600s"
         slash_fraction_double_sign: "0.050000000000000000"
         slash_fraction_downtime: "0.000100000000000000"
     gov:
@@ -78,8 +78,8 @@ genesis:
         min_deposit:
         - denom: "atkx"
           amount: "250000000000000000000"  
-        max_deposit_period: "120s" 
-        voting_period: "120s"
+        max_deposit_period: "604800s" 
+        voting_period: "604800s"
     evm:
       params:
         evm_denom: "atkx"

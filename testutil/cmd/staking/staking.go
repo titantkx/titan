@@ -5,6 +5,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/tokenize-titan/titan/utils"
+
 	"github.com/tokenize-titan/titan/testutil"
 	"github.com/tokenize-titan/titan/testutil/cmd"
 	"github.com/tokenize-titan/titan/testutil/cmd/bank"
@@ -80,17 +83,17 @@ func MustGetDelegation(t testing.TB, delegator string, validator string) Delegat
 }
 
 func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation int64, from string) Validator {
-	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
+	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
 	tx := txcmd.MustExecTx(t, ctx, "staking", "create-validator", "--pubkey="+valPk.String(), "--amount="+amount, "--commission-rate="+testutil.FormatFloat(commissionRate), "--commission-max-rate="+testutil.FormatFloat(commissionMaxRate), "--commission-max-change-rate="+testutil.FormatFloat(commissionMaxChangeRate), "--min-self-delegation="+testutil.FormatInt(minSelfDelegation), "--from="+from)
 
-	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
+	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
-	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetUtkxAmount()
-	stakedAmount := testutil.MustGetUtkxAmount(t, amount)
+	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+	stakedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	sharedAmount := stakedAmount.BigFloat()
 
 	require.Equal(t, balBefore.Sub(coinSpent).Sub(stakedAmount), balAfter)
@@ -104,7 +107,7 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 				if att.Key == "validator" {
 					valAddr = att.Value
 				} else if att.Key == "amount" {
-					actualStakedAmount = testutil.MustGetUtkxAmount(t, att.Value)
+					actualStakedAmount = testutil.MustGetBaseDenomAmount(t, att.Value)
 				}
 			}
 		}
@@ -123,7 +126,7 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 	require.Equal(t, commissionMaxChangeRate, val.Commission.CommissionRates.MaxChangeRate.Float64())
 	require.Equal(t, minSelfDelegation, val.MinSelfDelegation.Int64())
 	require.False(t, val.Jailed)
-	require.Equal(t, val.Status, BOND_STATUS_BONDED)
+	require.Equal(t, BOND_STATUS_BONDED, val.Status)
 	require.Equal(t, stakedAmount, val.Tokens)
 	val.DelegatorShares.RequireEqual(t, sharedAmount)
 
@@ -137,7 +140,7 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 
 func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 	valBefore := MustGetValidator(t, valAddr)
-	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
+	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
@@ -145,10 +148,10 @@ func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 	tx := txcmd.MustExecTx(t, ctx, "staking", "delegate", valAddr, amount, "--from="+from)
 
 	valAfter := MustGetValidator(t, valAddr)
-	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
+	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
-	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetUtkxAmount()
-	delegatedAmount := testutil.MustGetUtkxAmount(t, amount)
+	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+	delegatedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 	sharedAmount := valBefore.DelegatorShares.Mul(delegatedAmount.DivFloat(valBefore.Tokens))
 
@@ -165,7 +168,7 @@ func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from string) {
 	srcValBefore := MustGetValidator(t, srcVal)
 	dstValBefore := MustGetValidator(t, dstVal)
-	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
+	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 	srcDelBefore := MustGetDelegation(t, from, srcVal)
 	dstDelBefore, err := GetDelegation(from, dstVal)
 
@@ -182,11 +185,11 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 
 	srcValAfter := MustGetValidator(t, srcVal)
 	dstValAfter := MustGetValidator(t, dstVal)
-	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
+	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	reward := mustGetReward(t, tx.Events)
-	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetUtkxAmount()
-	redelegatedAmount := testutil.MustGetUtkxAmount(t, amount)
+	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+	redelegatedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	srcSlashedAmount := mustGetSlashedAmount(t, srcValBefore, srcValAfter)
 	dstSlashedAmount := mustGetSlashedAmount(t, dstValBefore, dstValAfter)
 	unbondedShares := srcValBefore.DelegatorShares.Mul(redelegatedAmount.DivFloat(srcValBefore.Tokens))
@@ -223,7 +226,7 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 
 func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.TxResponse {
 	valBefore := MustGetValidator(t, valAddr)
-	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
+	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 	delBefore := MustGetDelegation(t, from, valAddr)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
@@ -232,11 +235,11 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.
 	tx := txcmd.MustExecTx(t, ctx, "staking", "unbond", valAddr, amount, "--from="+from)
 
 	valAfter := MustGetValidator(t, valAddr)
-	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
+	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	reward := mustGetReward(t, tx.Events)
-	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetUtkxAmount()
-	unbondedAmount := testutil.MustGetUtkxAmount(t, amount)
+	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+	unbondedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 	unbondedShares := valBefore.DelegatorShares.Mul(unbondedAmount.DivFloat(valBefore.Tokens))
 
@@ -261,7 +264,7 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.
 
 func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeight int64, from string) {
 	valBefore := MustGetValidator(t, valAddr)
-	balBefore := bank.MustGetBalance(t, from, "utkx", 0)
+	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 	delBefore, err := GetDelegation(from, valAddr)
 
 	if err != nil {
@@ -276,11 +279,11 @@ func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeig
 	tx := txcmd.MustExecTx(t, ctx, "staking", "cancel-unbond", valAddr, amount, testutil.FormatInt(creationHeight), "--from="+from)
 
 	valAfter := MustGetValidator(t, valAddr)
-	balAfter := bank.MustGetBalance(t, from, "utkx", 0)
+	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	reward := mustGetReward(t, tx.Events)
-	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetUtkxAmount()
-	unbondedAmount := testutil.MustGetUtkxAmount(t, amount)
+	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+	unbondedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 	unbondedShares := valBefore.DelegatorShares.Mul(unbondedAmount.DivFloat(valBefore.Tokens))
 
@@ -305,7 +308,7 @@ func mustGetReward(t testing.TB, events []txcmd.Event) testutil.BigInt {
 		if event.Type == "withdraw_rewards" {
 			for _, att := range event.Attributes {
 				if att.Key == "amount" {
-					reward = reward.Add(testutil.MustGetUtkxAmount(t, att.Value))
+					reward = reward.Add(testutil.MustGetBaseDenomAmount(t, att.Value))
 				}
 			}
 		}

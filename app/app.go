@@ -131,6 +131,7 @@ import (
 	"github.com/tokenize-titan/titan/app/ante"
 	v1 "github.com/tokenize-titan/titan/app/upgrades/v1"
 	"github.com/tokenize-titan/titan/docs"
+	"github.com/tokenize-titan/titan/utils"
 	distrkeeper "github.com/tokenize-titan/titan/x/distribution/keeper"
 	gov "github.com/tokenize-titan/titan/x/gov"
 	govkeeper "github.com/tokenize-titan/titan/x/gov/keeper"
@@ -148,9 +149,10 @@ import (
 )
 
 const (
-	AccountAddressPrefix = "titan"
-	Name                 = "titand"
+	AccountAddressPrefix = utils.AccountAddressPrefix
 )
+
+var Name = fmt.Sprintf("%sd", utils.AccountAddressPrefix)
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
 
@@ -327,12 +329,6 @@ func New(
 	}
 
 	eip712.SetEncodingConfig(ethermintEncodingConfig)
-
-	// NOTE: set `DefaultPowerReduction`. This can be understand as minium stake amount of validator but not actually.
-	//				This value is used to calculate the voting power of validator.
-	// Re config `DefaultPowerReduction`
-	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
-	sdk.DefaultBondDenom = "utkx"
 
 	bApp := baseapp.NewBaseApp(
 		Name,

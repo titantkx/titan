@@ -22,7 +22,7 @@ const WithdrawRewards = ({ client }: WithdrawRewardsProps) => {
     delegator: "titan1xnpqgn3hz2xvg054w4cc5d5r9dh00nvj9cmkte",
     validator: "titanvaloper1rn4kdmg3qm6ga279kvlqa2n8mf4rheex7medn9",
     gas: "auto",
-    gasPrice: "10utkx",
+    gasPrice: "10atkx",
   };
 
   const withdrawRewardsSchema = Yup.object().shape({
