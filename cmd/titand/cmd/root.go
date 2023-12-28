@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	rosettaCmd "cosmossdk.io/tools/rosetta/cmd"
 	dbm "github.com/cometbft/cometbft-db"
@@ -142,6 +143,18 @@ func addDefaultKeyInfoKeyring(clientCtx client.Context) (client.Context, error) 
 // return tmcfg.DefaultConfig if no custom configuration is required for the application.
 func initTendermintConfig() *tmcfg.Config {
 	cfg := tmcfg.DefaultConfig()
+
+	cfg.Consensus.CreateEmptyBlocks = false
+	cfg.Consensus.CreateEmptyBlocksInterval = 120 * time.Second
+	cfg.Consensus.TimeoutPropose = 30 * time.Second
+	cfg.Consensus.TimeoutProposeDelta = 5 * time.Second
+	cfg.Consensus.TimeoutPrevote = 10 * time.Second
+	cfg.Consensus.TimeoutPrevoteDelta = 5 * time.Second
+	cfg.Consensus.TimeoutPrecommit = 10 * time.Second
+	cfg.Consensus.TimeoutPrecommitDelta = 5 * time.Second
+	cfg.Consensus.TimeoutCommit = 5 * time.Second
+	cfg.RPC.TimeoutBroadcastTxCommit = 20 * time.Second
+
 	return cfg
 }
 
