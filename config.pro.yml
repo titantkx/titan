@@ -37,6 +37,18 @@ validators:
     api.enabled-unsafe-cors: true
   config:
     moniker: "titan val1"
+    consensus: 
+      create_empty_blocks: false
+      create_empty_blocks_interval: 120s
+      timeout_propose: 30s
+      timeout_propose_delta: 5s
+      timeout_prevote: 10s
+      timeout_prevote_delta: 5s
+      timeout_precommit: 10s
+      timeout_precommit_delta: 5s
+      timeout_commit: 5s
+    rpc:
+      timeout_broadcast_tx_commit: 20s
   client:
     chain-id: "titan_18888-1"
     keyring-backend: "test"
@@ -55,6 +67,9 @@ genesis:
     block:      
       max_gas: "10000000"
       time_iota_ms: "1000"
+    evidence:
+      max_age_num_blocks: "518400"
+      max_age_duration: "2592000000000000"
 
   app_state:
     staking:
