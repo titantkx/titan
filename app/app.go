@@ -129,6 +129,7 @@ import (
 	feemarkettypes "github.com/tokenize-titan/ethermint/x/feemarket/types"
 
 	"github.com/tokenize-titan/titan/app/ante"
+	"github.com/tokenize-titan/titan/app/posthandler"
 	v1 "github.com/tokenize-titan/titan/app/upgrades/v1"
 	"github.com/tokenize-titan/titan/docs"
 	"github.com/tokenize-titan/titan/utils"
@@ -862,6 +863,8 @@ func New(
 
 	app.setupUpgradeHandlers()
 
+	app.setPostHandler()
+
 	// must be before Loading version
 	// requires the snapshot store to be created and registered as a BaseAppOption
 	// see cmd/wasmd/root.go: 206 - 214 approx
@@ -924,6 +927,16 @@ func (app *App) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64, wa
 	}
 
 	app.SetAnteHandler(anteHandler)
+}
+
+func (app *App) setPostHandler() {
+	postHandler := posthandler.NewPostHandler(
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.FeeGrantKeeper,
+	)
+
+	app.SetPostHandler(postHandler)
 }
 
 // Name returns the name of the App
