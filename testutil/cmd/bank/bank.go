@@ -14,7 +14,7 @@ import (
 	txcmd "github.com/tokenize-titan/titan/testutil/cmd/tx"
 )
 
-func MustSend(t testing.TB, from string, to string, amount string) tx.TxResponse {
+func MustSend(t testing.TB, from string, to string, amount string) txcmd.TxResponse {
 	fromBalBefore := MustGetBalance(t, from, utils.BaseDenom, 0)
 	toBalBefore := MustGetBalance(t, to, utils.BaseDenom, 0)
 
@@ -26,7 +26,8 @@ func MustSend(t testing.TB, from string, to string, amount string) tx.TxResponse
 	fromBalAfter := MustGetBalance(t, from, utils.BaseDenom, 0)
 	toBalAfter := MustGetBalance(t, to, utils.BaseDenom, 0)
 
-	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+	coinSpent, err := tx.GetDeductFeeAmount()
+	require.NoError(t, err)
 	sentAmount := testutil.MustGetBaseDenomAmount(t, amount)
 
 	require.Equal(t, fromBalBefore.Sub(coinSpent).Sub(sentAmount), fromBalAfter)
@@ -56,7 +57,8 @@ func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.Tx
 		toBalAfter = append(toBalAfter, MustGetBalance(t, to[i], utils.BaseDenom, 0))
 	}
 
-	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+	coinSpent, err := tx.GetDeductFeeAmount()
+	require.NoError(t, err)
 	sentAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	totalSentAmount := sentAmount.Mul(testutil.MakeBigInt(int64(len(to))))
 

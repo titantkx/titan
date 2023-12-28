@@ -92,7 +92,8 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
-	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+	coinSpent, err := tx.GetDeductFeeAmount()
+	require.NoError(t, err)
 	stakedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	sharedAmount := stakedAmount.BigFloat()
 
@@ -150,7 +151,8 @@ func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 	valAfter := MustGetValidator(t, valAddr)
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
-	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+	coinSpent, err := tx.GetDeductFeeAmount()
+	require.NoError(t, err)
 	delegatedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 	sharedAmount := valBefore.DelegatorShares.Mul(delegatedAmount.DivFloat(valBefore.Tokens))
@@ -188,7 +190,8 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	reward := mustGetReward(t, tx.Events)
-	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+	coinSpent, err := tx.GetDeductFeeAmount()
+	require.NoError(t, err)
 	redelegatedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	srcSlashedAmount := mustGetSlashedAmount(t, srcValBefore, srcValAfter)
 	dstSlashedAmount := mustGetSlashedAmount(t, dstValBefore, dstValAfter)
@@ -238,7 +241,8 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	reward := mustGetReward(t, tx.Events)
-	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+	coinSpent, err := tx.GetDeductFeeAmount()
+	require.NoError(t, err)
 	unbondedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 	unbondedShares := valBefore.DelegatorShares.Mul(unbondedAmount.DivFloat(valBefore.Tokens))
@@ -282,7 +286,8 @@ func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeig
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	reward := mustGetReward(t, tx.Events)
-	coinSpent := tx.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+	coinSpent, err := tx.GetDeductFeeAmount()
+	require.NoError(t, err)
 	unbondedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 	unbondedShares := valBefore.DelegatorShares.Mul(unbondedAmount.DivFloat(valBefore.Tokens))

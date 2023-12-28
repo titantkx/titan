@@ -113,3 +113,48 @@ func MustExecTx(t testing.TB, ctx context.Context, args ...string) TxResponse {
 	require.Equal(t, 0, tx.Code, tx.RawLog)
 	return *tx
 }
+
+func (txr TxResponse) GetRefundAmount() (testutil.BigInt, error) {
+	// find event in `tx.Events` have type "refund"
+	var refundEvent *Event
+	for _, event := range txr.Events {
+		if event.Type == "refund" {
+			refundEvent = &event
+			break
+		}
+	}
+
+	if refundEvent != nil {
+		// find attribute "amount" in `refundEvent.Attributes`
+		var amountValue string
+		for _, attr := range refundEvent.Attributes {
+			if attr.Key == "amount" {
+				amountValue = attr.Value
+				break
+			}
+		}
+
+		// convert amount value to BigInt
+		if amountValue != "" {
+			refundAmount, err := testutil.ParseAmount(amountValue)
+			if err == nil {
+				return refundAmount.GetBaseDenomAmount(), err
+			}
+		}
+
+		return testutil.Coins{}.GetBaseDenomAmount(), nil
+	}
+
+	return testutil.Coins{}.GetBaseDenomAmount(), nil
+}
+
+func (txr TxResponse) GetDeductFeeAmount() (testutil.BigInt, error) {
+	coinSpent := txr.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
+
+	refundAmount, err := txr.GetRefundAmount()
+	if err != nil {
+		return testutil.Coins{}.GetBaseDenomAmount(), err
+	}
+
+	return coinSpent.Sub(refundAmount), nil
+}
