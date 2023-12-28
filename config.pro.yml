@@ -65,7 +65,7 @@ genesis:
   chain_id: titan_18888-1
   consensus_params:
     block:      
-      max_gas: "10000000"
+      max_gas: "20000000"
       time_iota_ms: "1000"
     evidence:
       max_age_num_blocks: "518400"
