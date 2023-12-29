@@ -73,7 +73,7 @@ func (d RefundGasRemainingDecorator) maybeRefund(ctx sdk.Context, tx sdk.Tx, sim
 
 	gasMeter := ctx.GasMeter()
 
-	// check if gas meter is infinite
+	// check if gas meter is infinite, if so it can be eth tx so no refund is needed
 	if gasMeter.GasRemaining() == sdk.Gas(math.MaxUint64) ||
 		reflect.TypeOf(gasMeter) == reflect.TypeOf(sdk.NewInfiniteGasMeter()) ||
 		reflect.TypeOf(gasMeter) == reflect.TypeOf(etherminttypes.NewInfiniteGasMeterWithLimit(0)) {
