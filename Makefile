@@ -246,3 +246,11 @@ localnet-serve:
 
 localnet-serve-reset:
 	@ignite chain serve --skip-proto --reset-once -v
+
+###############################################################################
+###                                Testing                                  ###
+###############################################################################
+
+test-solidity:
+	@echo "Beginning solidity tests..."
+	./scripts/run-solidity-tests.sh

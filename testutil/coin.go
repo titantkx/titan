@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"errors"
 	"regexp"
 	"strings"
 	"testing"
@@ -31,6 +32,20 @@ func (coins Coins) GetBaseDenomAmount() BigInt {
 	return baseDenomAmount
 }
 
+func ParseCoin(txt string) (Coin, error) {
+	var coin Coin
+	matches := coinPattern.FindStringSubmatch(txt)
+	if len(matches) != 3 {
+		return coin, errors.New("invalid coin format")
+	}
+	err := coin.Amount.UnmarshalText([]byte(matches[1]))
+	if err != nil {
+		return coin, err
+	}
+	coin.Denom = matches[2]
+	return coin, nil
+}
+
 func MustParseCoin(t testing.TB, txt string) Coin {
 	var coin Coin
 	matches := coinPattern.FindStringSubmatch(txt)
@@ -39,6 +54,18 @@ func MustParseCoin(t testing.TB, txt string) Coin {
 	require.NoError(t, err)
 	coin.Denom = matches[2]
 	return coin
+}
+
+func ParseAmount(txt string) (Coins, error) {
+	var coins Coins
+	for _, txt := range strings.Split(txt, ",") {
+		coin, err := ParseCoin(txt)
+		if err != nil {
+			return nil, err
+		}
+		coins = append(coins, coin)
+	}
+	return coins, nil
 }
 
 func MustParseAmount(t testing.TB, amount string) Coins {

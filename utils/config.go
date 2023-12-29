@@ -25,10 +25,12 @@ var (
 	MicroDenom = fmt.Sprintf("u%s", DisplayDenom)
 	// MilliDenom defines the milli denomination used in titan (1/1,000 of a tkx).
 	MilliDenom = fmt.Sprintf("m%s", DisplayDenom)
+	// BondDenom defines the denomination used for bonds in titan.
+	BondDenom = BaseDenom
 )
 
 func InitSDKConfig() {
-	sdk.DefaultBondDenom = BaseDenom
+	sdk.DefaultBondDenom = BondDenom
 	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1e18)
 
 	// Set prefixes
