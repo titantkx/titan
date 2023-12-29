@@ -4,7 +4,7 @@ export PATH=$PATH:$GOPATH/bin
 
 make install
 
-cd tests/solidity
+cd tests/e2e/solidity
 
 if command -v yarn &> /dev/null; then
     yarn install
