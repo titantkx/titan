@@ -23,8 +23,6 @@ func NewPostHandler(
 	return func(
 		ctx sdk.Context, tx sdk.Tx, sim bool, success bool,
 	) (newCtx sdk.Context, err error) {
-		var postHandler sdk.PostHandler
-
 		defer Recover(ctx.Logger(), &err)
 
 		postDecorators := []sdk.PostDecorator{
@@ -32,6 +30,7 @@ func NewPostHandler(
 			// list.
 			NewRefundGasRemainingDecorator(accountKeeper, bankKeeper, feegrantKeeper),
 		}
+		postHandler := sdk.ChainPostDecorators(postDecorators...)
 
 		txWithExtensions, ok := tx.(authante.HasExtensionOptionsTx)
 		if ok {
@@ -42,7 +41,6 @@ func NewPostHandler(
 					return ctx, nil
 				case "/ethermint.types.v1.ExtensionOptionDynamicFeeTx":
 					// cosmos-sdk tx with dynamic fee extension
-					postHandler = sdk.ChainPostDecorators(postDecorators...)
 					return postHandler(ctx, tx, sim, success)
 				default:
 					return ctx, errorsmod.Wrapf(
@@ -56,7 +54,6 @@ func NewPostHandler(
 		// handle as totally normal Cosmos SDK tx
 		switch tx.(type) {
 		case sdk.Tx:
-			postHandler = sdk.ChainPostDecorators(postDecorators...)
 			return postHandler(ctx, tx, sim, success)
 		default:
 			return ctx, errorsmod.Wrapf(errortypes.ErrUnknownRequest, "invalid transaction type: %T", tx)

@@ -2,14 +2,18 @@ package posthandler
 
 import (
 	"fmt"
+	"math"
+	"reflect"
 
 	"cosmossdk.io/errors"
-	"cosmossdk.io/math"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
+
+	etherminttypes "github.com/tokenize-titan/ethermint/types"
 	"github.com/tokenize-titan/titan/utils"
 )
 
@@ -67,9 +71,17 @@ func (d RefundGasRemainingDecorator) maybeRefund(ctx sdk.Context, tx sdk.Tx, sim
 		return nil
 	}
 
+	gasMeter := ctx.GasMeter()
+
+	// check if gas meter is infinite
+	if gasMeter.GasRemaining() == sdk.Gas(math.MaxUint64) ||
+		reflect.TypeOf(gasMeter) == reflect.TypeOf(sdk.NewInfiniteGasMeter()) ||
+		reflect.TypeOf(gasMeter) == reflect.TypeOf(etherminttypes.NewInfiniteGasMeterWithLimit(0)) {
+		return nil
+	}
+
 	// Replace the context's gas meter with an infinite gas meter so that this
 	// posthandler doesn't run out of gas while refunding.
-	gasMeter := ctx.GasMeter()
 	ctx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	// Restore the original gas meter after this posthandler is done.
 	defer ctx.WithGasMeter(gasMeter)
@@ -130,7 +142,7 @@ func (d RefundGasRemainingDecorator) processRefund(ctx sdk.Context, refund sdk.C
 // getRefund returns the coins that should be refunded to the recipient.
 func getRefund(gasMeter sdk.GasMeter, feeTx sdk.FeeTx) sdk.Coins {
 	gasPrice := getGasPrice(feeTx)
-	toRefund := gasPrice.Amount.MulInt64(int64(gasMeter.GasRemaining())).TruncateInt()
+	toRefund := gasPrice.Amount.MulInt(sdkmath.NewIntFromUint64(gasMeter.GasRemaining())).TruncateInt()
 	maxToRefund := MaxPortionOfFeeToRefund.MulInt(feeTx.GetFee().AmountOf(utils.BondDenom)).TruncateInt()
 	amountToRefund := minimum(toRefund, maxToRefund)
 	return sdk.NewCoins(sdk.NewCoin(utils.BondDenom, amountToRefund))
@@ -154,7 +166,7 @@ func getGasPrice(feeTx sdk.FeeTx) sdk.DecCoin {
 }
 
 // minimum returns the smaller of a and b.
-func minimum(a, b math.Int) math.Int {
+func minimum(a sdkmath.Int, b sdkmath.Int) sdkmath.Int {
 	if a.LTE(b) {
 		return a
 	}
