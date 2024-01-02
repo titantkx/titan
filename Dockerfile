@@ -13,6 +13,9 @@ RUN GOOS=$TARGETOS GOARCH=$TARGETARCH make build
 
 FROM debian:12
 
+# install netcat
+RUN apt update && apt install -y netcat-traditional
+
 ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.5.0/libwasmvm.x86_64.so /usr/lib/libwasmvm.x86_64.so
 
 COPY --from=builder /go/src/github.com/tokenize-titan/titan/build/titand /usr/bin/titand
