@@ -1,0 +1,7 @@
+syntax = "proto3";
+package titan.validatorreward;
+
+option go_package = "github.com/tokenize-titan/titan/x/validatorreward/types";
+
+// Msg defines the Msg service.
+service Msg {}

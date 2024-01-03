@@ -1,0 +1,14 @@
+syntax = "proto3";
+package titan.validatorreward;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/tokenize-titan/titan/x/validatorreward/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (gogoproto.goproto_stringer) = false;
+
+  string rate = 1 [(gogoproto.moretags) = "yaml:\"rate\""];
+  string operator = 2 [(gogoproto.moretags) = "yaml:\"operator\""];
+}

@@ -141,6 +141,10 @@ import (
 	titanmodulekeeper "github.com/tokenize-titan/titan/x/titan/keeper"
 	titanmoduletypes "github.com/tokenize-titan/titan/x/titan/types"
 
+	validatorrewardmodule "github.com/tokenize-titan/titan/x/validatorreward"
+	validatorrewardmodulekeeper "github.com/tokenize-titan/titan/x/validatorreward/keeper"
+	validatorrewardmoduletypes "github.com/tokenize-titan/titan/x/validatorreward/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/tokenize-titan/titan/app/params"
@@ -204,12 +208,14 @@ var (
 		consensus.AppModuleBasic{},
 		nftmodule.AppModuleBasic{},
 
-		titanmodule.AppModuleBasic{},
 		// Ethermint modules
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
 		// wasm
 		wasm.AppModuleBasic{},
+		//
+		titanmodule.AppModuleBasic{},
+		validatorrewardmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -294,6 +300,8 @@ type App struct {
 	FeeMarketKeeper feemarketkeeper.Keeper
 
 	TitanKeeper titanmodulekeeper.Keeper
+
+	ValidatorrewardKeeper validatorrewardmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -354,6 +362,7 @@ func New(
 		// ethermint keys
 		evmtypes.StoreKey, feemarkettypes.StoreKey,
 		titanmoduletypes.StoreKey,
+		validatorrewardmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
@@ -635,6 +644,14 @@ func New(
 	)
 	titanModule := titanmodule.NewAppModule(appCodec, app.TitanKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.ValidatorrewardKeeper = *validatorrewardmodulekeeper.NewKeeper(
+		appCodec,
+		keys[validatorrewardmoduletypes.StoreKey],
+		keys[validatorrewardmoduletypes.MemStoreKey],
+		app.GetSubspace(validatorrewardmoduletypes.ModuleName),
+	)
+	validatorrewardModule := validatorrewardmodule.NewAppModule(appCodec, app.ValidatorrewardKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	/**** IBC Routing ****/
@@ -708,6 +725,7 @@ func New(
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper, evmSs),
 
 		titanModule,
+		validatorrewardModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
@@ -743,6 +761,7 @@ func New(
 		consensusparamtypes.ModuleName,
 		wasmtypes.ModuleName,
 		titanmoduletypes.ModuleName,
+		validatorrewardmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -771,6 +790,7 @@ func New(
 		consensusparamtypes.ModuleName,
 		wasmtypes.ModuleName,
 		titanmoduletypes.ModuleName,
+		validatorrewardmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -810,6 +830,7 @@ func New(
 		crisistypes.ModuleName,
 		// wasm after must ibc transfer
 		wasmtypes.ModuleName,
+		validatorrewardmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -1110,6 +1131,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	// ethermint subspaces
 	paramsKeeper.Subspace(evmtypes.ModuleName).WithKeyTable(evmtypes.ParamKeyTable()) //nolint: staticcheck
 	paramsKeeper.Subspace(feemarkettypes.ModuleName).WithKeyTable(feemarkettypes.ParamKeyTable())
+	paramsKeeper.Subspace(validatorrewardmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
