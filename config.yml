@@ -72,6 +72,9 @@ genesis:
       max_age_duration: "120000000000"
 
   app_state:
+    validatorreward:
+      params:
+        operator: "titan1up5lnguhgpu2qdqz9hav34yyvs0kjw3pruzrh7"
     staking:
       params:
         bond_denom: "atkx"
