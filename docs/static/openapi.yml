@@ -84046,6 +84046,8 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  titan.validatorreward.MsgSetRateResponse:
+    type: object
   titan.validatorreward.Params:
     type: object
     properties:
