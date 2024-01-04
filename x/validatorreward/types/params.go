@@ -3,32 +3,21 @@ package types
 import (
 	"fmt"
 
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"gopkg.in/yaml.v2"
+
+	sdkmath "cosmossdk.io/math"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var _ paramtypes.ParamSet = (*Params)(nil)
+var ParamsKey = []byte("Params")
 
-var (
-	KeyRate = []byte("Rate")
-	// TODO: Determine the default value
-	DefaultRate string = "rate"
-)
+var DefaultRate = sdk.NewDecWithPrec(6, 2) // 6%
 
-var (
-	KeyOperator = []byte("Operator")
-	// TODO: Determine the default value
-	DefaultOperator string = "operator"
-)
-
-// ParamKeyTable the param key table for launch module
-func ParamKeyTable() paramtypes.KeyTable {
-	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
-}
+var DefaultOperator string = "titan1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqe22t5s"
 
 // NewParams creates a new Params instance
 func NewParams(
-	rate string,
+	rate sdkmath.LegacyDec,
 	operator string,
 ) Params {
 	return Params{
@@ -43,14 +32,6 @@ func DefaultParams() Params {
 		DefaultRate,
 		DefaultOperator,
 	)
-}
-
-// ParamSetPairs get the params.ParamSet
-func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
-	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(KeyRate, &p.Rate, validateRate),
-		paramtypes.NewParamSetPair(KeyOperator, &p.Operator, validateOperator),
-	}
 }
 
 // Validate validates the set of params
@@ -74,13 +55,22 @@ func (p Params) String() string {
 
 // validateRate validates the Rate param
 func validateRate(v interface{}) error {
-	rate, ok := v.(string)
+	rate, ok := v.(sdk.Dec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", v)
 	}
 
-	// TODO implement validation
-	_ = rate
+	if rate.IsNil() {
+		return fmt.Errorf("rate should not be nil")
+	}
+
+	if rate.IsNegative() {
+		return fmt.Errorf("rate should not be negative")
+	}
+
+	if rate.GT(sdk.OneDec()) {
+		return fmt.Errorf("rate should not be greater than 1")
+	}
 
 	return nil
 }
@@ -92,8 +82,10 @@ func validateOperator(v interface{}) error {
 		return fmt.Errorf("invalid parameter type: %T", v)
 	}
 
-	// TODO implement validation
-	_ = operator
+	// validate operator address
+	if _, err := sdk.AccAddressFromBech32(operator); err != nil {
+		return fmt.Errorf("invalid operator address: %s", err)
+	}
 
 	return nil
 }

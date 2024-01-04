@@ -648,7 +648,6 @@ func New(
 		appCodec,
 		keys[validatorrewardmoduletypes.StoreKey],
 		keys[validatorrewardmoduletypes.MemStoreKey],
-		app.GetSubspace(validatorrewardmoduletypes.ModuleName),
 	)
 	validatorrewardModule := validatorrewardmodule.NewAppModule(appCodec, app.ValidatorrewardKeeper, app.AccountKeeper, app.BankKeeper)
 

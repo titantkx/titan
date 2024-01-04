@@ -3,7 +3,7 @@ package titan.validatorreward;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "cosmos/base/query/v1beta1/pagination.proto";
+// import "cosmos/base/query/v1beta1/pagination.proto";
 import "titan/validatorreward/params.proto";
 
 option go_package = "github.com/tokenize-titan/titan/x/validatorreward/types";
@@ -12,7 +12,8 @@ option go_package = "github.com/tokenize-titan/titan/x/validatorreward/types";
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/tokenize-titan/titan/validatorreward/params";
+    option (google.api.http).get =
+        "/tokenize-titan/titan/validatorreward/params";
   }
 }
 
