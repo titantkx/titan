@@ -4,10 +4,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/tokenize-titan/titan/utils"
 	"github.com/tokenize-titan/titan/x/validatorreward/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {
+	utils.InitSDKConfig()
+
 	tests := []struct {
 		desc     string
 		genState *types.GenesisState
@@ -19,9 +22,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid:    true,
 		},
 		{
-			desc:     "valid genesis state",
+			desc: "valid genesis state",
 			genState: &types.GenesisState{
-
+				Params: types.DefaultParams(),
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,

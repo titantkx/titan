@@ -6,11 +6,14 @@ import (
 	"github.com/stretchr/testify/require"
 	keepertest "github.com/tokenize-titan/titan/testutil/keeper"
 	"github.com/tokenize-titan/titan/testutil/nullify"
+	"github.com/tokenize-titan/titan/utils"
 	"github.com/tokenize-titan/titan/x/validatorreward"
 	"github.com/tokenize-titan/titan/x/validatorreward/types"
 )
 
 func TestGenesis(t *testing.T) {
+	utils.InitSDKConfig()
+
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
 
