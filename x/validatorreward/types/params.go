@@ -9,8 +9,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var ParamsKey = []byte("Params")
-
 var DefaultRate = sdk.NewDecWithPrec(6, 2) // 6%
 
 var DefaultOperator string = "titan1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqe22t5s"

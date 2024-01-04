@@ -14,6 +14,8 @@ const (
 	MemStoreKey = "mem_validatorreward"
 )
 
+var ParamsKey = []byte("Params")
+
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
