@@ -84046,8 +84046,11 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  titan.validatorreward.MsgSetOperatorResponse:
+    type: object
   titan.validatorreward.MsgSetRateResponse:
     type: object
+    description: MsgSetRateResponse defines the Msg/SetRate response type.
   titan.validatorreward.Params:
     type: object
     properties:

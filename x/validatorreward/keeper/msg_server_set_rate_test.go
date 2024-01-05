@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -20,8 +19,6 @@ func TestMsgServer_SetRate(t *testing.T) {
 	zeroAddr, err := sdk.AccAddressFromHexUnsafe(zeroAddrHexStr)
 	require.NoError(t, err)
 	zeroAddrStr := zeroAddr.String()
-
-	fmt.Println("zeroAddrStr: ", zeroAddrStr)
 
 	// Set up test cases
 	testCases := []struct {
