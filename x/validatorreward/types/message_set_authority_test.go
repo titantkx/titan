@@ -8,37 +8,37 @@ import (
 	"github.com/tokenize-titan/titan/testutil/sample"
 )
 
-func TestMsgSetOperator_ValidateBasic(t *testing.T) {
+func TestMsgSetAuthority_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgSetOperator
+		msg  MsgSetAuthority
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgSetOperator{
-				Operator:    "invalid_address",
-				NewOperator: sample.AccAddress(),
+			msg: MsgSetAuthority{
+				Authority:    "invalid_address",
+				NewAuthority: sample.AccAddress(),
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgSetOperator{
-				Operator:    sample.AccAddress(),
-				NewOperator: sample.AccAddress(),
+			msg: MsgSetAuthority{
+				Authority:    sample.AccAddress(),
+				NewAuthority: sample.AccAddress(),
 			},
 		}, {
 			name: "invalid new address",
-			msg: MsgSetOperator{
-				Operator:    sample.AccAddress(),
-				NewOperator: "invalid_address",
+			msg: MsgSetAuthority{
+				Authority:    sample.AccAddress(),
+				NewAuthority: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid new address",
-			msg: MsgSetOperator{
-				Operator:    sample.AccAddress(),
-				NewOperator: sample.AccAddress(),
+			msg: MsgSetAuthority{
+				Authority:    sample.AccAddress(),
+				NewAuthority: sample.AccAddress(),
 			},
 		},
 	}

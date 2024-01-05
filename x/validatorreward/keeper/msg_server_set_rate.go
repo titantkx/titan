@@ -10,13 +10,13 @@ import (
 func (k msgServer) SetRate(goCtx context.Context, msg *types.MsgSetRate) (*types.MsgSetRateResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// validate operator
-	operatorAddr, err := sdk.AccAddressFromBech32(msg.Operator)
+	// validate authority
+	authorityAddr, err := sdk.AccAddressFromBech32(msg.Authority)
 	if err != nil {
 		return nil, err
 	}
 
-	if !operatorAddr.Equals(k.GetOperator(ctx)) {
+	if !authorityAddr.Equals(k.GetAuthority(ctx)) {
 		return nil, types.ErrForbidden.Wrapf("not allowed to set rate")
 	}
 

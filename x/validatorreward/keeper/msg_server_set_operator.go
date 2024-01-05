@@ -8,32 +8,32 @@ import (
 	"github.com/tokenize-titan/titan/x/validatorreward/types"
 )
 
-func (k msgServer) SetOperator(goCtx context.Context, msg *types.MsgSetOperator) (*types.MsgSetOperatorResponse, error) {
+func (k msgServer) SetAuthority(goCtx context.Context, msg *types.MsgSetAuthority) (*types.MsgSetAuthorityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// validate operator
-	operatorAddr, err := sdk.AccAddressFromBech32(msg.Operator)
+	// validate authority
+	authorityAddr, err := sdk.AccAddressFromBech32(msg.Authority)
 	if err != nil {
 		return nil, err
 	}
 
-	if !operatorAddr.Equals(k.GetOperator(ctx)) {
-		return nil, types.ErrForbidden.Wrapf("not allowed to set operator")
+	if !authorityAddr.Equals(k.GetAuthority(ctx)) {
+		return nil, types.ErrForbidden.Wrapf("not allowed to set authority")
 	}
 
-	newOperatorAcc, err := sdk.AccAddressFromBech32(msg.NewOperator)
+	newAuthorityAcc, err := sdk.AccAddressFromBech32(msg.NewAuthority)
 	if err != nil {
-		return nil, sdkerrors.ErrInvalidAddress.Wrap("invalid new operator address")
+		return nil, sdkerrors.ErrInvalidAddress.Wrap("invalid new authority address")
 	}
 
-	k.Keeper.SetOperator(ctx, newOperatorAcc)
+	k.Keeper.SetAuthority(ctx, newAuthorityAcc)
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventTypeSetOperator,
-			sdk.NewAttribute(types.AttributeKeyOperator, msg.NewOperator),
+			types.EventTypeSetAuthority,
+			sdk.NewAttribute(types.AttributeKeyAuthority, msg.NewAuthority),
 		),
 	)
 
-	return &types.MsgSetOperatorResponse{}, nil
+	return &types.MsgSetAuthorityResponse{}, nil
 }

@@ -31,10 +31,10 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// MsgSetRate allow operator config `rate`
+// MsgSetRate allow authority config `rate`
 type MsgSetRate struct {
-	Operator string                                 `protobuf:"bytes,1,opt,name=operator,proto3" json:"operator,omitempty"`
-	Rate     github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=rate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"rate"`
+	Authority string                                 `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
+	Rate      github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=rate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"rate"`
 }
 
 func (m *MsgSetRate) Reset()         { *m = MsgSetRate{} }
@@ -70,9 +70,9 @@ func (m *MsgSetRate) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetRate proto.InternalMessageInfo
 
-func (m *MsgSetRate) GetOperator() string {
+func (m *MsgSetRate) GetAuthority() string {
 	if m != nil {
-		return m.Operator
+		return m.Authority
 	}
 	return ""
 }
@@ -114,24 +114,24 @@ func (m *MsgSetRateResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetRateResponse proto.InternalMessageInfo
 
-// MsgSetOperator allow operator config `operator`
-type MsgSetOperator struct {
-	Operator    string `protobuf:"bytes,1,opt,name=operator,proto3" json:"operator,omitempty"`
-	NewOperator string `protobuf:"bytes,2,opt,name=new_operator,json=newOperator,proto3" json:"new_operator,omitempty"`
+// MsgSetAuthority allow authority config `authority`
+type MsgSetAuthority struct {
+	Authority    string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
+	NewAuthority string `protobuf:"bytes,2,opt,name=new_authority,json=newAuthority,proto3" json:"new_authority,omitempty"`
 }
 
-func (m *MsgSetOperator) Reset()         { *m = MsgSetOperator{} }
-func (m *MsgSetOperator) String() string { return proto.CompactTextString(m) }
-func (*MsgSetOperator) ProtoMessage()    {}
-func (*MsgSetOperator) Descriptor() ([]byte, []int) {
+func (m *MsgSetAuthority) Reset()         { *m = MsgSetAuthority{} }
+func (m *MsgSetAuthority) String() string { return proto.CompactTextString(m) }
+func (*MsgSetAuthority) ProtoMessage()    {}
+func (*MsgSetAuthority) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2e7e19db6b4ac245, []int{2}
 }
-func (m *MsgSetOperator) XXX_Unmarshal(b []byte) error {
+func (m *MsgSetAuthority) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgSetOperator) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgSetAuthority) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgSetOperator.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgSetAuthority.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -141,48 +141,48 @@ func (m *MsgSetOperator) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
-func (m *MsgSetOperator) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgSetOperator.Merge(m, src)
+func (m *MsgSetAuthority) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetAuthority.Merge(m, src)
 }
-func (m *MsgSetOperator) XXX_Size() int {
+func (m *MsgSetAuthority) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgSetOperator) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgSetOperator.DiscardUnknown(m)
+func (m *MsgSetAuthority) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetAuthority.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgSetOperator proto.InternalMessageInfo
+var xxx_messageInfo_MsgSetAuthority proto.InternalMessageInfo
 
-func (m *MsgSetOperator) GetOperator() string {
+func (m *MsgSetAuthority) GetAuthority() string {
 	if m != nil {
-		return m.Operator
+		return m.Authority
 	}
 	return ""
 }
 
-func (m *MsgSetOperator) GetNewOperator() string {
+func (m *MsgSetAuthority) GetNewAuthority() string {
 	if m != nil {
-		return m.NewOperator
+		return m.NewAuthority
 	}
 	return ""
 }
 
-// MsgSetOperatorResponse defines the Msg/SetOperator response type.
-type MsgSetOperatorResponse struct {
+// MsgSetAuthorityResponse defines the Msg/SetAuthority response type.
+type MsgSetAuthorityResponse struct {
 }
 
-func (m *MsgSetOperatorResponse) Reset()         { *m = MsgSetOperatorResponse{} }
-func (m *MsgSetOperatorResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgSetOperatorResponse) ProtoMessage()    {}
-func (*MsgSetOperatorResponse) Descriptor() ([]byte, []int) {
+func (m *MsgSetAuthorityResponse) Reset()         { *m = MsgSetAuthorityResponse{} }
+func (m *MsgSetAuthorityResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetAuthorityResponse) ProtoMessage()    {}
+func (*MsgSetAuthorityResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2e7e19db6b4ac245, []int{3}
 }
-func (m *MsgSetOperatorResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgSetAuthorityResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgSetOperatorResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgSetAuthorityResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgSetOperatorResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgSetAuthorityResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -192,54 +192,54 @@ func (m *MsgSetOperatorResponse) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-func (m *MsgSetOperatorResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgSetOperatorResponse.Merge(m, src)
+func (m *MsgSetAuthorityResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetAuthorityResponse.Merge(m, src)
 }
-func (m *MsgSetOperatorResponse) XXX_Size() int {
+func (m *MsgSetAuthorityResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgSetOperatorResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgSetOperatorResponse.DiscardUnknown(m)
+func (m *MsgSetAuthorityResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetAuthorityResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgSetOperatorResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgSetAuthorityResponse proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*MsgSetRate)(nil), "titan.validatorreward.MsgSetRate")
 	proto.RegisterType((*MsgSetRateResponse)(nil), "titan.validatorreward.MsgSetRateResponse")
-	proto.RegisterType((*MsgSetOperator)(nil), "titan.validatorreward.MsgSetOperator")
-	proto.RegisterType((*MsgSetOperatorResponse)(nil), "titan.validatorreward.MsgSetOperatorResponse")
+	proto.RegisterType((*MsgSetAuthority)(nil), "titan.validatorreward.MsgSetAuthority")
+	proto.RegisterType((*MsgSetAuthorityResponse)(nil), "titan.validatorreward.MsgSetAuthorityResponse")
 }
 
 func init() { proto.RegisterFile("titan/validatorreward/tx.proto", fileDescriptor_2e7e19db6b4ac245) }
 
 var fileDescriptor_2e7e19db6b4ac245 = []byte{
-	// 396 bytes of a gzipped FileDescriptorProto
+	// 399 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x2b, 0xc9, 0x2c, 0x49,
 	0xcc, 0xd3, 0x2f, 0x4b, 0xcc, 0xc9, 0x4c, 0x49, 0x2c, 0xc9, 0x2f, 0x2a, 0x4a, 0x2d, 0x4f, 0x2c,
 	0x4a, 0xd1, 0x2f, 0xa9, 0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0x05, 0xcb, 0xeb, 0xa1,
 	0xc9, 0x4b, 0x89, 0x27, 0xe7, 0x17, 0xe7, 0xe6, 0x17, 0xeb, 0xe7, 0x16, 0xa7, 0xeb, 0x97, 0x19,
 	0x82, 0x28, 0x88, 0x7a, 0x29, 0x49, 0x88, 0x44, 0x3c, 0x98, 0xa7, 0x0f, 0xe1, 0x40, 0xa5, 0x44,
-	0xd2, 0xf3, 0xd3, 0xf3, 0x21, 0xe2, 0x20, 0x16, 0x44, 0x54, 0x69, 0x31, 0x23, 0x17, 0x97, 0x6f,
-	0x71, 0x7a, 0x70, 0x6a, 0x49, 0x50, 0x62, 0x49, 0xaa, 0x90, 0x09, 0x17, 0x47, 0x7e, 0x41, 0x6a,
-	0x11, 0xc8, 0x2a, 0x09, 0x46, 0x05, 0x46, 0x0d, 0x4e, 0x27, 0x89, 0x4b, 0x5b, 0x74, 0x45, 0xa0,
-	0x06, 0x39, 0xa6, 0xa4, 0x14, 0xa5, 0x16, 0x17, 0x07, 0x97, 0x14, 0x65, 0xe6, 0xa5, 0x07, 0xc1,
-	0x55, 0x0a, 0x05, 0x70, 0xb1, 0x14, 0x25, 0x96, 0xa4, 0x4a, 0x30, 0x81, 0x75, 0xd8, 0x9c, 0xb8,
-	0x27, 0xcf, 0x70, 0xeb, 0x9e, 0xbc, 0x5a, 0x7a, 0x66, 0x49, 0x46, 0x69, 0x92, 0x5e, 0x72, 0x7e,
-	0x2e, 0xd4, 0x25, 0x50, 0x4a, 0xb7, 0x38, 0x25, 0x5b, 0xbf, 0xa4, 0xb2, 0x20, 0xb5, 0x58, 0xcf,
-	0x25, 0x35, 0xf9, 0xd2, 0x16, 0x5d, 0x2e, 0xa8, 0xf9, 0x2e, 0xa9, 0xc9, 0x41, 0x60, 0x93, 0xac,
-	0x78, 0x9b, 0x9e, 0x6f, 0xd0, 0x82, 0x5b, 0xa0, 0x24, 0xc2, 0x25, 0x84, 0x70, 0x64, 0x50, 0x6a,
-	0x71, 0x41, 0x7e, 0x5e, 0x71, 0xaa, 0xd2, 0x24, 0x46, 0x2e, 0x3e, 0x88, 0xb0, 0x3f, 0xcc, 0x25,
-	0xe4, 0xb9, 0xdf, 0x9a, 0x8b, 0x27, 0x2f, 0xb5, 0x3c, 0x1e, 0xae, 0x93, 0x89, 0x80, 0x4e, 0xee,
-	0xbc, 0xd4, 0x72, 0x98, 0x95, 0xe8, 0x4e, 0x95, 0xe0, 0x12, 0x43, 0x75, 0x13, 0xcc, 0xb9, 0x46,
-	0xa7, 0x18, 0xb9, 0x98, 0x7d, 0x8b, 0xd3, 0x85, 0xc2, 0xb9, 0xd8, 0x61, 0xc1, 0xad, 0xa8, 0x87,
-	0x35, 0x7e, 0xf5, 0x10, 0x9e, 0x95, 0xd2, 0x24, 0xa8, 0x04, 0x66, 0x81, 0x50, 0x32, 0x17, 0x37,
-	0x72, 0x58, 0xa8, 0xe2, 0xd5, 0x09, 0x53, 0x26, 0xa5, 0x4b, 0x94, 0x32, 0x98, 0x25, 0x52, 0xac,
-	0x0d, 0xcf, 0x37, 0x68, 0x31, 0x3a, 0x05, 0x9e, 0x78, 0x24, 0xc7, 0x78, 0xe1, 0x91, 0x1c, 0xe3,
-	0x83, 0x47, 0x72, 0x8c, 0x13, 0x1e, 0xcb, 0x31, 0x5c, 0x78, 0x2c, 0xc7, 0x70, 0xe3, 0xb1, 0x1c,
-	0x43, 0x94, 0x39, 0x52, 0xb4, 0x97, 0xe4, 0x67, 0xa7, 0xe6, 0x65, 0x56, 0xa5, 0xea, 0x42, 0x92,
-	0x39, 0x84, 0xac, 0xc0, 0x4c, 0xee, 0xa0, 0xb4, 0x90, 0xc4, 0x06, 0x4e, 0x91, 0xc6, 0x80, 0x00,
-	0x00, 0x00, 0xff, 0xff, 0x37, 0x95, 0x63, 0x91, 0x14, 0x03, 0x00, 0x00,
+	0xd2, 0xf3, 0xd3, 0xf3, 0x21, 0xe2, 0x20, 0x16, 0x44, 0x54, 0x69, 0x19, 0x23, 0x17, 0x97, 0x6f,
+	0x71, 0x7a, 0x70, 0x6a, 0x49, 0x50, 0x62, 0x49, 0xaa, 0x90, 0x19, 0x17, 0x67, 0x62, 0x69, 0x49,
+	0x46, 0x7e, 0x51, 0x66, 0x49, 0xa5, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0xa7, 0x93, 0xc4, 0xa5, 0x2d,
+	0xba, 0x22, 0x50, 0x93, 0x1c, 0x53, 0x52, 0x8a, 0x52, 0x8b, 0x8b, 0x83, 0x4b, 0x8a, 0x32, 0xf3,
+	0xd2, 0x83, 0x10, 0x4a, 0x85, 0x02, 0xb8, 0x58, 0x8a, 0x12, 0x4b, 0x52, 0x25, 0x98, 0xc0, 0x5a,
+	0x6c, 0x4e, 0xdc, 0x93, 0x67, 0xb8, 0x75, 0x4f, 0x5e, 0x2d, 0x3d, 0xb3, 0x24, 0xa3, 0x34, 0x49,
+	0x2f, 0x39, 0x3f, 0x17, 0xea, 0x16, 0x28, 0xa5, 0x5b, 0x9c, 0x92, 0xad, 0x5f, 0x52, 0x59, 0x90,
+	0x5a, 0xac, 0xe7, 0x92, 0x9a, 0x7c, 0x69, 0x8b, 0x2e, 0x17, 0xd4, 0x02, 0x97, 0xd4, 0xe4, 0x20,
+	0xb0, 0x49, 0x56, 0x7c, 0x4d, 0xcf, 0x37, 0x68, 0x21, 0x6c, 0x50, 0x12, 0xe1, 0x12, 0x42, 0xb8,
+	0x33, 0x28, 0xb5, 0xb8, 0x20, 0x3f, 0xaf, 0x38, 0x55, 0x69, 0x06, 0x23, 0x17, 0x3f, 0x44, 0xd8,
+	0x11, 0xee, 0x16, 0x72, 0xfd, 0x60, 0xcb, 0xc5, 0x9b, 0x97, 0x5a, 0x1e, 0x8f, 0xd0, 0xcb, 0x44,
+	0x40, 0x2f, 0x4f, 0x5e, 0x6a, 0x39, 0xdc, 0x5a, 0x0c, 0x07, 0x4b, 0x72, 0x89, 0xa3, 0xb9, 0x0c,
+	0xe6, 0x6a, 0xa3, 0xb3, 0x8c, 0x5c, 0xcc, 0xbe, 0xc5, 0xe9, 0x42, 0xe1, 0x5c, 0xec, 0xb0, 0x80,
+	0x57, 0xd4, 0xc3, 0x1a, 0xd3, 0x7a, 0x08, 0x3f, 0x4b, 0x69, 0x12, 0x54, 0x02, 0xb3, 0x40, 0x28,
+	0x8d, 0x8b, 0x07, 0x25, 0x48, 0xd4, 0xf0, 0x6a, 0x85, 0xab, 0x93, 0xd2, 0x23, 0x4e, 0x1d, 0xcc,
+	0x1e, 0x29, 0xd6, 0x86, 0xe7, 0x1b, 0xb4, 0x18, 0x9d, 0x02, 0x4f, 0x3c, 0x92, 0x63, 0xbc, 0xf0,
+	0x48, 0x8e, 0xf1, 0xc1, 0x23, 0x39, 0xc6, 0x09, 0x8f, 0xe5, 0x18, 0x2e, 0x3c, 0x96, 0x63, 0xb8,
+	0xf1, 0x58, 0x8e, 0x21, 0xca, 0x1c, 0x29, 0x05, 0x94, 0xe4, 0x67, 0xa7, 0xe6, 0x65, 0x56, 0xa5,
+	0xea, 0x42, 0xd2, 0x3c, 0x84, 0xac, 0xc0, 0x4c, 0xfb, 0xa0, 0x64, 0x91, 0xc4, 0x06, 0x4e, 0x9e,
+	0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0x1f, 0x43, 0xa7, 0x75, 0x21, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -256,8 +256,8 @@ const _ = grpc.SupportPackageIsVersion4
 type MsgClient interface {
 	// SetRate defines a method for setting the rate
 	SetRate(ctx context.Context, in *MsgSetRate, opts ...grpc.CallOption) (*MsgSetRateResponse, error)
-	// SetOperator defines a method for setting the operator
-	SetOperator(ctx context.Context, in *MsgSetOperator, opts ...grpc.CallOption) (*MsgSetOperatorResponse, error)
+	// SetAuthority defines a method for setting the authority
+	SetAuthority(ctx context.Context, in *MsgSetAuthority, opts ...grpc.CallOption) (*MsgSetAuthorityResponse, error)
 }
 
 type msgClient struct {
@@ -277,9 +277,9 @@ func (c *msgClient) SetRate(ctx context.Context, in *MsgSetRate, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *msgClient) SetOperator(ctx context.Context, in *MsgSetOperator, opts ...grpc.CallOption) (*MsgSetOperatorResponse, error) {
-	out := new(MsgSetOperatorResponse)
-	err := c.cc.Invoke(ctx, "/titan.validatorreward.Msg/SetOperator", in, out, opts...)
+func (c *msgClient) SetAuthority(ctx context.Context, in *MsgSetAuthority, opts ...grpc.CallOption) (*MsgSetAuthorityResponse, error) {
+	out := new(MsgSetAuthorityResponse)
+	err := c.cc.Invoke(ctx, "/titan.validatorreward.Msg/SetAuthority", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -290,8 +290,8 @@ func (c *msgClient) SetOperator(ctx context.Context, in *MsgSetOperator, opts ..
 type MsgServer interface {
 	// SetRate defines a method for setting the rate
 	SetRate(context.Context, *MsgSetRate) (*MsgSetRateResponse, error)
-	// SetOperator defines a method for setting the operator
-	SetOperator(context.Context, *MsgSetOperator) (*MsgSetOperatorResponse, error)
+	// SetAuthority defines a method for setting the authority
+	SetAuthority(context.Context, *MsgSetAuthority) (*MsgSetAuthorityResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -301,8 +301,8 @@ type UnimplementedMsgServer struct {
 func (*UnimplementedMsgServer) SetRate(ctx context.Context, req *MsgSetRate) (*MsgSetRateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetRate not implemented")
 }
-func (*UnimplementedMsgServer) SetOperator(ctx context.Context, req *MsgSetOperator) (*MsgSetOperatorResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetOperator not implemented")
+func (*UnimplementedMsgServer) SetAuthority(ctx context.Context, req *MsgSetAuthority) (*MsgSetAuthorityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetAuthority not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -327,20 +327,20 @@ func _Msg_SetRate_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_SetOperator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgSetOperator)
+func _Msg_SetAuthority_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetAuthority)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).SetOperator(ctx, in)
+		return srv.(MsgServer).SetAuthority(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/titan.validatorreward.Msg/SetOperator",
+		FullMethod: "/titan.validatorreward.Msg/SetAuthority",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).SetOperator(ctx, req.(*MsgSetOperator))
+		return srv.(MsgServer).SetAuthority(ctx, req.(*MsgSetAuthority))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -354,8 +354,8 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_SetRate_Handler,
 		},
 		{
-			MethodName: "SetOperator",
-			Handler:    _Msg_SetOperator_Handler,
+			MethodName: "SetAuthority",
+			Handler:    _Msg_SetAuthority_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -392,10 +392,10 @@ func (m *MsgSetRate) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x12
-	if len(m.Operator) > 0 {
-		i -= len(m.Operator)
-		copy(dAtA[i:], m.Operator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Operator)))
+	if len(m.Authority) > 0 {
+		i -= len(m.Authority)
+		copy(dAtA[i:], m.Authority)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Authority)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -425,7 +425,7 @@ func (m *MsgSetRateResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgSetOperator) Marshal() (dAtA []byte, err error) {
+func (m *MsgSetAuthority) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -435,34 +435,34 @@ func (m *MsgSetOperator) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgSetOperator) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgSetAuthority) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgSetOperator) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgSetAuthority) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.NewOperator) > 0 {
-		i -= len(m.NewOperator)
-		copy(dAtA[i:], m.NewOperator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.NewOperator)))
+	if len(m.NewAuthority) > 0 {
+		i -= len(m.NewAuthority)
+		copy(dAtA[i:], m.NewAuthority)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.NewAuthority)))
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Operator) > 0 {
-		i -= len(m.Operator)
-		copy(dAtA[i:], m.Operator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Operator)))
+	if len(m.Authority) > 0 {
+		i -= len(m.Authority)
+		copy(dAtA[i:], m.Authority)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Authority)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgSetOperatorResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgSetAuthorityResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -472,12 +472,12 @@ func (m *MsgSetOperatorResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgSetOperatorResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgSetAuthorityResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgSetOperatorResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgSetAuthorityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -502,7 +502,7 @@ func (m *MsgSetRate) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Operator)
+	l = len(m.Authority)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -520,24 +520,24 @@ func (m *MsgSetRateResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgSetOperator) Size() (n int) {
+func (m *MsgSetAuthority) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.Operator)
+	l = len(m.Authority)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.NewOperator)
+	l = len(m.NewAuthority)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
 }
 
-func (m *MsgSetOperatorResponse) Size() (n int) {
+func (m *MsgSetAuthorityResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -583,7 +583,7 @@ func (m *MsgSetRate) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Operator", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Authority", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -611,7 +611,7 @@ func (m *MsgSetRate) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Operator = string(dAtA[iNdEx:postIndex])
+			m.Authority = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -718,7 +718,7 @@ func (m *MsgSetRateResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgSetOperator) Unmarshal(dAtA []byte) error {
+func (m *MsgSetAuthority) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -741,15 +741,15 @@ func (m *MsgSetOperator) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgSetOperator: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgSetAuthority: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgSetOperator: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgSetAuthority: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Operator", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Authority", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -777,11 +777,11 @@ func (m *MsgSetOperator) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Operator = string(dAtA[iNdEx:postIndex])
+			m.Authority = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NewOperator", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NewAuthority", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -809,7 +809,7 @@ func (m *MsgSetOperator) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.NewOperator = string(dAtA[iNdEx:postIndex])
+			m.NewAuthority = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -832,7 +832,7 @@ func (m *MsgSetOperator) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgSetOperatorResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgSetAuthorityResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -855,10 +855,10 @@ func (m *MsgSetOperatorResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgSetOperatorResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgSetAuthorityResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgSetOperatorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgSetAuthorityResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

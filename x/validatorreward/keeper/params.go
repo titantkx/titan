@@ -47,16 +47,16 @@ func (k Keeper) SetRate(ctx sdk.Context, rate sdk.Dec) {
 	k.SetParams(ctx, params)
 }
 
-// Operator returns the Operator param
-func (k Keeper) GetOperator(ctx sdk.Context) sdk.AccAddress {
+// Authority returns the Authority param
+func (k Keeper) GetAuthority(ctx sdk.Context) sdk.AccAddress {
 	params := k.GetParams(ctx)
-	addr := sdk.MustAccAddressFromBech32(params.Operator)
+	addr := sdk.MustAccAddressFromBech32(params.Authority)
 	return addr
 }
 
-// SetOperator sets the Operator param
-func (k Keeper) SetOperator(ctx sdk.Context, operator sdk.AccAddress) {
+// SetAuthority sets the Authority param
+func (k Keeper) SetAuthority(ctx sdk.Context, authority sdk.AccAddress) {
 	params := k.GetParams(ctx)
-	params.Operator = operator.String()
+	params.Authority = authority.String()
 	k.SetParams(ctx, params)
 }

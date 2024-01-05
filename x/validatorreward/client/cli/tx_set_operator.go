@@ -12,22 +12,22 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdSetOperator() *cobra.Command {
+func CmdSetAuthority() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-operator [new-operator]",
-		Short: "Broadcast message setOperator",
+		Use:   "set-authority [new-authority]",
+		Short: "Broadcast message setAuthority",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argNewOperator := args[0]
+			argNewAuthority := args[0]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgSetOperator(
+			msg := types.NewMsgSetAuthority(
 				clientCtx.GetFromAddress().String(),
-				argNewOperator,
+				argNewAuthority,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

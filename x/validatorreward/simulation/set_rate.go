@@ -19,7 +19,7 @@ func SimulateMsgSetRate(
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgSetRate{
-			Operator: simAccount.Address.String(),
+			Authority: simAccount.Address.String(),
 		}
 
 		// TODO: Handling the SetRate simulation

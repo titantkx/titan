@@ -22,18 +22,18 @@ func TestMsgServer_SetRate(t *testing.T) {
 
 	// Set up test cases
 	testCases := []struct {
-		name     string
-		operator string
-		rate     sdk.Dec
-		expect   func(ms types.MsgServer, ctx sdk.Context, k *keeper.Keeper, operator string, rate sdk.Dec)
+		name      string
+		authority string
+		rate      sdk.Dec
+		expect    func(ms types.MsgServer, ctx sdk.Context, k *keeper.Keeper, authority string, rate sdk.Dec)
 	}{
 		{
-			name:     "Valid operator",
-			operator: zeroAddrStr,
-			rate:     sdk.NewDecWithPrec(5, 1),
-			expect: func(ms types.MsgServer, ctx sdk.Context, k *keeper.Keeper, operator string, rate sdk.Dec) {
+			name:      "Valid authority",
+			authority: zeroAddrStr,
+			rate:      sdk.NewDecWithPrec(5, 1),
+			expect: func(ms types.MsgServer, ctx sdk.Context, k *keeper.Keeper, authority string, rate sdk.Dec) {
 				// Call the function to be tested
-				msg := types.NewMsgSetRate(operator, rate)
+				msg := types.NewMsgSetRate(authority, rate)
 				_, err := ms.SetRate(ctx, msg)
 
 				// Check if the rate is set correctly
@@ -42,13 +42,13 @@ func TestMsgServer_SetRate(t *testing.T) {
 			},
 		},
 		{
-			name:     "Invalid operator",
-			operator: "invalid operator address format",
-			rate:     sdk.NewDecWithPrec(5, 1),
-			expect: func(ms types.MsgServer, ctx sdk.Context, k *keeper.Keeper, operator string, rate sdk.Dec) {
+			name:      "Invalid authority",
+			authority: "invalid authority address format",
+			rate:      sdk.NewDecWithPrec(5, 1),
+			expect: func(ms types.MsgServer, ctx sdk.Context, k *keeper.Keeper, authority string, rate sdk.Dec) {
 				oldRate := k.GetRate(ctx)
 				// Call the function to be tested
-				msg := types.NewMsgSetRate(operator, rate)
+				msg := types.NewMsgSetRate(authority, rate)
 				_, err := ms.SetRate(ctx, msg)
 
 				require.Error(t, err)
@@ -56,13 +56,13 @@ func TestMsgServer_SetRate(t *testing.T) {
 			},
 		},
 		{
-			name:     "Invalid operator address",
-			operator: sample.AccAddress(),
-			rate:     sdk.NewDecWithPrec(5, 1),
-			expect: func(ms types.MsgServer, ctx sdk.Context, k *keeper.Keeper, operator string, rate sdk.Dec) {
+			name:      "Invalid authority address",
+			authority: sample.AccAddress(),
+			rate:      sdk.NewDecWithPrec(5, 1),
+			expect: func(ms types.MsgServer, ctx sdk.Context, k *keeper.Keeper, authority string, rate sdk.Dec) {
 				oldRate := k.GetRate(ctx)
 				// Call the function to be tested
-				msg := types.NewMsgSetRate(operator, rate)
+				msg := types.NewMsgSetRate(authority, rate)
 				_, err := ms.SetRate(ctx, msg)
 
 				require.ErrorIs(t, err, types.ErrForbidden)
@@ -76,7 +76,7 @@ func TestMsgServer_SetRate(t *testing.T) {
 		ms, ctx, k := setupMsgServer(t)
 
 		t.Run(tc.name, func(t *testing.T) {
-			tc.expect(ms, ctx, k, tc.operator, tc.rate)
+			tc.expect(ms, ctx, k, tc.authority, tc.rate)
 		})
 	}
 }

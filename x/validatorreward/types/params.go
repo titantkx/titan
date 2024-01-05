@@ -11,16 +11,16 @@ import (
 
 var DefaultRate = sdk.NewDecWithPrec(6, 2) // 6%
 
-var DefaultOperator string = "titan1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqe22t5s"
+var DefaultAuthority string = "titan1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqe22t5s"
 
 // NewParams creates a new Params instance
 func NewParams(
 	rate sdkmath.LegacyDec,
-	operator string,
+	authority string,
 ) Params {
 	return Params{
-		Rate:     rate,
-		Operator: operator,
+		Rate:      rate,
+		Authority: authority,
 	}
 }
 
@@ -28,7 +28,7 @@ func NewParams(
 func DefaultParams() Params {
 	return NewParams(
 		DefaultRate,
-		DefaultOperator,
+		DefaultAuthority,
 	)
 }
 
@@ -38,7 +38,7 @@ func (p Params) Validate() error {
 		return err
 	}
 
-	if err := validateOperator(p.Operator); err != nil {
+	if err := validateAuthority(p.Authority); err != nil {
 		return err
 	}
 
@@ -73,16 +73,16 @@ func validateRate(v interface{}) error {
 	return nil
 }
 
-// validateOperator validates the Operator param
-func validateOperator(v interface{}) error {
-	operator, ok := v.(string)
+// validateAuthority validates the Authority param
+func validateAuthority(v interface{}) error {
+	authority, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", v)
 	}
 
-	// validate operator address
-	if _, err := sdk.AccAddressFromBech32(operator); err != nil {
-		return fmt.Errorf("invalid operator address: %s", err)
+	// validate authority address
+	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
+		return fmt.Errorf("invalid authority address: %s", err)
 	}
 
 	return nil

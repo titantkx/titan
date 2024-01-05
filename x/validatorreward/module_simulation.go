@@ -27,9 +27,9 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgSetRate int = 100
 
-	opWeightMsgSetOperator = "op_weight_msg_set_operator"
+	opWeightMsgSetAuthority = "op_weight_msg_set_authority"
 	// TODO: Determine the simulation weight value
-	defaultWeightMsgSetOperator int = 100
+	defaultWeightMsgSetAuthority int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
 )
@@ -70,15 +70,15 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		validatorrewardsimulation.SimulateMsgSetRate(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgSetOperator int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSetOperator, &weightMsgSetOperator, nil,
+	var weightMsgSetAuthority int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSetAuthority, &weightMsgSetAuthority, nil,
 		func(_ *rand.Rand) {
-			weightMsgSetOperator = defaultWeightMsgSetOperator
+			weightMsgSetAuthority = defaultWeightMsgSetAuthority
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgSetOperator,
-		validatorrewardsimulation.SimulateMsgSetOperator(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgSetAuthority,
+		validatorrewardsimulation.SimulateMsgSetAuthority(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation
@@ -98,10 +98,10 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 			},
 		),
 		simulation.NewWeightedProposalMsg(
-			opWeightMsgSetOperator,
-			defaultWeightMsgSetOperator,
+			opWeightMsgSetAuthority,
+			defaultWeightMsgSetAuthority,
 			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
-				validatorrewardsimulation.SimulateMsgSetOperator(am.accountKeeper, am.bankKeeper, am.keeper)
+				validatorrewardsimulation.SimulateMsgSetAuthority(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
 		),

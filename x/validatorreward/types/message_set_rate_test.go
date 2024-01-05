@@ -20,41 +20,41 @@ func TestMsgSetRate_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: MsgSetRate{
-				Operator: "invalid_address",
-				Rate:     sdk.NewDec(0),
+				Authority: "invalid_address",
+				Rate:      sdk.NewDec(0),
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: MsgSetRate{
-				Operator: sample.AccAddress(),
-				Rate:     sdk.NewDec(0),
+				Authority: sample.AccAddress(),
+				Rate:      sdk.NewDec(0),
 			},
 		}, {
 			name: "rate not provided",
 			msg: MsgSetRate{
-				Operator: sample.AccAddress(),
+				Authority: sample.AccAddress(),
 			},
 			err: ErrInvalidRate,
 		}, {
 			name: "rate too low",
 			msg: MsgSetRate{
-				Operator: sample.AccAddress(),
-				Rate:     sdk.NewDec(-1),
+				Authority: sample.AccAddress(),
+				Rate:      sdk.NewDec(-1),
 			},
 			err: ErrInvalidRate,
 		}, {
 			name: "rate too high",
 			msg: MsgSetRate{
-				Operator: sample.AccAddress(),
-				Rate:     sdk.NewDec(1000000000000000000),
+				Authority: sample.AccAddress(),
+				Rate:      sdk.NewDec(1000000000000000000),
 			},
 			err: ErrInvalidRate,
 		}, {
 			name: "valid rate",
 			msg: MsgSetRate{
-				Operator: sample.AccAddress(),
-				Rate:     sdk.NewDec(0),
+				Authority: sample.AccAddress(),
+				Rate:      sdk.NewDec(0),
 			},
 		},
 	}

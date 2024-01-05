@@ -9,7 +9,7 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSetRate{}, "validatorreward/SetRate", nil)
-	cdc.RegisterConcrete(&MsgSetOperator{}, "validatorreward/SetOperator", nil)
+	cdc.RegisterConcrete(&MsgSetAuthority{}, "validatorreward/SetAuthority", nil)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -18,7 +18,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgSetRate{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgSetOperator{},
+		&MsgSetAuthority{},
 	)
 	// this line is used by starport scaffolding # 3
 

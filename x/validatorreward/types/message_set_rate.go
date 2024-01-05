@@ -10,10 +10,10 @@ const TypeMsgSetRate = "set_rate"
 
 var _ sdk.Msg = &MsgSetRate{}
 
-func NewMsgSetRate(operator string, rate sdk.Dec) *MsgSetRate {
+func NewMsgSetRate(authority string, rate sdk.Dec) *MsgSetRate {
 	return &MsgSetRate{
-		Operator: operator,
-		Rate:     rate,
+		Authority: authority,
+		Rate:      rate,
 	}
 }
 
@@ -26,11 +26,11 @@ func (msg *MsgSetRate) Type() string {
 }
 
 func (msg *MsgSetRate) GetSigners() []sdk.AccAddress {
-	operator, err := sdk.AccAddressFromBech32(msg.Operator)
+	authority, err := sdk.AccAddressFromBech32(msg.Authority)
 	if err != nil {
 		panic(err)
 	}
-	return []sdk.AccAddress{operator}
+	return []sdk.AccAddress{authority}
 }
 
 func (msg *MsgSetRate) GetSignBytes() []byte {
@@ -39,9 +39,9 @@ func (msg *MsgSetRate) GetSignBytes() []byte {
 }
 
 func (msg *MsgSetRate) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Operator)
+	_, err := sdk.AccAddressFromBech32(msg.Authority)
 	if err != nil {
-		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid operator address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid authority address (%s)", err)
 	}
 
 	// msg.Rate must provided

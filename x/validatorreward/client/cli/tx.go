@@ -11,9 +11,7 @@ import (
 	"github.com/tokenize-titan/titan/x/validatorreward/types"
 )
 
-var (
-	DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
-)
+var DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
 
 const (
 	flagPacketTimeoutTimestamp = "packet-timeout-timestamp"
@@ -31,7 +29,7 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdSetRate())
-	cmd.AddCommand(CmdSetOperator())
+	cmd.AddCommand(CmdSetAuthority())
 	// this line is used by starport scaffolding # 1
 
 	return cmd

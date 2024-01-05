@@ -1,9 +1,9 @@
 package types
 
 const (
-	EventTypeSetOperator = "set_operator"
-	EventTypeSetRate     = "set_rate"
+	EventTypeSetAuthority = "set_authority"
+	EventTypeSetRate      = "set_rate"
 
-	AttributeKeyOperator = "operator"
-	AttributeKeyRate     = "rate"
+	AttributeKeyAuthority = "authority"
+	AttributeKeyRate      = "rate"
 )
