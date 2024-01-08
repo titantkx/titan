@@ -74,7 +74,7 @@ genesis:
   app_state:
     validatorreward:
       params:
-        operator: "titan1up5lnguhgpu2qdqz9hav34yyvs0kjw3pruzrh7"
+        authority: "titan1up5lnguhgpu2qdqz9hav34yyvs0kjw3pruzrh7"
     staking:
       params:
         bond_denom: "atkx"
