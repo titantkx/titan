@@ -634,6 +634,8 @@ func New(
 		appCodec,
 		keys[validatorrewardmoduletypes.StoreKey],
 		keys[validatorrewardmoduletypes.MemStoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
 	)
 	validatorrewardModule := validatorrewardmodule.NewAppModule(appCodec, app.ValidatorrewardKeeper, app.AccountKeeper, app.BankKeeper)
 
