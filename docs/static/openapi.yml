@@ -53311,7 +53311,7 @@ paths:
                 properties:
                   rate:
                     type: string
-                  operator:
+                  authority:
                     type: string
             description: >-
               QueryParamsResponse is response type for the Query/Params RPC
@@ -84046,8 +84046,11 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
-  titan.validatorreward.MsgSetOperatorResponse:
+  titan.validatorreward.MsgFundRewardPoolResponse:
     type: object
+  titan.validatorreward.MsgSetAuthorityResponse:
+    type: object
+    description: MsgSetAuthorityResponse defines the Msg/SetAuthority response type.
   titan.validatorreward.MsgSetRateResponse:
     type: object
     description: MsgSetRateResponse defines the Msg/SetRate response type.
@@ -84056,7 +84059,7 @@ definitions:
     properties:
       rate:
         type: string
-      operator:
+      authority:
         type: string
     description: Params defines the parameters for the module.
   titan.validatorreward.QueryParamsResponse:
@@ -84068,6 +84071,6 @@ definitions:
         properties:
           rate:
             type: string
-          operator:
+          authority:
             type: string
     description: QueryParamsResponse is response type for the Query/Params RPC method.

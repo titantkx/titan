@@ -5,6 +5,7 @@ package titan.validatorreward;
 option go_package = "github.com/tokenize-titan/titan/x/validatorreward/types";
 
 import "cosmos/msg/v1/msg.proto";
+import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 
@@ -14,8 +15,11 @@ service Msg {
 
   // SetRate defines a method for setting the rate
   rpc SetRate(MsgSetRate) returns (MsgSetRateResponse);
+
   // SetAuthority defines a method for setting the authority
   rpc SetAuthority(MsgSetAuthority) returns (MsgSetAuthorityResponse);
+  // FundRewardPool defines a method for funding the reward pool
+  rpc FundRewardPool(MsgFundRewardPool) returns (MsgFundRewardPoolResponse);
 }
 
 // MsgSetRate allow authority config `rate`
@@ -43,3 +47,21 @@ message MsgSetAuthority {
 
 // MsgSetAuthorityResponse defines the Msg/SetAuthority response type.
 message MsgSetAuthorityResponse {}
+
+// MsgFundRewardPool allow anyone to fund the reward pool
+message MsgFundRewardPool {
+  option (cosmos.msg.v1.signer) = "depositor";
+
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string depositor = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  // repeated cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false]
+  repeated cosmos.base.v1beta1.Coin amount = 2 [
+    (gogoproto.nullable)     = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+// MsgFundRewardPoolResponse defines the Msg/FundRewardPool response type.
+message MsgFundRewardPoolResponse {}

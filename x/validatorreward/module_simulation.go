@@ -31,6 +31,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgSetAuthority int = 100
 
+	opWeightMsgFundRewardPool = "op_weight_msg_fund_reward_pool"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgFundRewardPool int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -81,6 +85,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		validatorrewardsimulation.SimulateMsgSetAuthority(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
+	var weightMsgFundRewardPool int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgFundRewardPool, &weightMsgFundRewardPool, nil,
+		func(_ *rand.Rand) {
+			weightMsgFundRewardPool = defaultWeightMsgFundRewardPool
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgFundRewardPool,
+		validatorrewardsimulation.SimulateMsgFundRewardPool(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
 	// this line is used by starport scaffolding # simapp/module/operation
 
 	return operations
@@ -102,6 +117,14 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 			defaultWeightMsgSetAuthority,
 			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
 				validatorrewardsimulation.SimulateMsgSetAuthority(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgFundRewardPool,
+			defaultWeightMsgFundRewardPool,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				validatorrewardsimulation.SimulateMsgFundRewardPool(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
 		),
