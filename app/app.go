@@ -52,7 +52,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	sdkdistr "github.com/cosmos/cosmos-sdk/x/distribution"
 	sdkdistributionkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
@@ -133,14 +132,15 @@ import (
 	v1 "github.com/tokenize-titan/titan/app/upgrades/v1"
 	"github.com/tokenize-titan/titan/docs"
 	"github.com/tokenize-titan/titan/utils"
+	distr "github.com/tokenize-titan/titan/x/distribution"
 	distrkeeper "github.com/tokenize-titan/titan/x/distribution/keeper"
 	gov "github.com/tokenize-titan/titan/x/gov"
 	govkeeper "github.com/tokenize-titan/titan/x/gov/keeper"
 	stakingkeeper "github.com/tokenize-titan/titan/x/staking/keeper"
 
-	validatorrewardmodule "github.com/tokenize-titan/titan/x/validatorreward"
-	validatorrewardmodulekeeper "github.com/tokenize-titan/titan/x/validatorreward/keeper"
-	validatorrewardmoduletypes "github.com/tokenize-titan/titan/x/validatorreward/types"
+	"github.com/tokenize-titan/titan/x/validatorreward"
+	validatorrewardkeeper "github.com/tokenize-titan/titan/x/validatorreward/keeper"
+	validatorrewardtypes "github.com/tokenize-titan/titan/x/validatorreward/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
@@ -211,23 +211,24 @@ var (
 		// wasm
 		wasm.AppModuleBasic{},
 		//
-		validatorrewardmodule.AppModuleBasic{},
+		validatorreward.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:            nil,
-		distrtypes.ModuleName:                 nil,
-		icatypes.ModuleName:                   nil,
-		stakingtypes.BondedPoolName:           {authtypes.Staking},
-		stakingtypes.NotBondedPoolName:        {authtypes.Staking},
-		govtypes.ModuleName:                   nil,
-		ibctransfertypes.ModuleName:           {authtypes.Minter, authtypes.Burner},
-		evmtypes.ModuleName:                   {authtypes.Minter, authtypes.Burner},
-		wasmtypes.ModuleName:                  nil,
-		nft.ModuleName:                        nil,
-		validatorrewardmoduletypes.ModuleName: nil,
+		validatorrewardtypes.ValidatorRewardCollectorName: nil,
+		authtypes.FeeCollectorName:                        nil,
+		distrtypes.ModuleName:                             nil,
+		icatypes.ModuleName:                               nil,
+		stakingtypes.BondedPoolName:                       {authtypes.Staking},
+		stakingtypes.NotBondedPoolName:                    {authtypes.Staking},
+		govtypes.ModuleName:                               nil,
+		ibctransfertypes.ModuleName:                       {authtypes.Minter, authtypes.Burner},
+		evmtypes.ModuleName:                               {authtypes.Minter, authtypes.Burner},
+		wasmtypes.ModuleName:                              nil,
+		nft.ModuleName:                                    nil,
+		validatorrewardtypes.ModuleName:                   nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -296,7 +297,7 @@ type App struct {
 	EvmKeeper       *evmkeeper.Keeper
 	FeeMarketKeeper feemarketkeeper.Keeper
 
-	ValidatorrewardKeeper validatorrewardmodulekeeper.Keeper
+	ValidatorrewardKeeper validatorrewardkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -357,7 +358,7 @@ func New(
 		// ethermint keys
 		evmtypes.StoreKey, feemarkettypes.StoreKey,
 
-		validatorrewardmoduletypes.StoreKey,
+		validatorrewardtypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
@@ -447,6 +448,7 @@ func New(
 		app.BankKeeper,
 		app.StakingKeeper,
 		authtypes.FeeCollectorName,
+		validatorrewardtypes.ValidatorRewardCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -631,14 +633,14 @@ func New(
 
 	app.NFTKeeper = nftkeeper.NewKeeper(keys[nftkeeper.StoreKey], appCodec, app.AccountKeeper, app.BankKeeper)
 
-	app.ValidatorrewardKeeper = *validatorrewardmodulekeeper.NewKeeper(
+	app.ValidatorrewardKeeper = *validatorrewardkeeper.NewKeeper(
 		appCodec,
-		keys[validatorrewardmoduletypes.StoreKey],
-		keys[validatorrewardmoduletypes.MemStoreKey],
+		keys[validatorrewardtypes.StoreKey],
+		keys[validatorrewardtypes.MemStoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
 	)
-	validatorrewardModule := validatorrewardmodule.NewAppModule(appCodec, app.ValidatorrewardKeeper, app.AccountKeeper, app.BankKeeper)
+	validatorrewardModule := validatorreward.NewAppModule(appCodec, app.ValidatorrewardKeeper, app.AccountKeeper, app.BankKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -697,7 +699,7 @@ func New(
 		groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		gov.NewAppModule(appCodec, &app.GovKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(govtypes.ModuleName)),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(slashingtypes.ModuleName)),
-		distr.NewAppModule(appCodec, app.DistrKeeper.Keeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(distrtypes.ModuleName)),
+		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(distrtypes.ModuleName)),
 		staking.NewAppModule(appCodec, app.StakingKeeper.Keeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName)),
 		upgrade.NewAppModule(app.UpgradeKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
@@ -747,7 +749,7 @@ func New(
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		wasmtypes.ModuleName,
-		validatorrewardmoduletypes.ModuleName,
+		validatorrewardtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -775,7 +777,7 @@ func New(
 		upgradetypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		wasmtypes.ModuleName,
-		validatorrewardmoduletypes.ModuleName,
+		validatorrewardtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -814,7 +816,7 @@ func New(
 		crisistypes.ModuleName,
 		// wasm after must ibc transfer
 		wasmtypes.ModuleName,
-		validatorrewardmoduletypes.ModuleName,
+		validatorrewardtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -1115,7 +1117,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(evmtypes.ModuleName).WithKeyTable(evmtypes.ParamKeyTable()) //nolint: staticcheck
 	paramsKeeper.Subspace(feemarkettypes.ModuleName).WithKeyTable(feemarkettypes.ParamKeyTable())
 
-	paramsKeeper.Subspace(validatorrewardmoduletypes.ModuleName)
+	paramsKeeper.Subspace(validatorrewardtypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
