@@ -12,6 +12,9 @@ const (
 
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_validatorreward"
+
+	// ValidatorRewardCollectorName the root string for the validator reward collector account address
+	ValidatorRewardCollectorName = "validator_reward_collector"
 )
 
 var ParamsKey = []byte("Params")
