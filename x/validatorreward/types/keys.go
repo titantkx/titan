@@ -22,3 +22,7 @@ var ParamsKey = []byte("Params")
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
+
+const (
+	LastDistributeTimeKey = "LastDistributeTime/value" // prefix for last distribute time
+)

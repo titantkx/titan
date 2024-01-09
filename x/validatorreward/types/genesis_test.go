@@ -3,6 +3,7 @@ package types_test
 import (
 	"testing"
 
+	"github.com/cometbft/cometbft/types/time"
 	"github.com/stretchr/testify/require"
 	"github.com/tokenize-titan/titan/utils"
 	"github.com/tokenize-titan/titan/x/validatorreward/types"
@@ -10,6 +11,8 @@ import (
 
 func TestGenesisState_Validate(t *testing.T) {
 	utils.InitSDKConfig()
+
+	now := time.Now()
 
 	tests := []struct {
 		desc     string
@@ -24,7 +27,8 @@ func TestGenesisState_Validate(t *testing.T) {
 		{
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
-				Params: types.DefaultParams(),
+				Params:             types.DefaultParams(),
+				LastDistributeTime: &now,
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
