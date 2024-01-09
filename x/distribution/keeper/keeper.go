@@ -91,7 +91,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, totalPreviousPower int64, bonded
 	}
 
 	// calculate fraction allocated to validators
-	remaining := feesCollected
+	remaining := feesCollected.Add(rewardsCollected...)
 	communityTax := k.GetCommunityTax(ctx)
 	voteMultiplier := math.LegacyOneDec().Sub(communityTax)
 	feeMultiplier := feesCollected.MulDecTruncate(voteMultiplier).Add(rewardsCollected...)
