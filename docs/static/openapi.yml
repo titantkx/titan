@@ -84048,6 +84048,7 @@ definitions:
       the connection handshake.
   titan.validatorreward.MsgFundRewardPoolResponse:
     type: object
+    description: MsgFundRewardPoolResponse defines the Msg/FundRewardPool response type.
   titan.validatorreward.MsgSetAuthorityResponse:
     type: object
     description: MsgSetAuthorityResponse defines the Msg/SetAuthority response type.
