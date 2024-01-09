@@ -15,9 +15,10 @@ import (
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtestutil "github.com/cosmos/cosmos-sdk/x/distribution/testutil"
 	"github.com/cosmos/cosmos-sdk/x/distribution/types"
+
+	"github.com/tokenize-titan/titan/x/distribution/keeper"
 )
 
 func TestSetWithdrawAddr(t *testing.T) {
@@ -47,6 +48,7 @@ func TestSetWithdrawAddr(t *testing.T) {
 		bankKeeper,
 		stakingKeeper,
 		"fee_collector",
+		"validator_reward_collector",
 		authtypes.NewModuleAddress("gov").String(),
 	)
 
@@ -94,6 +96,7 @@ func TestWithdrawValidatorCommission(t *testing.T) {
 		bankKeeper,
 		stakingKeeper,
 		"fee_collector",
+		"validator_reward_collector",
 		authtypes.NewModuleAddress("gov").String(),
 	)
 
@@ -145,6 +148,7 @@ func TestGetTotalRewards(t *testing.T) {
 		bankKeeper,
 		stakingKeeper,
 		"fee_collector",
+		"validator_reward_collector",
 		authtypes.NewModuleAddress("gov").String(),
 	)
 
@@ -183,6 +187,7 @@ func TestFundCommunityPool(t *testing.T) {
 		bankKeeper,
 		stakingKeeper,
 		"fee_collector",
+		"validator_reward_collector",
 		authtypes.NewModuleAddress("gov").String(),
 	)
 
