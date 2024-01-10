@@ -75,6 +75,7 @@ genesis:
     validatorreward:
       params:
         authority: "titan1up5lnguhgpu2qdqz9hav34yyvs0kjw3pruzrh7"
+        rate : "0.190000000000000000"
     staking:
       params:
         bond_denom: "atkx"

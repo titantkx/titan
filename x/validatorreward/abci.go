@@ -10,6 +10,11 @@ import (
 
 // BeginBlocker add validator reward to `feeCollector`
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k keeper.Keeper) {
-	// @todo
-	k.DistributeTokens(ctx)
+	// determine the total power signing the block
+	var previousTotalPower int64
+	for _, voteInfo := range req.LastCommitInfo.GetVotes() {
+		previousTotalPower += voteInfo.Validator.Power
+	}
+
+	k.DistributeTokens(ctx, previousTotalPower)
 }
