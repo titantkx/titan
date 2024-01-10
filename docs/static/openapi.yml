@@ -53336,6 +53336,35 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
+  /tokenize-titan/titan/validatorreward/reward_pool:
+    get:
+      summary: Queries a list of RewardPool items.
+      operationId: TitanValidatorrewardRewardPool
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
 definitions:
   cosmos.auth.v1beta1.AddressBytesToStringResponse:
     type: object
@@ -84075,3 +84104,5 @@ definitions:
           authority:
             type: string
     description: QueryParamsResponse is response type for the Query/Params RPC method.
+  titan.validatorreward.QueryRewardPoolResponse:
+    type: object
