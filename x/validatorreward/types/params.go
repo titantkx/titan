@@ -9,9 +9,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var DefaultRate = sdk.NewDecWithPrec(6, 2) // 6%
+const (
+	ZeroHexAddress = "0000000000000000000000000000000000000000"
+)
 
-var DefaultAuthority string = "titan1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqe22t5s"
+var DefaultRate = sdk.NewDecWithPrec(6, 2) // 6%
 
 // NewParams creates a new Params instance
 func NewParams(
@@ -26,9 +28,14 @@ func NewParams(
 
 // DefaultParams returns a default set of parameters
 func DefaultParams() Params {
+	zeroAddr, err := sdk.AccAddressFromHexUnsafe(ZeroHexAddress)
+	if err != nil {
+		panic(err)
+	}
+
 	return NewParams(
 		DefaultRate,
-		DefaultAuthority,
+		zeroAddr.String(),
 	)
 }
 

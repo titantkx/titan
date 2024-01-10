@@ -16,7 +16,7 @@ import (
 func TestMsgServer_SetAuthority(t *testing.T) {
 	utils.InitSDKConfig()
 
-	zeroAddr, err := sdk.AccAddressFromHexUnsafe(zeroAddrHexStr)
+	zeroAddr, err := sdk.AccAddressFromHexUnsafe(types.ZeroHexAddress)
 	require.NoError(t, err)
 	zeroAddrStr := zeroAddr.String()
 
