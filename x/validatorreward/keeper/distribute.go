@@ -9,6 +9,8 @@ import (
 	"github.com/tokenize-titan/titan/x/validatorreward/types"
 )
 
+const timeYear = time.Hour * 24 * 365
+
 func (k Keeper) DistributeTokens(ctx sdk.Context, totalPreviousPower int64) {
 	// get current balance of reward pool
 	validatorRewardAccount := k.authKeeper.GetModuleAccount(ctx, types.ModuleName)
@@ -31,7 +33,7 @@ func (k Keeper) DistributeTokens(ctx sdk.Context, totalPreviousPower int64) {
 
 	// Calculate Duration since last distribution
 	duration := ctx.BlockHeader().Time.Sub(lastDistributeTime)
-	yearDurationInNanoseconds := int64(time.Hour * 24 * 365)
+	yearDurationInNanoseconds := int64(timeYear)
 	durationInYearFraction := sdk.NewDec(duration.Nanoseconds()).Quo(sdk.NewDec(yearDurationInNanoseconds))
 
 	totalPreviousPowerInDecCoin := sdk.NewDecCoin(utils.BondDenom, sdk.NewInt(totalPreviousPower).Mul(sdk.DefaultPowerReduction))
