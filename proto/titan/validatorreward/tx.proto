@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package titan.validatorreward;
+
+option go_package = "github.com/tokenize-titan/titan/x/validatorreward/types";
+
+import "cosmos/msg/v1/msg.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // SetRate defines a method for setting the rate
+  rpc SetRate(MsgSetRate) returns (MsgSetRateResponse);
+
+  // SetAuthority defines a method for setting the authority
+  rpc SetAuthority(MsgSetAuthority) returns (MsgSetAuthorityResponse);
+  // FundRewardPool defines a method for funding the reward pool
+  rpc FundRewardPool(MsgFundRewardPool) returns (MsgFundRewardPoolResponse);
+}
+
+// MsgSetRate allow authority config `rate`
+message MsgSetRate {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string rate      = 2 [
+    (cosmos_proto.scalar)  = "cosmos.Dec",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable)   = false
+  ];
+}
+
+// MsgSetRateResponse defines the Msg/SetRate response type.
+message MsgSetRateResponse {}
+
+// MsgSetAuthority allow authority config `authority`
+message MsgSetAuthority {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  string authority     = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string new_authority = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// MsgSetAuthorityResponse defines the Msg/SetAuthority response type.
+message MsgSetAuthorityResponse {}
+
+// MsgFundRewardPool allow anyone to fund the reward pool
+message MsgFundRewardPool {
+  option (cosmos.msg.v1.signer) = "depositor";
+
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string depositor = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  // repeated cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false]
+  repeated cosmos.base.v1beta1.Coin amount = 2 [
+    (gogoproto.nullable)     = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+// MsgFundRewardPoolResponse defines the Msg/FundRewardPool response type.
+message MsgFundRewardPoolResponse {}

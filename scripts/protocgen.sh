@@ -11,6 +11,7 @@ cd proto
 proto_dirs=$(find ./titan -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
   for file in $(find "${dir}" -maxdepth 3 -name '*.proto'); do
+    echo "Generating gogo proto code for $file"
     # this regex checks if a proto file has its go_package set to cosmossdk.io/api/...
     # gogo proto files SHOULD ONLY be generated if this is false
     # we don't want gogo proto to run for proto files which are natively built for google.golang.org/protobuf
@@ -23,7 +24,7 @@ done
 cd ..
 
 # move proto files to the right places
-cp -r github.com/titanlab/titan/* ./
+cp -r github.com/tokenize-titan/titan/* ./
 rm -rf github.com
 
 go mod tidy

@@ -1,0 +1,24 @@
+syntax = "proto3";
+package titan.validatorreward;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+import "titan/validatorreward/params.proto";
+
+option go_package = "github.com/tokenize-titan/titan/x/validatorreward/types";
+
+// GenesisState defines the validatorreward module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+
+  // last_distribute_time is the last block time when the validator reward is
+  // distributed.
+  google.protobuf.Timestamp last_distribute_time = 2
+      [(gogoproto.stdtime) = true];
+}
+
+// TimestampProto is a wrapper around google.protobuf.Timestamp.
+message TimestampProto {
+  google.protobuf.Timestamp timestamp = 1 [(gogoproto.stdtime) = true];
+}

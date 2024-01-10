@@ -27,11 +27,13 @@ var (
 	MilliDenom = fmt.Sprintf("m%s", DisplayDenom)
 	// BondDenom defines the denomination used for bonds in titan.
 	BondDenom = BaseDenom
+
+	PowerReduction = sdk.NewIntFromUint64(1e18)
 )
 
 func InitSDKConfig() {
 	sdk.DefaultBondDenom = BondDenom
-	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1e18)
+	sdk.DefaultPowerReduction = PowerReduction
 
 	// Set prefixes
 	accountPubKeyPrefix := AccountAddressPrefix + "pub"

@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package titan.validatorreward;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+
+import "cosmos/base/v1beta1/coin.proto";
+// import "cosmos/base/query/v1beta1/pagination.proto";
+
+import "titan/validatorreward/params.proto";
+
+option go_package = "github.com/tokenize-titan/titan/x/validatorreward/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get =
+        "/tokenize-titan/titan/validatorreward/params";
+  }
+
+  // Queries a list of RewardPool items.
+  rpc RewardPool(QueryRewardPoolRequest) returns (QueryRewardPoolResponse) {
+    option (google.api.http).get =
+        "/tokenize-titan/titan/validatorreward/reward_pool";
+  }
+}
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryRewardPoolRequest is request type for the Query/RewardPool RPC method.
+message QueryRewardPoolRequest {}
+
+// QueryRewardPoolResponse is response type for the Query/RewardPool RPC method.
+message QueryRewardPoolResponse {
+  repeated cosmos.base.v1beta1.Coin pool = 1 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable)     = false
+  ];
+}
