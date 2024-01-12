@@ -26,8 +26,7 @@ func MustSend(t testing.TB, from string, to string, amount string) txcmd.TxRespo
 	fromBalAfter := MustGetBalance(t, from, utils.BaseDenom, 0)
 	toBalAfter := MustGetBalance(t, to, utils.BaseDenom, 0)
 
-	coinSpent, err := tx.GetDeductFeeAmount()
-	require.NoError(t, err)
+	coinSpent := tx.MustGetDeductFeeAmount(t)
 	sentAmount := testutil.MustGetBaseDenomAmount(t, amount)
 
 	require.Equal(t, fromBalBefore.Sub(coinSpent).Sub(sentAmount), fromBalAfter)
@@ -57,8 +56,7 @@ func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.Tx
 		toBalAfter = append(toBalAfter, MustGetBalance(t, to[i], utils.BaseDenom, 0))
 	}
 
-	coinSpent, err := tx.GetDeductFeeAmount()
-	require.NoError(t, err)
+	coinSpent := tx.MustGetDeductFeeAmount(t)
 	sentAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	totalSentAmount := sentAmount.Mul(testutil.MakeBigInt(int64(len(to))))
 

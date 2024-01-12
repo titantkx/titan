@@ -88,8 +88,21 @@ func MustGetAccounts(t testing.TB, height int64) <-chan Account {
 				require.NotEmpty(t, account.Type)
 				require.NotEmpty(t, account.GetAddress())
 				if pk := account.GetPubKey(); pk != nil {
-					require.NotEmpty(t, pk.Type)
-					require.NotEmpty(t, pk.Key)
+					switch pk.Type {
+					case "/cosmos.crypto.multisig.LegacyAminoPubKey":
+						pk := pk.Value.(testutil.MultisigPublicKey)
+						require.NotEmpty(t, pk.Type)
+						require.Positive(t, pk.Threshold)
+						require.NotEmpty(t, pk.PublicKeys)
+						for _, spk := range pk.PublicKeys {
+							require.NotEmpty(t, spk.Type)
+							require.NotEmpty(t, spk.Key)
+						}
+					default:
+						pk := pk.Value.(testutil.SinglePublicKey)
+						require.NotEmpty(t, pk.Type)
+						require.NotEmpty(t, pk.Key)
+					}
 				}
 				require.GreaterOrEqual(t, account.GetAccountNumber(), int64(0))
 				require.GreaterOrEqual(t, account.GetSequence(), int64(0))

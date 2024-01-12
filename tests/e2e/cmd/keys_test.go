@@ -2,7 +2,7 @@ package cmd_test
 
 import (
 	"io"
-	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -14,9 +14,18 @@ import (
 func MustAddKey(t testing.TB) keys.Key {
 	name := testutil.GetName()
 	t.Cleanup(func() {
-		defer keys.MustDelete(t, name)
+		keys.MustDelete(t, name)
+		testutil.PutName(name)
 	})
 	return keys.MustAdd(t, name)
+}
+
+func MustAddMultisigKey(t testing.TB, threshold int, keyNames ...string) keys.MultisigKey {
+	name := strings.Join(keyNames, "_") + "_multisig"
+	t.Cleanup(func() {
+		keys.MustDelete(t, name)
+	})
+	return keys.MustAddMultisig(t, name, threshold, keyNames...)
 }
 
 func TestAddKey(t *testing.T) {
@@ -59,6 +68,7 @@ func TestShowKeyNotFound(t *testing.T) {
 	t.Parallel()
 
 	name := testutil.GetName()
+	defer testutil.PutName(name)
 
 	_, err := cmd.Exec("titand", "keys", "show", name)
 
@@ -70,6 +80,7 @@ func TestDeleteKey(t *testing.T) {
 	t.Parallel()
 
 	name := testutil.GetName()
+	defer testutil.PutName(name)
 
 	keys.MustAdd(t, name)
 	keys.MustDelete(t, name)
@@ -84,6 +95,7 @@ func TestDeleteKeyNotFound(t *testing.T) {
 	t.Parallel()
 
 	name := testutil.GetName()
+	defer testutil.PutName(name)
 
 	_, err := cmd.Exec("titand", "keys", "delete", name)
 
@@ -95,7 +107,9 @@ func TestRenameKey(t *testing.T) {
 	t.Parallel()
 
 	oldName := testutil.GetName()
+	defer testutil.PutName(oldName)
 	newName := testutil.GetName()
+	defer testutil.PutName(newName)
 
 	defer keys.MustDelete(t, newName)
 	oldKey := keys.MustAdd(t, oldName)
@@ -112,7 +126,9 @@ func TestRenameKeyNotFound(t *testing.T) {
 	t.Parallel()
 
 	oldName := testutil.GetName()
+	defer testutil.PutName(oldName)
 	newName := testutil.GetName()
+	defer testutil.PutName(newName)
 
 	_, err := cmd.Exec("titand", "keys", "rename", oldName, newName)
 
@@ -155,6 +171,7 @@ func TestListKeys(t *testing.T) {
 
 func exportKey(t testing.TB, password string, w io.Writer) keys.Key {
 	name := testutil.GetName()
+	defer testutil.PutName(name)
 	defer keys.MustDelete(t, name)
 	key := keys.MustAdd(t, name)
 	output := keys.MustExport(t, name, password)
@@ -174,17 +191,12 @@ func TestImportKey(t *testing.T) {
 	t.Parallel()
 
 	password := testutil.MustRandomString(t, 12)
-	file, err := os.CreateTemp("", "private_key_*.txt")
-	require.NoError(t, err)
-	require.NotNil(t, file)
-	defer func() {
-		file.Close()
-		os.Remove(file.Name())
-	}()
+	file := testutil.MustCreateTemp(t, "private_key_*.txt")
 
 	exportedKey := exportKey(t, password, file)
 
 	name := testutil.GetName()
+	defer testutil.PutName(name)
 	defer keys.MustDelete(t, name)
 	keys.MustImport(t, name, file.Name(), password)
 
@@ -194,4 +206,12 @@ func TestImportKey(t *testing.T) {
 	require.Equal(t, exportedKey.Address, importedKey.Address)
 	require.Equal(t, exportedKey.PubKey.Type, importedKey.PubKey.Type)
 	require.Equal(t, exportedKey.PubKey.Key, importedKey.PubKey.Key)
+}
+
+func TestAddMultisigKey(t *testing.T) {
+	t.Parallel()
+
+	key1 := MustAddKey(t)
+	key2 := MustAddKey(t)
+	MustAddMultisigKey(t, 2, key1.Name, key2.Name)
 }
