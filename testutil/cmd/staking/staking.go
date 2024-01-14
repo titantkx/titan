@@ -6,6 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	sdkmath "cosmossdk.io/math"
+
 	"github.com/tokenize-titan/titan/utils"
 
 	"github.com/tokenize-titan/titan/testutil"
@@ -25,7 +27,7 @@ type Validator struct {
 	OperatorAddress   string             `json:"operator_address"`
 	ConsensusPubkey   testutil.PublicKey `json:"consensus_pubkey"`
 	Commission        Commission         `json:"commission"`
-	MinSelfDelegation testutil.Int       `json:"min_self_delegation"`
+	MinSelfDelegation sdkmath.Int        `json:"min_self_delegation"`
 	Jailed            bool               `json:"jailed"`
 	Status            string             `json:"status"`
 	Tokens            testutil.BigInt    `json:"tokens"`
@@ -40,6 +42,16 @@ type CommissionRates struct {
 	Rate          testutil.Float `json:"rate"`
 	MaxRate       testutil.Float `json:"max_rate"`
 	MaxChangeRate testutil.Float `json:"max_change_rate"`
+}
+
+type StakingParams struct {
+	BondDenom               string            `json:"bond_denom"`
+	HistoricalEntries       int64             `json:"historical_entries"`
+	MaxEntries              int64             `json:"max_entries"`
+	MaxValidators           int64             `json:"max_validators"`
+	MinCommissionRate       testutil.Float    `json:"min_commission_rate"`
+	UnbondingTime           testutil.Duration `json:"unbonding_time"`
+	GlobalMinSelfDelegation sdkmath.Int       `json:"global_min_self_delegation"`
 }
 
 func MustGetValidator(t testing.TB, address string) Validator {
@@ -82,13 +94,13 @@ func MustGetDelegation(t testing.TB, delegator string, validator string) Delegat
 	return resp
 }
 
-func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation int64, from string) Validator {
+func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation sdkmath.Int, from string) Validator {
 	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
-	tx := txcmd.MustExecTx(t, ctx, "staking", "create-validator", "--pubkey="+valPk.String(), "--amount="+amount, "--commission-rate="+testutil.FormatFloat(commissionRate), "--commission-max-rate="+testutil.FormatFloat(commissionMaxRate), "--commission-max-change-rate="+testutil.FormatFloat(commissionMaxChangeRate), "--min-self-delegation="+testutil.FormatInt(minSelfDelegation), "--from="+from)
+	tx := txcmd.MustExecTx(t, ctx, "staking", "create-validator", "--pubkey="+valPk.String(), "--amount="+amount, "--commission-rate="+testutil.FormatFloat(commissionRate), "--commission-max-rate="+testutil.FormatFloat(commissionMaxRate), "--commission-max-change-rate="+testutil.FormatFloat(commissionMaxChangeRate), "--min-self-delegation="+minSelfDelegation.String(), "--from="+from)
 
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
@@ -125,7 +137,7 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 	require.Equal(t, commissionRate, val.Commission.CommissionRates.Rate.Float64())
 	require.Equal(t, commissionMaxRate, val.Commission.CommissionRates.MaxRate.Float64())
 	require.Equal(t, commissionMaxChangeRate, val.Commission.CommissionRates.MaxChangeRate.Float64())
-	require.Equal(t, minSelfDelegation, val.MinSelfDelegation.Int64())
+	require.Equal(t, minSelfDelegation, val.MinSelfDelegation)
 	require.False(t, val.Jailed)
 	require.Equal(t, BOND_STATUS_BONDED, val.Status)
 	require.Equal(t, stakedAmount, val.Tokens)
@@ -137,6 +149,13 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 	del.Delegation.Shares.RequireEqual(t, sharedAmount)
 
 	return val
+}
+
+func MustErrCreateValidator(t testing.TB, expErr string, valPk testutil.PublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation sdkmath.Int, from string) {
+	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
+	defer cancel()
+
+	txcmd.MustErrExecTx(t, ctx, expErr, "staking", "create-validator", "--pubkey="+valPk.String(), "--amount="+amount, "--commission-rate="+testutil.FormatFloat(commissionRate), "--commission-max-rate="+testutil.FormatFloat(commissionMaxRate), "--commission-max-change-rate="+testutil.FormatFloat(commissionMaxChangeRate), "--min-self-delegation="+minSelfDelegation.String(), "--from="+from)
 }
 
 func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
@@ -327,4 +346,10 @@ func mustGetSlashedAmount(t testing.TB, valBefore Validator, valAfter Validator)
 	}
 	params := slashing.MustGetParams(t)
 	return valBefore.Tokens.BigFloat().Mul(params.SlashFractionDowntime).BigInt()
+}
+
+func MustGetParams(t testing.TB) StakingParams {
+	var params StakingParams
+	cmd.MustQuery(t, &params, "staking", "params")
+	return params
 }
