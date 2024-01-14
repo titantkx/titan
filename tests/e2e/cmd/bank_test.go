@@ -10,6 +10,7 @@ import (
 	"github.com/tokenize-titan/titan/utils"
 
 	"github.com/tokenize-titan/titan/testutil"
+	"github.com/tokenize-titan/titan/testutil/cmd"
 	"github.com/tokenize-titan/titan/testutil/cmd/auth"
 	"github.com/tokenize-titan/titan/testutil/cmd/bank"
 	"github.com/tokenize-titan/titan/testutil/cmd/keys"
@@ -142,4 +143,49 @@ func TestMultiSendLowBalance(t *testing.T) {
 	require.Equal(t, senderBalBefore, senderBalAfter)
 	require.Equal(t, receiver1BalBefore, receiver1BalAfter)
 	require.Equal(t, receiver2BalBefore, receiver2BalAfter)
+}
+
+func TestMultisigSend(t *testing.T) {
+	t.Parallel()
+
+	sender1 := MustCreateAccount(t, "")
+	sender2 := MustCreateAccount(t, "")
+	receiver := MustCreateAccount(t, "")
+	multisigAccount := MustAddMultisigKey(t, 2, sender1.Name, sender2.Name)
+
+	MustAcquireMoney(t, multisigAccount.Address, "1"+utils.DisplayDenom)
+
+	unsingedTx := testutil.MustCreateTemp(t, "unsigned_tx_*.json")
+	unsignedTxContent := txcmd.MustGenerateTx(t, "bank", "send", multisigAccount.Name, receiver.Address, "0.5"+utils.DisplayDenom)
+	_, err := unsingedTx.Write(unsignedTxContent)
+	require.NoError(t, err)
+
+	signedTx1 := testutil.MustCreateTemp(t, "singed_tx_1_*.json")
+	signedTx1Content := cmd.MustExec(t, "titand", "tx", "sign", "--from="+sender1.Name, "--multisig="+multisigAccount.Address, unsingedTx.Name())
+	require.NotEmpty(t, signedTx1Content)
+	_, err = signedTx1.Write(signedTx1Content)
+	require.NoError(t, err)
+
+	signedTx2 := testutil.MustCreateTemp(t, "singed_tx_2_*.json")
+	signedTx2Content := cmd.MustExec(t, "titand", "tx", "sign", "--from="+sender2.Name, "--multisig="+multisigAccount.Address, unsingedTx.Name())
+	require.NotEmpty(t, signedTx2Content)
+	_, err = signedTx2.Write(signedTx2Content)
+	require.NoError(t, err)
+
+	signedTx := testutil.MustCreateTemp(t, "singed_tx_*.json")
+	signedTxContent := cmd.MustExec(t, "titand", "tx", "multisign", unsingedTx.Name(), multisigAccount.Name, signedTx1.Name(), signedTx2.Name())
+	require.NotEmpty(t, signedTxContent)
+	_, err = signedTx.Write(signedTxContent)
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
+	defer cancel()
+	tx := txcmd.MustBroadcastTx(t, ctx, signedTx.Name())
+
+	coinSpent := tx.MustGetDeductFeeAmount(t)
+	senderBal := bank.MustGetBalance(t, multisigAccount.Address, utils.BaseDenom, 0)
+	receiverBal := bank.MustGetBalance(t, receiver.Address, utils.BaseDenom, 0)
+
+	require.Equal(t, testutil.MakeBigIntFromString("500000000000000000").Sub(coinSpent), senderBal)
+	require.Equal(t, testutil.MakeBigIntFromString("500000000000000000"), receiverBal)
 }

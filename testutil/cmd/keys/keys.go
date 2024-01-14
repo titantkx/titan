@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -21,13 +22,13 @@ type Key struct {
 	Mnemonic string    `json:"mnemonic"`
 }
 
-type PublicKey testutil.PublicKey
+type PublicKey testutil.SinglePublicKey
 
 func (pk *PublicKey) UnmarshalText(txt []byte) error {
 	if len(txt) > 2 && txt[0] == '"' && txt[len(txt)-1] == '"' {
 		txt = txt[1 : len(txt)-1]
 	}
-	return json.Unmarshal(txt, (*testutil.PublicKey)(pk))
+	return json.Unmarshal(txt, (*testutil.SinglePublicKey)(pk))
 }
 
 func MustShowAddress(t testing.TB, name string) string {
@@ -119,4 +120,39 @@ func MustImport(t testing.TB, name string, fileName string, password string) {
 		err = cmd.MakeExecError(err, output)
 	}
 	require.NoError(t, err)
+}
+
+type MultisigKey struct {
+	Name    string            `json:"name"`
+	Type    string            `json:"type"`
+	Address string            `json:"address"`
+	PubKey  MultisigPublicKey `json:"pubkey"`
+}
+
+type MultisigPublicKey testutil.MultisigPublicKey
+
+func (pk *MultisigPublicKey) UnmarshalText(txt []byte) error {
+	if len(txt) > 2 && txt[0] == '"' && txt[len(txt)-1] == '"' {
+		txt = txt[1 : len(txt)-1]
+	}
+	return json.Unmarshal(txt, (*testutil.MultisigPublicKey)(pk))
+}
+
+func MustAddMultisig(t testing.TB, name string, threshold int, keys ...string) MultisigKey {
+	output := cmd.MustExec(t, "titand", "keys", "add", name, "--multisig="+strings.Join(keys, ","), "--multisig-threshold="+strconv.Itoa(threshold), "--output=json")
+	require.NotNil(t, output)
+	var mutisigKey MultisigKey
+	err := cmd.UnmarshalJSON(output, &mutisigKey)
+	require.NoError(t, err)
+	require.Equal(t, name, mutisigKey.Name)
+	require.Equal(t, "multi", mutisigKey.Type)
+	require.NotEmpty(t, mutisigKey.Address)
+	require.Equal(t, "/cosmos.crypto.multisig.LegacyAminoPubKey", mutisigKey.PubKey.Type)
+	require.Equal(t, threshold, mutisigKey.PubKey.Threshold)
+	require.Len(t, mutisigKey.PubKey.PublicKeys, len(keys))
+	for i := range keys {
+		expectedPublicKey := testutil.SinglePublicKey(MustShow(t, keys[i]).PubKey)
+		require.Contains(t, mutisigKey.PubKey.PublicKeys, expectedPublicKey)
+	}
+	return mutisigKey
 }

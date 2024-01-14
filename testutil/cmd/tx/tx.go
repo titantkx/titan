@@ -1,8 +1,11 @@
 package tx
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"testing"
 	"time"
@@ -157,6 +160,12 @@ func (txr TxResponse) GetRefundAmount() (testutil.BigInt, error) {
 	return testutil.Coins{}.GetBaseDenomAmount(), nil
 }
 
+func (txr TxResponse) MustGetRefundAmount(t testing.TB) testutil.BigInt {
+	amount, err := txr.GetRefundAmount()
+	require.NoError(t, err)
+	return amount
+}
+
 func (txr TxResponse) GetDeductFeeAmount() (testutil.BigInt, error) {
 	coinSpent := txr.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
 
@@ -166,4 +175,57 @@ func (txr TxResponse) GetDeductFeeAmount() (testutil.BigInt, error) {
 	}
 
 	return coinSpent.Sub(refundAmount), nil
+}
+
+func (txr TxResponse) MustGetDeductFeeAmount(t testing.TB) testutil.BigInt {
+	amount, err := txr.GetDeductFeeAmount()
+	require.NoError(t, err)
+	return amount
+}
+
+func GenerateTx(args ...string) ([]byte, error) {
+	gasPrice, err := feemarket.GetBaseFee(0)
+	if err != nil {
+		return nil, err
+	}
+	args = append([]string{"tx"}, args...)
+	args = append(args, "--gas=auto", "--gas-adjustment=2", "--gas-prices="+gasPrice.String()+utils.BaseDenom, "--generate-only")
+	output, err := cmd.Exec("titand", args...)
+	if err != nil {
+		return nil, err
+	}
+	s := bufio.NewScanner(bytes.NewBuffer(output))
+	if s.Scan() && s.Scan() {
+		return s.Bytes(), nil
+	}
+	return nil, fmt.Errorf("invalid output: %s", string(output))
+}
+
+func MustGenerateTx(t testing.TB, args ...string) []byte {
+	output, err := GenerateTx(args...)
+	require.NoError(t, err)
+	require.NotEmpty(t, output)
+	return output
+}
+
+func BroadcastTx(ctx context.Context, filePath string) (*TxResponse, error) {
+	output, err := cmd.Exec("titand", "tx", "broadcast", filePath, "--output=json", "-y")
+	if err != nil {
+		return nil, err
+	}
+	var tx TxResponse
+	if err := cmd.UnmarshalJSON(output, &tx); err != nil {
+		return nil, err
+	}
+	if tx.Code != 0 {
+		return nil, errors.New(tx.RawLog)
+	}
+	return QueryTx(ctx, tx.Hash)
+}
+
+func MustBroadcastTx(t testing.TB, ctx context.Context, filePath string) TxResponse {
+	tx, err := BroadcastTx(ctx, filePath)
+	require.NoError(t, err)
+	require.Equal(t, 0, tx.Code, tx.RawLog)
+	return *tx
 }

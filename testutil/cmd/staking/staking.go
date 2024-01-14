@@ -24,14 +24,14 @@ const (
 )
 
 type Validator struct {
-	OperatorAddress   string             `json:"operator_address"`
-	ConsensusPubkey   testutil.PublicKey `json:"consensus_pubkey"`
-	Commission        Commission         `json:"commission"`
-	MinSelfDelegation sdkmath.Int        `json:"min_self_delegation"`
-	Jailed            bool               `json:"jailed"`
-	Status            string             `json:"status"`
-	Tokens            testutil.BigInt    `json:"tokens"`
-	DelegatorShares   testutil.BigFloat  `json:"delegator_shares"`
+	OperatorAddress   string                   `json:"operator_address"`
+	ConsensusPubkey   testutil.SinglePublicKey `json:"consensus_pubkey"`
+	Commission        Commission               `json:"commission"`
+	MinSelfDelegation sdkmath.Int              `json:"min_self_delegation"`
+	Jailed            bool                     `json:"jailed"`
+	Status            string                   `json:"status"`
+	Tokens            testutil.BigInt          `json:"tokens"`
+	DelegatorShares   testutil.BigFloat        `json:"delegator_shares"`
 }
 
 type Commission struct {
@@ -94,7 +94,7 @@ func MustGetDelegation(t testing.TB, delegator string, validator string) Delegat
 	return resp
 }
 
-func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation sdkmath.Int, from string) Validator {
+func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation sdkmath.Int, from string) Validator {
 	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
@@ -104,8 +104,7 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
-	coinSpent, err := tx.GetDeductFeeAmount()
-	require.NoError(t, err)
+	coinSpent := tx.MustGetDeductFeeAmount(t)
 	stakedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	sharedAmount := stakedAmount.BigFloat()
 
@@ -151,7 +150,7 @@ func MustCreateValidator(t testing.TB, valPk testutil.PublicKey, amount string, 
 	return val
 }
 
-func MustErrCreateValidator(t testing.TB, expErr string, valPk testutil.PublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation sdkmath.Int, from string) {
+func MustErrCreateValidator(t testing.TB, expErr string, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation sdkmath.Int, from string) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
@@ -170,8 +169,7 @@ func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 	valAfter := MustGetValidator(t, valAddr)
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
-	coinSpent, err := tx.GetDeductFeeAmount()
-	require.NoError(t, err)
+	coinSpent := tx.MustGetDeductFeeAmount(t)
 	delegatedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 	sharedAmount := valBefore.DelegatorShares.Mul(delegatedAmount.DivFloat(valBefore.Tokens))
@@ -209,8 +207,7 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	reward := mustGetReward(t, tx.Events)
-	coinSpent, err := tx.GetDeductFeeAmount()
-	require.NoError(t, err)
+	coinSpent := tx.MustGetDeductFeeAmount(t)
 	redelegatedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	srcSlashedAmount := mustGetSlashedAmount(t, srcValBefore, srcValAfter)
 	dstSlashedAmount := mustGetSlashedAmount(t, dstValBefore, dstValAfter)
@@ -260,8 +257,7 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	reward := mustGetReward(t, tx.Events)
-	coinSpent, err := tx.GetDeductFeeAmount()
-	require.NoError(t, err)
+	coinSpent := tx.MustGetDeductFeeAmount(t)
 	unbondedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 	unbondedShares := valBefore.DelegatorShares.Mul(unbondedAmount.DivFloat(valBefore.Tokens))
@@ -305,8 +301,7 @@ func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeig
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	reward := mustGetReward(t, tx.Events)
-	coinSpent, err := tx.GetDeductFeeAmount()
-	require.NoError(t, err)
+	coinSpent := tx.MustGetDeductFeeAmount(t)
 	unbondedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
 	unbondedShares := valBefore.DelegatorShares.Mul(unbondedAmount.DivFloat(valBefore.Tokens))
