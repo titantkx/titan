@@ -150,7 +150,7 @@ func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount st
 	return val
 }
 
-func MustErrCreateValidator(t testing.TB, expErr string, valPk testutil.PublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation sdkmath.Int, from string) {
+func MustErrCreateValidator(t testing.TB, expErr string, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation sdkmath.Int, from string) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
