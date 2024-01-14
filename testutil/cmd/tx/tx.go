@@ -114,6 +114,15 @@ func MustExecTx(t testing.TB, ctx context.Context, args ...string) TxResponse {
 	return *tx
 }
 
+func MustErrExecTx(t testing.TB, ctx context.Context, expErr string, args ...string) {
+	tx, err := ExecTx(ctx, args...)
+	require.Nil(t, tx)
+	require.Error(t, err)
+	if expErr != "" {
+		require.Contains(t, err.Error(), expErr)
+	}
+}
+
 func (txr TxResponse) GetRefundAmount() (testutil.BigInt, error) {
 	// find event in `tx.Events` have type "refund"
 	var refundEvent *Event
