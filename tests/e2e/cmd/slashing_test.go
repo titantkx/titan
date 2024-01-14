@@ -5,12 +5,16 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
 	"github.com/tokenize-titan/titan/testutil/cmd/distribution"
 	"github.com/tokenize-titan/titan/testutil/cmd/slashing"
 	"github.com/tokenize-titan/titan/testutil/cmd/staking"
+	"github.com/tokenize-titan/titan/utils"
 )
 
 func TestValidatorInactive(t *testing.T) {
+	utils.InitSDKConfig()
+
 	params := slashing.MustGetParams(t)
 
 	// Create validator

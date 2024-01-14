@@ -30,6 +30,8 @@ validators:
 - name: val1
   bonded: 100000tkx
   home: "local_test_data/.titan_val1"
+  gentx: 
+    min-self-delegation: "5000000000000000000"
   app:
     minimum-gas-prices: 0atkx
     api.enable: true
@@ -81,6 +83,7 @@ genesis:
         bond_denom: "atkx"
         unbonding_time: "120s"
         max_validators: 8
+        global_min_self_delegation: "5000000000000000000"
     crisis:
       constant_fee:
         denom: "atkx"
