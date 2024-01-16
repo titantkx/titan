@@ -5,16 +5,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	sdkmath "cosmossdk.io/math"
-
-	"github.com/tokenize-titan/titan/utils"
-
 	"github.com/tokenize-titan/titan/testutil"
 	"github.com/tokenize-titan/titan/testutil/cmd"
 	"github.com/tokenize-titan/titan/testutil/cmd/bank"
 	"github.com/tokenize-titan/titan/testutil/cmd/slashing"
 	txcmd "github.com/tokenize-titan/titan/testutil/cmd/tx"
+	"github.com/tokenize-titan/titan/utils"
 )
 
 const (
@@ -27,7 +23,7 @@ type Validator struct {
 	OperatorAddress   string                   `json:"operator_address"`
 	ConsensusPubkey   testutil.SinglePublicKey `json:"consensus_pubkey"`
 	Commission        Commission               `json:"commission"`
-	MinSelfDelegation sdkmath.Int              `json:"min_self_delegation"`
+	MinSelfDelegation testutil.BigInt          `json:"min_self_delegation"`
 	Jailed            bool                     `json:"jailed"`
 	Status            string                   `json:"status"`
 	Tokens            testutil.BigInt          `json:"tokens"`
@@ -51,7 +47,7 @@ type StakingParams struct {
 	MaxValidators           int64             `json:"max_validators"`
 	MinCommissionRate       testutil.Float    `json:"min_commission_rate"`
 	UnbondingTime           testutil.Duration `json:"unbonding_time"`
-	GlobalMinSelfDelegation sdkmath.Int       `json:"global_min_self_delegation"`
+	GlobalMinSelfDelegation testutil.BigInt   `json:"global_min_self_delegation"`
 }
 
 func MustGetValidator(t testing.TB, address string) Validator {
@@ -94,7 +90,7 @@ func MustGetDelegation(t testing.TB, delegator string, validator string) Delegat
 	return resp
 }
 
-func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation sdkmath.Int, from string) Validator {
+func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.BigInt, from string) Validator {
 	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
@@ -138,7 +134,6 @@ func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount st
 	require.Equal(t, commissionMaxChangeRate, val.Commission.CommissionRates.MaxChangeRate.Float64())
 	require.Equal(t, minSelfDelegation, val.MinSelfDelegation)
 	require.False(t, val.Jailed)
-	require.Equal(t, BOND_STATUS_BONDED, val.Status)
 	require.Equal(t, stakedAmount, val.Tokens)
 	val.DelegatorShares.RequireEqual(t, sharedAmount)
 
@@ -150,7 +145,7 @@ func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount st
 	return val
 }
 
-func MustErrCreateValidator(t testing.TB, expErr string, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation sdkmath.Int, from string) {
+func MustErrCreateValidator(t testing.TB, expErr string, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.BigInt, from string) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
@@ -336,7 +331,12 @@ func mustGetReward(t testing.TB, events []txcmd.Event) testutil.BigInt {
 }
 
 func mustGetSlashedAmount(t testing.TB, valBefore Validator, valAfter Validator) testutil.BigInt {
-	if valBefore.Jailed || !valAfter.Jailed {
+	if !valAfter.Jailed || valBefore.Jailed {
+		// Validator is not jailed or was jailed before
+		return testutil.MakeBigInt(0)
+	}
+	if valAfter.Tokens.Cmp(valAfter.MinSelfDelegation) < 0 {
+		// Validator was jailed due to self delegation lower than min self delegation
 		return testutil.MakeBigInt(0)
 	}
 	params := slashing.MustGetParams(t)
@@ -347,4 +347,92 @@ func MustGetParams(t testing.TB) StakingParams {
 	var params StakingParams
 	cmd.MustQuery(t, &params, "staking", "params")
 	return params
+}
+
+func MustCreateValidatorForOther(t testing.TB, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.BigInt, from string, delAddr string) Validator {
+	delBalBefore := bank.MustGetBalance(t, delAddr, utils.BaseDenom, 0)
+	fromBalBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
+
+	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
+	defer cancel()
+
+	tx := txcmd.MustExecTx(t, ctx, "staking", "create-validator-for-other", delAddr, "--pubkey="+valPk.String(), "--amount="+amount, "--commission-rate="+testutil.FormatFloat(commissionRate), "--commission-max-rate="+testutil.FormatFloat(commissionMaxRate), "--commission-max-change-rate="+testutil.FormatFloat(commissionMaxChangeRate), "--min-self-delegation="+minSelfDelegation.String(), "--from="+from)
+
+	delBalAfter := bank.MustGetBalance(t, delAddr, utils.BaseDenom, 0)
+	fromBalAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
+
+	coinSpent := tx.MustGetDeductFeeAmount(t)
+	stakedAmount := testutil.MustGetBaseDenomAmount(t, amount)
+	sharedAmount := stakedAmount.BigFloat()
+
+	require.Equal(t, delBalBefore, delBalAfter)
+	require.Equal(t, fromBalBefore.Sub(coinSpent).Sub(stakedAmount), fromBalAfter)
+
+	var valAddr string
+	var actualStakedAmount testutil.BigInt
+
+	for _, event := range tx.Events {
+		if event.Type == "create_validator" {
+			for _, att := range event.Attributes {
+				if att.Key == "validator" {
+					valAddr = att.Value
+				} else if att.Key == "amount" {
+					actualStakedAmount = testutil.MustGetBaseDenomAmount(t, att.Value)
+				}
+			}
+		}
+	}
+
+	require.NotEmpty(t, valAddr)
+	require.False(t, actualStakedAmount.IsZero())
+	require.Equal(t, stakedAmount, actualStakedAmount)
+
+	val := MustGetValidator(t, valAddr)
+
+	require.Equal(t, valPk.Type, val.ConsensusPubkey.Type)
+	require.Equal(t, valPk.Key, val.ConsensusPubkey.Key)
+	require.Equal(t, commissionRate, val.Commission.CommissionRates.Rate.Float64())
+	require.Equal(t, commissionMaxRate, val.Commission.CommissionRates.MaxRate.Float64())
+	require.Equal(t, commissionMaxChangeRate, val.Commission.CommissionRates.MaxChangeRate.Float64())
+	require.Equal(t, minSelfDelegation, val.MinSelfDelegation)
+	require.False(t, val.Jailed)
+	require.Equal(t, stakedAmount, val.Tokens)
+	val.DelegatorShares.RequireEqual(t, sharedAmount)
+
+	del := MustGetDelegation(t, delAddr, valAddr)
+
+	require.Equal(t, stakedAmount, del.Balance.Amount)
+	del.Delegation.Shares.RequireEqual(t, sharedAmount)
+
+	return val
+}
+
+func MustDelegateForOther(t testing.TB, valAddr string, amount string, from string, delAddr string) {
+	valBefore := MustGetValidator(t, valAddr)
+	delBalBefore := bank.MustGetBalance(t, delAddr, utils.BaseDenom, 0)
+	fromBalBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
+
+	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
+	defer cancel()
+
+	tx := txcmd.MustExecTx(t, ctx, "staking", "delegate-for-other", delAddr, valAddr, amount, "--from="+from)
+
+	valAfter := MustGetValidator(t, valAddr)
+	delBalAfter := bank.MustGetBalance(t, delAddr, utils.BaseDenom, 0)
+	fromBalAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
+
+	coinSpent := tx.MustGetDeductFeeAmount(t)
+	delegatedAmount := testutil.MustGetBaseDenomAmount(t, amount)
+	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
+	sharedAmount := valBefore.DelegatorShares.Mul(delegatedAmount.DivFloat(valBefore.Tokens))
+
+	require.Equal(t, delBalBefore, delBalAfter)
+	require.Equal(t, fromBalBefore.Sub(coinSpent).Sub(delegatedAmount), fromBalAfter)
+	require.Equal(t, valBefore.Tokens.Sub(slashedAmount).Add(delegatedAmount), valAfter.Tokens)
+	valAfter.DelegatorShares.RequireEqual(t, valBefore.DelegatorShares.Add(sharedAmount))
+
+	del := MustGetDelegation(t, delAddr, valAddr)
+
+	require.Equal(t, delegatedAmount, del.Balance.Amount)
+	del.Delegation.Shares.RequireEqual(t, sharedAmount)
 }
