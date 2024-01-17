@@ -28,7 +28,7 @@ accounts:
 
 validators:
 - name: val1
-  bonded: 1000tkx
+  bonded: 2048tkx
   home: "local_test_data/.titan_val1"
   app:
     minimum-gas-prices: 0atkx
