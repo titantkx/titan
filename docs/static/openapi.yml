@@ -28646,6 +28646,14 @@ paths:
                     title: >-
                       min_commission_rate is the chain-wide minimum commission
                       rate that a validator can charge their delegators
+                  global_min_self_delegation:
+                    type: string
+                    title: >-
+                      global_min_self_delegation is the chain-wide minimum self
+                      delegation required for a validator to be active
+
+                      we jump index 10 to allow for future additions of
+                      cosmos-sdk
             description: >-
               QueryParamsResponse is response type for the Query/Params RPC
               method.
@@ -53345,6 +53353,27 @@ paths:
           description: A successful response.
           schema:
             type: object
+            properties:
+              pool:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    denom:
+                      type: string
+                    amount:
+                      type: string
+                  description: >-
+                    Coin defines a token with a denomination and an amount.
+
+
+                    NOTE: The amount field is an Int which implements the custom
+                    method
+
+                    signatures required by gogoproto.
+            description: >-
+              QueryRewardPoolResponse is response type for the Query/RewardPool
+              RPC method.
         default:
           description: An unexpected error response.
           schema:
@@ -70863,9 +70892,17 @@ definitions:
     type: object
     description: 'Since: cosmos-sdk 0.46'
     title: MsgCancelUnbondingDelegationResponse
+  cosmos.staking.v1beta1.MsgCreateValidatorForOtherResponse:
+    type: object
+    description: >-
+      MsgCreateValidatorForOtherResponse defines the Msg/CreateValidatorForOther
+      response type.
   cosmos.staking.v1beta1.MsgCreateValidatorResponse:
     type: object
     description: MsgCreateValidatorResponse defines the Msg/CreateValidator response type.
+  cosmos.staking.v1beta1.MsgDelegateForOtherResponse:
+    type: object
+    description: MsgDelegateResponse defines the Msg/DelegateForOther response type.
   cosmos.staking.v1beta1.MsgDelegateResponse:
     type: object
     description: MsgDelegateResponse defines the Msg/Delegate response type.
@@ -70914,6 +70951,13 @@ definitions:
         title: >-
           min_commission_rate is the chain-wide minimum commission rate that a
           validator can charge their delegators
+      global_min_self_delegation:
+        type: string
+        title: >-
+          global_min_self_delegation is the chain-wide minimum self delegation
+          required for a validator to be active
+
+          we jump index 10 to allow for future additions of cosmos-sdk
     description: Params defines the parameters for the x/staking module.
   cosmos.staking.v1beta1.Pool:
     type: object
@@ -71889,6 +71933,13 @@ definitions:
             title: >-
               min_commission_rate is the chain-wide minimum commission rate that
               a validator can charge their delegators
+          global_min_self_delegation:
+            type: string
+            title: >-
+              global_min_self_delegation is the chain-wide minimum self
+              delegation required for a validator to be active
+
+              we jump index 10 to allow for future additions of cosmos-sdk
     description: QueryParamsResponse is response type for the Query/Params RPC method.
   cosmos.staking.v1beta1.QueryPoolResponse:
     type: object
@@ -84106,3 +84157,21 @@ definitions:
     description: QueryParamsResponse is response type for the Query/Params RPC method.
   titan.validatorreward.QueryRewardPoolResponse:
     type: object
+    properties:
+      pool:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+    description: >-
+      QueryRewardPoolResponse is response type for the Query/RewardPool RPC
+      method.
