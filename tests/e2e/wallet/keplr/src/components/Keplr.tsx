@@ -38,11 +38,11 @@ const chainInfo: ChainInfo = {
     {
       coinDenom: "tkx",
       coinMinimalDenom: "atkx",
-      coinDecimals: 18,
+      coinDecimals: 18,      
       gasPriceStep: {
-        low: 0.001 * 1e10,
-        average: 0.025 * 1e10,
-        high: 0.04 * 1e10,
+        low: 10 * 1e10,
+        average: 10 * 1e10,
+        high: 20 * 1e10,
       },
     },
   ],

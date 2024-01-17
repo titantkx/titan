@@ -2,7 +2,7 @@ version: 1
 
 accounts:
 - name: faucet
-  coins: ['99994990tkx']
+  coins: ['96997990tkx']
   # titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr
   mnemonic: hair banner wedding drive age force situate shield tortoise coffee lucky rubber
 - name: test
@@ -15,20 +15,20 @@ accounts:
   mnemonic: vague actress result stage connect little skin fragile gift chef exile trophy
 - name: val1
   # titan1cxjpv02d4cg7jp9qvh2her2lz5ljut0upv5gyv
-  coins: ['1002tkx']
+  coins: ['1000002tkx']
   mnemonic: tree text ghost clay fun asset audit focus carbon slab two aim
 - name: val2
   # titan12gxum5krnqerwdtpc32ypvuwxlnnaq2kwxexl9
-  coins: ['1003tkx']
+  coins: ['1000003tkx']
   mnemonic: dignity include calm dinner frog clip bunker report grocery point actor home
 - name: val3
   # titan1j90sphl02kuc5s465m9c33qpa28hrlx07qvjdp
-  coins: ['1004tkx']
+  coins: ['1000004tkx']
   mnemonic: merry strike spray access able edge rally bulk other butter involve situate
 
 validators:
 - name: val1
-  bonded: 1000tkx
+  bonded: 2048tkx
   home: "local_test_data/.titan_val1"
   app:
     minimum-gas-prices: 0atkx

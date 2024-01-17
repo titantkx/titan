@@ -52,7 +52,7 @@ validators:
     rpc:
       timeout_broadcast_tx_commit: 10s
   client:
-    chain-id: "titan_18888-1"
+    chain-id: "titan_18887-1"
     keyring-backend: "test"
 
 client:
@@ -64,7 +64,7 @@ faucet:
   coins: ['10tkx']
 
 genesis:
-  chain_id: titan_18888-1
+  chain_id: titan_18887-1
   consensus_params:
     block:      
       max_gas: "40000000"
