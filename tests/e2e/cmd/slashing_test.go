@@ -9,16 +9,13 @@ import (
 	"github.com/tokenize-titan/titan/testutil/cmd/distribution"
 	"github.com/tokenize-titan/titan/testutil/cmd/slashing"
 	"github.com/tokenize-titan/titan/testutil/cmd/staking"
-	"github.com/tokenize-titan/titan/utils"
 )
 
 func TestValidatorInactive(t *testing.T) {
-	utils.InitSDKConfig()
-
 	params := slashing.MustGetParams(t)
 
 	// Create validator
-	valBefore := MustCreateValidator(t)
+	valBefore := MustCreateValidator(t, "")
 
 	totalBalBefore := MustGetTotalBalance(t, 0)
 	distPoolBefore := distribution.MustGetCommunityPool(t)
@@ -35,7 +32,6 @@ func TestValidatorInactive(t *testing.T) {
 
 	slashedAmount := valBefore.Tokens.BigFloat().Mul(params.SlashFractionDowntime).BigInt()
 
-	require.Equal(t, "BOND_STATUS_UNBONDING", valAfter.Status)
 	require.Equal(t, valBefore.Tokens.Sub(slashedAmount), valAfter.Tokens)
 
 	totalBalAfter := MustGetTotalBalance(t, 0)

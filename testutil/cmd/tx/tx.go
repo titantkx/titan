@@ -122,7 +122,7 @@ func MustErrExecTx(t testing.TB, ctx context.Context, expErr string, args ...str
 	require.Nil(t, tx)
 	require.Error(t, err)
 	if expErr != "" {
-		require.Contains(t, err.Error(), expErr)
+		require.ErrorContains(t, err, expErr)
 	}
 }
 

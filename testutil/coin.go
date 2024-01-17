@@ -18,18 +18,23 @@ type Coin struct {
 	Denom  string   `json:"denom"`
 }
 
-type Coins []Coin
+func (coin Coin) String() string {
+	return coin.Amount.String() + coin.Denom
+}
 
-func (coins Coins) GetBaseDenomAmount() BigInt {
-	baseDenomAmount := MakeBigInt(0)
-	for _, coin := range coins {
-		if coin.Denom == "tkx" {
-			baseDenomAmount = baseDenomAmount.Add(coin.Amount.Mul(MakeBigFloat(1000_000_000_000_000_000)).BigInt())
-		} else if coin.Denom == utils.BaseDenom {
-			baseDenomAmount = baseDenomAmount.Add(coin.Amount.BigInt())
-		}
+func (coin Coin) GetBaseDenomAmount() BigInt {
+	switch coin.Denom {
+	case utils.DisplayDenom:
+		return coin.Amount.Mul(MakeBigFloat(1_000_000_000_000_000_000)).BigInt()
+	case utils.MilliDenom:
+		return coin.Amount.Mul(MakeBigFloat(1_000_000_000_000_000)).BigInt()
+	case utils.MicroDenom:
+		return coin.Amount.Mul(MakeBigFloat(1_000_000_000_000)).BigInt()
+	case utils.BaseDenom:
+		return coin.Amount.BigInt()
+	default:
+		return MakeBigInt(0)
 	}
-	return baseDenomAmount
 }
 
 func ParseCoin(txt string) (Coin, error) {
@@ -54,6 +59,24 @@ func MustParseCoin(t testing.TB, txt string) Coin {
 	require.NoError(t, err)
 	coin.Denom = matches[2]
 	return coin
+}
+
+type Coins []Coin
+
+func (coins Coins) String() string {
+	s := make([]string, len(coins))
+	for i := range coins {
+		s[i] = coins[i].String()
+	}
+	return strings.Join(s, ",")
+}
+
+func (coins Coins) GetBaseDenomAmount() BigInt {
+	baseDenomAmount := MakeBigInt(0)
+	for _, coin := range coins {
+		baseDenomAmount = baseDenomAmount.Add(coin.GetBaseDenomAmount())
+	}
+	return baseDenomAmount
 }
 
 func ParseAmount(txt string) (Coins, error) {
