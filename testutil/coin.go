@@ -13,9 +13,23 @@ import (
 
 var coinPattern = regexp.MustCompile(`((?:[\d]+\.)?[\d]+)([\w]+)`)
 
+var OneToken Coin
+
+func init() {
+	var err error
+	OneToken, err = ParseCoin("1" + utils.DisplayDenom)
+	if err != nil {
+		panic(err)
+	}
+}
+
 type Coin struct {
 	Amount BigFloat `json:"amount"`
 	Denom  string   `json:"denom"`
+}
+
+func (coin Coin) GetAmount() string {
+	return coin.GetBaseDenomAmount().String() + utils.BaseDenom
 }
 
 func (coin Coin) String() string {
@@ -62,6 +76,14 @@ func MustParseCoin(t testing.TB, txt string) Coin {
 }
 
 type Coins []Coin
+
+func (coins Coins) Add(coin Coin) Coins {
+	return append(coins, coin)
+}
+
+func (coins Coins) GetAmount() string {
+	return coins.GetBaseDenomAmount().String() + utils.BaseDenom
+}
 
 func (coins Coins) String() string {
 	s := make([]string, len(coins))

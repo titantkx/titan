@@ -20,27 +20,35 @@ func MustGetMinStakeAmount(t testing.TB, minSelfDelegation testutil.BigInt) test
 	return testutil.MakeBigIntFromString(stakeAmount.String())
 }
 
-func MustCreateValidator(t testing.TB, stakeAmount string) staking.Validator {
+func MustCreateValidator(t testing.TB, stakeAmount string) (del keys.Key, val staking.Validator) {
 	valPk := testutil.MustGenerateEd25519PK(t)
-	del := MustCreateAccount(t, "10000"+utils.DisplayDenom)
-
-	minSelfDelegation := MustGetGlobalMinSelfDelegation(t)
-	if stakeAmount == "" {
-		stakeAmount = MustGetMinStakeAmount(t, minSelfDelegation).String() + utils.BaseDenom
-	}
-
-	return staking.MustCreateValidator(t, valPk, stakeAmount, 0.1, 0.2, 0.001, minSelfDelegation, del.Address)
-}
-
-func MustCreateValidatorForOther(t testing.TB, stakeAmount string) (from keys.Key, del keys.Key, val staking.Validator) {
-	valPk := testutil.MustGenerateEd25519PK(t)
-	from = MustCreateAccount(t, "10000"+utils.DisplayDenom)
 	del = MustCreateAccount(t, "")
 
 	minSelfDelegation := MustGetGlobalMinSelfDelegation(t)
 	if stakeAmount == "" {
 		stakeAmount = MustGetMinStakeAmount(t, minSelfDelegation).String() + utils.BaseDenom
 	}
+
+	bal := testutil.MustParseAmount(t, stakeAmount).Add(testutil.OneToken)
+	MustAcquireMoney(t, del.Address, bal.GetAmount())
+
+	val = staking.MustCreateValidator(t, valPk, stakeAmount, 0.1, 0.2, 0.001, minSelfDelegation, del.Address)
+
+	return del, val
+}
+
+func MustCreateValidatorForOther(t testing.TB, stakeAmount string) (from keys.Key, del keys.Key, val staking.Validator) {
+	valPk := testutil.MustGenerateEd25519PK(t)
+	from = MustCreateAccount(t, "")
+	del = MustCreateAccount(t, "")
+
+	minSelfDelegation := MustGetGlobalMinSelfDelegation(t)
+	if stakeAmount == "" {
+		stakeAmount = MustGetMinStakeAmount(t, minSelfDelegation).String() + utils.BaseDenom
+	}
+
+	bal := testutil.MustParseAmount(t, stakeAmount).Add(testutil.OneToken)
+	MustAcquireMoney(t, from.Address, bal.GetAmount())
 
 	val = staking.MustCreateValidatorForOther(t, valPk, stakeAmount, 0.1, 0.2, 0.001, minSelfDelegation, from.Address, del.Address)
 
@@ -57,33 +65,39 @@ func TestCreateValidatorMinSelfDelegationTooLow(t *testing.T) {
 	t.Parallel()
 
 	valPk := testutil.MustGenerateEd25519PK(t)
-	del := MustCreateAccount(t, "10000"+utils.DisplayDenom)
+	del := MustCreateAccount(t, "")
 
 	onePowerAmount := testutil.TokensFromConsensusPower(1)
 	minSelfDelegation := MustGetGlobalMinSelfDelegation(t).Sub(onePowerAmount)
-	stakeAmount := MustGetMinStakeAmount(t, minSelfDelegation)
+	stakeAmount := MustGetMinStakeAmount(t, minSelfDelegation).String() + utils.BaseDenom
 
-	staking.MustErrCreateValidator(t, "cannot set validator min self delegation to less than global minimum", valPk, stakeAmount.String()+utils.BaseDenom, 0.1, 0.2, 0.001, minSelfDelegation, del.Address)
+	bal := testutil.MustParseAmount(t, stakeAmount).Add(testutil.OneToken)
+	MustAcquireMoney(t, del.Address, bal.GetAmount())
+
+	staking.MustErrCreateValidator(t, "cannot set validator min self delegation to less than global minimum", valPk, stakeAmount, 0.1, 0.2, 0.001, minSelfDelegation, del.Address)
 }
 
 func TestCreateValidatorSelfDelegationTooLow(t *testing.T) {
 	t.Parallel()
 
 	valPk := testutil.MustGenerateEd25519PK(t)
-	del := MustCreateAccount(t, "10000"+utils.DisplayDenom)
+	del := MustCreateAccount(t, "")
 
 	onePowerAmount := testutil.TokensFromConsensusPower(1)
 	minSelfDelegation := MustGetGlobalMinSelfDelegation(t)
-	stakeAmount := MustGetMinStakeAmount(t, minSelfDelegation).Sub(onePowerAmount)
+	stakeAmount := MustGetMinStakeAmount(t, minSelfDelegation).Sub(onePowerAmount).String() + utils.BaseDenom
 
-	staking.MustErrCreateValidator(t, "validator's self delegation must be greater than their minimum self delegation", valPk, stakeAmount.String()+utils.BaseDenom, 0.1, 0.2, 0.001, minSelfDelegation, del.Address)
+	bal := testutil.MustParseAmount(t, stakeAmount).Add(testutil.OneToken)
+	MustAcquireMoney(t, del.Address, bal.GetAmount())
+
+	staking.MustErrCreateValidator(t, "validator's self delegation must be greater than their minimum self delegation", valPk, stakeAmount, 0.1, 0.2, 0.001, minSelfDelegation, del.Address)
 }
 
 func TestDelegate(t *testing.T) {
 	t.Parallel()
 
 	del := MustCreateAccount(t, "2"+utils.DisplayDenom)
-	val := MustCreateValidator(t, "")
+	_, val := MustCreateValidator(t, "")
 	staking.MustDelegate(t, val.OperatorAddress, "1"+utils.DisplayDenom, del.Address)
 }
 
@@ -91,8 +105,8 @@ func TestRedelegate(t *testing.T) {
 	t.Parallel()
 
 	del := MustCreateAccount(t, "2"+utils.DisplayDenom)
-	val1 := MustCreateValidator(t, "")
-	val2 := MustCreateValidator(t, "")
+	_, val1 := MustCreateValidator(t, "")
+	_, val2 := MustCreateValidator(t, "")
 
 	staking.MustDelegate(t, val1.OperatorAddress, "1"+utils.DisplayDenom, del.Address)
 	staking.MustRedelegate(t, val1.OperatorAddress, val2.OperatorAddress, "0.5"+utils.DisplayDenom, del.Address)
@@ -102,14 +116,11 @@ func TestRedelegate(t *testing.T) {
 func TestRedelegateValidatorIsJailed(t *testing.T) {
 	t.Parallel()
 
-	valPk := testutil.MustGenerateEd25519PK(t)
-	del := MustCreateAccount(t, "10000"+utils.DisplayDenom)
-
 	minSelfDelegation := MustGetGlobalMinSelfDelegation(t)
 	stakeAmount := MustGetMinStakeAmount(t, minSelfDelegation).String() + utils.BaseDenom
 
-	val1 := staking.MustCreateValidator(t, valPk, stakeAmount, 0.1, 0.2, 0.001, minSelfDelegation, del.Address)
-	val2 := MustCreateValidator(t, "")
+	del, val1 := MustCreateValidator(t, stakeAmount)
+	_, val2 := MustCreateValidator(t, "")
 
 	staking.MustRedelegate(t, val1.OperatorAddress, val2.OperatorAddress, "1"+utils.DisplayDenom, del.Address)
 
@@ -121,15 +132,12 @@ func TestRedelegateValidatorIsJailed(t *testing.T) {
 func TestRedelegateValidatorIsNotJailed(t *testing.T) {
 	t.Parallel()
 
-	valPk := testutil.MustGenerateEd25519PK(t)
-	del := MustCreateAccount(t, "10000"+utils.DisplayDenom)
-
 	redelegateAmount := testutil.MustParseAmount(t, "1"+utils.DisplayDenom)
 	minSelfDelegation := MustGetGlobalMinSelfDelegation(t)
-	stakeAmount := MustGetMinStakeAmount(t, minSelfDelegation).Add(redelegateAmount.GetBaseDenomAmount())
+	stakeAmount := MustGetMinStakeAmount(t, minSelfDelegation).Add(redelegateAmount.GetBaseDenomAmount()).String() + utils.BaseDenom
 
-	val1 := staking.MustCreateValidator(t, valPk, stakeAmount.String()+utils.BaseDenom, 0.1, 0.2, 0.001, minSelfDelegation, del.Address)
-	val2 := MustCreateValidator(t, "")
+	del, val1 := MustCreateValidator(t, stakeAmount)
+	_, val2 := MustCreateValidator(t, "")
 
 	staking.MustRedelegate(t, val1.OperatorAddress, val2.OperatorAddress, redelegateAmount.String(), del.Address)
 
@@ -142,7 +150,7 @@ func TestUnbond(t *testing.T) {
 	t.Parallel()
 
 	del := MustCreateAccount(t, "2"+utils.DisplayDenom)
-	val := MustCreateValidator(t, "")
+	_, val := MustCreateValidator(t, "")
 
 	staking.MustDelegate(t, val.OperatorAddress, "1"+utils.DisplayDenom, del.Address)
 	staking.MustUnbond(t, val.OperatorAddress, "0.5"+utils.DisplayDenom, del.Address)
@@ -152,13 +160,10 @@ func TestUnbond(t *testing.T) {
 func TestUnbondValidatorIsJailed(t *testing.T) {
 	t.Parallel()
 
-	valPk := testutil.MustGenerateEd25519PK(t)
-	del := MustCreateAccount(t, "10000"+utils.DisplayDenom)
-
 	minSelfDelegation := MustGetGlobalMinSelfDelegation(t)
 	stakeAmount := MustGetMinStakeAmount(t, minSelfDelegation).String() + utils.BaseDenom
 
-	val := staking.MustCreateValidator(t, valPk, stakeAmount, 0.1, 0.2, 0.001, minSelfDelegation, del.Address)
+	del, val := MustCreateValidator(t, stakeAmount)
 
 	staking.MustUnbond(t, val.OperatorAddress, "1"+utils.DisplayDenom, del.Address)
 
@@ -170,14 +175,11 @@ func TestUnbondValidatorIsJailed(t *testing.T) {
 func TestUnbondValidatorIsNotJailed(t *testing.T) {
 	t.Parallel()
 
-	valPk := testutil.MustGenerateEd25519PK(t)
-	del := MustCreateAccount(t, "10000"+utils.DisplayDenom)
-
 	unbondAmount := testutil.MustParseAmount(t, "1"+utils.DisplayDenom)
 	minSelfDelegation := MustGetGlobalMinSelfDelegation(t)
-	stakeAmount := MustGetMinStakeAmount(t, minSelfDelegation).Add(unbondAmount.GetBaseDenomAmount())
+	stakeAmount := MustGetMinStakeAmount(t, minSelfDelegation).Add(unbondAmount.GetBaseDenomAmount()).String() + utils.BaseDenom
 
-	val := staking.MustCreateValidator(t, valPk, stakeAmount.String()+utils.BaseDenom, 0.1, 0.2, 0.001, minSelfDelegation, del.Address)
+	del, val := MustCreateValidator(t, stakeAmount)
 
 	staking.MustUnbond(t, val.OperatorAddress, "1"+utils.DisplayDenom, del.Address)
 
@@ -190,7 +192,7 @@ func TestCancelUnbound(t *testing.T) {
 	t.Parallel()
 
 	del := MustCreateAccount(t, "2"+utils.DisplayDenom)
-	val := MustCreateValidator(t, "")
+	_, val := MustCreateValidator(t, "")
 
 	staking.MustDelegate(t, val.OperatorAddress, "1"+utils.DisplayDenom, del.Address)
 
@@ -211,7 +213,7 @@ func TestCreateValidatorForOtherCanRedelegate(t *testing.T) {
 	t.Parallel()
 
 	_, del, val1 := MustCreateValidatorForOther(t, "")
-	val2 := MustCreateValidator(t, "")
+	_, val2 := MustCreateValidator(t, "")
 
 	MustAcquireMoney(t, del.Address, "1"+utils.DisplayDenom)
 	staking.MustRedelegate(t, val1.OperatorAddress, val2.OperatorAddress, "1"+utils.DisplayDenom, del.Address)
@@ -246,7 +248,7 @@ func TestDelegateForOther(t *testing.T) {
 
 	del1 := MustCreateAccount(t, "2"+utils.DisplayDenom)
 	del2 := MustCreateAccount(t, "")
-	val := MustCreateValidator(t, "")
+	_, val := MustCreateValidator(t, "")
 
 	staking.MustDelegateForOther(t, val.OperatorAddress, "1"+utils.DisplayDenom, del1.Address, del2.Address)
 }
@@ -256,8 +258,8 @@ func TestDelegateForOtherCanRedelegate(t *testing.T) {
 
 	del1 := MustCreateAccount(t, "2"+utils.DisplayDenom)
 	del2 := MustCreateAccount(t, "1"+utils.DisplayDenom)
-	val1 := MustCreateValidator(t, "")
-	val2 := MustCreateValidator(t, "")
+	_, val1 := MustCreateValidator(t, "")
+	_, val2 := MustCreateValidator(t, "")
 
 	staking.MustDelegateForOther(t, val1.OperatorAddress, "1"+utils.DisplayDenom, del1.Address, del2.Address)
 
@@ -270,7 +272,7 @@ func TestDelegateForOtherCanUnbond(t *testing.T) {
 
 	del1 := MustCreateAccount(t, "2"+utils.DisplayDenom)
 	del2 := MustCreateAccount(t, "1"+utils.DisplayDenom)
-	val := MustCreateValidator(t, "")
+	_, val := MustCreateValidator(t, "")
 
 	staking.MustDelegateForOther(t, val.OperatorAddress, "1"+utils.DisplayDenom, del1.Address, del2.Address)
 
@@ -283,7 +285,7 @@ func TestDelegateForOtherCanCancelUnbond(t *testing.T) {
 
 	del1 := MustCreateAccount(t, "2"+utils.DisplayDenom)
 	del2 := MustCreateAccount(t, "1"+utils.DisplayDenom)
-	val := MustCreateValidator(t, "")
+	_, val := MustCreateValidator(t, "")
 
 	staking.MustDelegateForOther(t, val.OperatorAddress, "1"+utils.DisplayDenom, del1.Address, del2.Address)
 

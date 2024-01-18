@@ -15,7 +15,7 @@ func TestValidatorInactive(t *testing.T) {
 	params := slashing.MustGetParams(t)
 
 	// Create validator
-	valBefore := MustCreateValidator(t, "")
+	_, valBefore := MustCreateValidator(t, "")
 
 	totalBalBefore := MustGetTotalBalance(t, 0)
 	distPoolBefore := distribution.MustGetCommunityPool(t)

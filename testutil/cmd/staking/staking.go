@@ -106,20 +106,17 @@ func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount st
 
 	require.Equal(t, balBefore.Sub(coinSpent).Sub(stakedAmount), balAfter)
 
-	var valAddr string
-	var actualStakedAmount testutil.BigInt
+	evt := tx.FindEvent("create_validator")
+	require.NotNil(t, evt)
 
-	for _, event := range tx.Events {
-		if event.Type == "create_validator" {
-			for _, att := range event.Attributes {
-				if att.Key == "validator" {
-					valAddr = att.Value
-				} else if att.Key == "amount" {
-					actualStakedAmount = testutil.MustGetBaseDenomAmount(t, att.Value)
-				}
-			}
-		}
-	}
+	valAttr := evt.FindAttribute("validator")
+	require.NotNil(t, valAttr)
+
+	amountAttr := evt.FindAttribute("amount")
+	require.NotNil(t, amountAttr)
+
+	valAddr := valAttr.Value
+	actualStakedAmount := testutil.MustGetBaseDenomAmount(t, amountAttr.Value)
 
 	require.NotEmpty(t, valAddr)
 	require.False(t, actualStakedAmount.IsZero())
