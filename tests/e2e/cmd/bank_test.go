@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -65,9 +66,19 @@ func MustGetTotalBalance(t testing.TB, height int64) testutil.BigInt {
 func TestTotalBalanceNotChanged(t *testing.T) {
 	t.Parallel()
 
-	totalBal := MustGetTotalBalance(t, 0)
+	startHeight := status.MustGetStatus(t).SyncInfo.LatestBlockHeight.Int64()
 
-	require.Equal(t, testutil.MakeBigIntFromString("100000000000000000000000000"), totalBal)
+	totalBalBefore := MustGetTotalBalance(t, startHeight)
+
+	for {
+		curHeight := status.MustGetStatus(t).SyncInfo.LatestBlockHeight.Int64()
+		if curHeight-startHeight >= 5 { // Wait for at least 5 blocks
+			totalBalAfter := MustGetTotalBalance(t, curHeight)
+			require.Equal(t, totalBalBefore, totalBalAfter)
+			break
+		}
+		time.Sleep(1 * time.Second)
+	}
 }
 
 func TestSend(t *testing.T) {

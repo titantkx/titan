@@ -30,6 +30,15 @@ type TxResponse struct {
 	Events    []Event         `json:"events"`
 }
 
+func (txr TxResponse) FindEvent(typ string) *Event {
+	for _, evt := range txr.Events {
+		if evt.Type == typ {
+			return &evt
+		}
+	}
+	return nil
+}
+
 type Tx struct {
 	Type       string   `json:"@type"`
 	Body       struct{} `json:"body"`
@@ -53,6 +62,15 @@ type Fee struct {
 type Event struct {
 	Type       string      `json:"type"`
 	Attributes []Attribute `json:"attributes"`
+}
+
+func (evt Event) FindAttribute(key string) *Attribute {
+	for _, attr := range evt.Attributes {
+		if attr.Key == key {
+			return &attr
+		}
+	}
+	return nil
 }
 
 type Attribute struct {
@@ -127,37 +145,22 @@ func MustErrExecTx(t testing.TB, ctx context.Context, expErr string, args ...str
 }
 
 func (txr TxResponse) GetRefundAmount() (testutil.BigInt, error) {
-	// find event in `tx.Events` have type "refund"
-	var refundEvent *Event
-	for _, event := range txr.Events {
-		if event.Type == "refund" {
-			refundEvent = &event
-			break
-		}
+	refundEvent := txr.FindEvent("refund")
+	if refundEvent == nil {
+		return testutil.MakeBigInt(0), nil
 	}
 
-	if refundEvent != nil {
-		// find attribute "amount" in `refundEvent.Attributes`
-		var amountValue string
-		for _, attr := range refundEvent.Attributes {
-			if attr.Key == "amount" {
-				amountValue = attr.Value
-				break
-			}
-		}
-
-		// convert amount value to BigInt
-		if amountValue != "" {
-			refundAmount, err := testutil.ParseAmount(amountValue)
-			if err == nil {
-				return refundAmount.GetBaseDenomAmount(), err
-			}
-		}
-
-		return testutil.Coins{}.GetBaseDenomAmount(), nil
+	amountAttr := refundEvent.FindAttribute("amount")
+	if amountAttr == nil {
+		return testutil.MakeBigInt(0), errors.New("amount attribute is required")
 	}
 
-	return testutil.Coins{}.GetBaseDenomAmount(), nil
+	amount, err := testutil.ParseAmount(amountAttr.Value)
+	if err != nil {
+		return testutil.MakeBigInt(0), err
+	}
+
+	return amount.GetBaseDenomAmount(), nil
 }
 
 func (txr TxResponse) MustGetRefundAmount(t testing.TB) testutil.BigInt {
