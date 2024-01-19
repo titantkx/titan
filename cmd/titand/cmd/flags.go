@@ -34,6 +34,9 @@ func UpdateFlags(cmd *cobra.Command) (*cobra.Command, error) {
 		rosetta.FlagPricesToSuggest: {
 			Value: fmt.Sprintf("10%s", utils.BaseDenom),
 		},
+		flags.FlagGasAdjustment: {
+			Value: "1.2",
+		},
 	}
 
 	return ethermintsrvflags.OverrideFlags(cmd, overrides)

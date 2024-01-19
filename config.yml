@@ -37,6 +37,7 @@ validators:
     api.enable: true
     api.swagger: true
     api.enabled-unsafe-cors: true
+    pruning: nothing
   config:
     moniker: "titan val1"
     consensus: 
@@ -51,6 +52,8 @@ validators:
       timeout_commit: 1s
     rpc:
       timeout_broadcast_tx_commit: 10s
+    tx_index:
+      indexer: "kv"
   client:
     chain-id: "titan_18887-1"
     keyring-backend: "test"

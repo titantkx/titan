@@ -156,6 +156,7 @@ func initTendermintConfig() *tmcfg.Config {
 	cfg.Consensus.TimeoutPrecommitDelta = 5 * time.Second
 	cfg.Consensus.TimeoutCommit = 5 * time.Second
 	cfg.RPC.TimeoutBroadcastTxCommit = 20 * time.Second
+	cfg.TxIndex.Indexer = "null"
 
 	return cfg
 }
@@ -449,6 +450,9 @@ func initAppConfig() (string, interface{}) {
 	//
 	// In simapp, we set the min gas prices to 0.
 	srvCfg.MinGasPrices = fmt.Sprintf("0%s", utils.BaseDenom)
+	srvCfg.Pruning = "custom"
+	srvCfg.PruningInterval = "10"
+	srvCfg.PruningKeepRecent = "100"
 
 	customAppConfig := CustomAppConfig{
 		Config: *srvCfg,
