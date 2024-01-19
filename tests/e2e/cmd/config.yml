@@ -87,8 +87,8 @@ genesis:
         min_deposit:
           - denom: "atkx"
             amount: "250000000000000000000"
-        max_deposit_period: "120s"
-        voting_period: "120s"
+        max_deposit_period: "15s"
+        voting_period: "30s"
     evm:
       params:
         evm_denom: "atkx"
