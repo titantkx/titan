@@ -16,6 +16,7 @@ import (
 
 func TestMain(m *testing.M) {
 	utils.InitSDKConfig()
+
 	appPath, err := filepath.Abs("../../..")
 	if err != nil {
 		panic(err)
@@ -28,12 +29,31 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
+
 	if err := cmd.Init(homePath); err != nil {
 		panic(err)
 	}
+
 	process := startBlockchain(appPath, homePath, configPath)
+
+	done := make(chan struct{})
+
+	go func() {
+		state, err := process.Wait()
+		if err != nil {
+			panic(err)
+		}
+		if state.ExitCode() != 0 {
+			panic(state.String())
+		}
+		done <- struct{}{}
+	}()
+
 	code := m.Run()
-	process.Kill()
+
+	process.Signal(os.Interrupt)
+	<-done
+
 	os.Exit(code)
 }
 
@@ -48,15 +68,6 @@ func startBlockchain(appPath, homePath, configPath string) *os.Process {
 		panic(err)
 	}
 	ready := make(chan struct{})
-	go func() {
-		state, err := cmd.Process.Wait()
-		if err != nil {
-			panic(err)
-		}
-		if state.ExitCode() != 0 {
-			panic(state.String())
-		}
-	}()
 	go func() {
 		started := false
 		scanner := bufio.NewScanner(output)
