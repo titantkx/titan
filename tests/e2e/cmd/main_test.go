@@ -3,12 +3,12 @@ package cmd_test
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/tokenize-titan/titan/testutil/cmd"
 	"github.com/tokenize-titan/titan/utils"
@@ -21,11 +21,11 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	homePath, err := filepath.Abs("./.titand")
+	homePath, err := filepath.Abs(".titand")
 	if err != nil {
 		panic(err)
 	}
-	configPath, err := filepath.Abs("./config.yml")
+	configPath, err := filepath.Abs("config.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +34,15 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	process := startBlockchain(appPath, homePath, configPath)
+	logger, err := os.Create("titand.log")
+	if err != nil {
+		panic(err)
+	}
+	defer logger.Close()
+
+	fmt.Println("Blockchain starting...")
+	process := startBlockchain(logger, appPath, homePath, configPath)
+	fmt.Println("Blockchain started")
 
 	done := make(chan struct{})
 
@@ -57,8 +65,8 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func startBlockchain(appPath, homePath, configPath string) *os.Process {
-	cmd := exec.Command("ignite", "chain", "serve", "--skip-proto", "--reset-once", "--path="+appPath, "--home="+homePath, "--config="+configPath)
+func startBlockchain(w io.Writer, appPath, homePath, configPath string) *os.Process {
+	cmd := exec.Command("ignite", "chain", "serve", "--skip-proto", "--reset-once", "--path="+appPath, "--home="+homePath, "--config="+configPath, "-v")
 	fmt.Println("[CMD]", cmd)
 	output, err := cmd.StdoutPipe()
 	if err != nil {
@@ -69,20 +77,26 @@ func startBlockchain(appPath, homePath, configPath string) *os.Process {
 	}
 	ready := make(chan struct{})
 	go func() {
-		started := false
-		scanner := bufio.NewScanner(output)
-		for scanner.Scan() {
-			fmt.Println(scanner.Text())
-			if !started && strings.Contains(scanner.Text(), "Blockchain is running") {
-				started = true
+		isRunning := false
+		r := bufio.NewReader(output)
+		for {
+			line, isPrefix, err := r.ReadLine()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				panic(err)
+			}
+			w.Write(line)
+			if !isPrefix {
+				w.Write([]byte("\n"))
+			}
+			if !isRunning && strings.Contains(string(line), "executed block") {
+				isRunning = true
 				ready <- struct{}{}
 			}
 		}
-		if err := scanner.Err(); err != nil {
-			panic(err)
-		}
 	}()
 	<-ready
-	time.Sleep(3 * time.Second)
 	return cmd.Process
 }
