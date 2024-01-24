@@ -30,7 +30,7 @@ func TestValidatorInactive(t *testing.T) {
 		}
 	}
 
-	slashedAmount := valBefore.Tokens.BigFloat().Mul(params.SlashFractionDowntime).BigInt()
+	slashedAmount := valBefore.Tokens.Float().Mul(params.SlashFractionDowntime).Int()
 
 	require.Equal(t, valBefore.Tokens.Sub(slashedAmount), valAfter.Tokens)
 

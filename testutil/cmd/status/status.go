@@ -39,3 +39,18 @@ func MustGetStatus(t testing.TB) Status {
 	require.NoError(t, err)
 	return status
 }
+
+func MustGetLatestBlockHeight(t testing.TB) int64 {
+	return MustGetStatus(t).SyncInfo.LatestBlockHeight.Int64()
+}
+
+// Wait until block height
+func MustWait(t testing.TB, height int64) {
+	for {
+		curHeight := MustGetLatestBlockHeight(t)
+		if curHeight >= height {
+			break
+		}
+		time.Sleep(1 * time.Second)
+	}
+}

@@ -23,11 +23,11 @@ type Validator struct {
 	OperatorAddress   string                   `json:"operator_address"`
 	ConsensusPubkey   testutil.SinglePublicKey `json:"consensus_pubkey"`
 	Commission        Commission               `json:"commission"`
-	MinSelfDelegation testutil.BigInt          `json:"min_self_delegation"`
+	MinSelfDelegation testutil.Int             `json:"min_self_delegation"`
 	Jailed            bool                     `json:"jailed"`
 	Status            string                   `json:"status"`
-	Tokens            testutil.BigInt          `json:"tokens"`
-	DelegatorShares   testutil.BigFloat        `json:"delegator_shares"`
+	Tokens            testutil.Int             `json:"tokens"`
+	DelegatorShares   testutil.Float           `json:"delegator_shares"`
 }
 
 type Commission struct {
@@ -47,7 +47,7 @@ type StakingParams struct {
 	MaxValidators           int64             `json:"max_validators"`
 	MinCommissionRate       testutil.Float    `json:"min_commission_rate"`
 	UnbondingTime           testutil.Duration `json:"unbonding_time"`
-	GlobalMinSelfDelegation testutil.BigInt   `json:"global_min_self_delegation"`
+	GlobalMinSelfDelegation testutil.Int      `json:"global_min_self_delegation"`
 }
 
 func MustGetValidator(t testing.TB, address string) Validator {
@@ -63,14 +63,14 @@ type DelegationResponse struct {
 }
 
 type Delegation struct {
-	DelegatorAddress string            `json:"delegator_address"`
-	ValidatorAddress string            `json:"validator_address"`
-	Shares           testutil.BigFloat `json:"shares"`
+	DelegatorAddress string         `json:"delegator_address"`
+	ValidatorAddress string         `json:"validator_address"`
+	Shares           testutil.Float `json:"shares"`
 }
 
 type Balance struct {
-	Denom  string          `json:"denom"`
-	Amount testutil.BigInt `json:"amount"`
+	Denom  string       `json:"denom"`
+	Amount testutil.Int `json:"amount"`
 }
 
 func GetDelegation(delegator string, validator string) (*DelegationResponse, error) {
@@ -90,7 +90,7 @@ func MustGetDelegation(t testing.TB, delegator string, validator string) Delegat
 	return resp
 }
 
-func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.BigInt, from string) Validator {
+func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.Int, from string) Validator {
 	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
@@ -102,21 +102,12 @@ func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount st
 
 	coinSpent := tx.MustGetDeductFeeAmount(t)
 	stakedAmount := testutil.MustGetBaseDenomAmount(t, amount)
-	sharedAmount := stakedAmount.BigFloat()
+	sharedAmount := stakedAmount.Float()
 
 	require.Equal(t, balBefore.Sub(coinSpent).Sub(stakedAmount), balAfter)
 
-	evt := tx.FindEvent("create_validator")
-	require.NotNil(t, evt)
-
-	valAttr := evt.FindAttribute("validator")
-	require.NotNil(t, valAttr)
-
-	amountAttr := evt.FindAttribute("amount")
-	require.NotNil(t, amountAttr)
-
-	valAddr := valAttr.Value
-	actualStakedAmount := testutil.MustGetBaseDenomAmount(t, amountAttr.Value)
+	valAddr := tx.MustGetEventAttributeValue(t, "create_validator", "validator")
+	actualStakedAmount := mustGetStakedAmount(t, tx)
 
 	require.NotEmpty(t, valAddr)
 	require.False(t, actualStakedAmount.IsZero())
@@ -132,17 +123,17 @@ func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount st
 	require.Equal(t, minSelfDelegation, val.MinSelfDelegation)
 	require.False(t, val.Jailed)
 	require.Equal(t, stakedAmount, val.Tokens)
-	val.DelegatorShares.RequireEqual(t, sharedAmount)
+	require.Equal(t, sharedAmount.String(), val.DelegatorShares.String())
 
 	del := MustGetDelegation(t, from, valAddr)
 
 	require.Equal(t, stakedAmount, del.Balance.Amount)
-	del.Delegation.Shares.RequireEqual(t, sharedAmount)
+	require.Equal(t, sharedAmount.String(), del.Delegation.Shares.String())
 
 	return val
 }
 
-func MustErrCreateValidator(t testing.TB, expErr string, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.BigInt, from string) {
+func MustErrCreateValidator(t testing.TB, expErr string, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.Int, from string) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
@@ -168,12 +159,12 @@ func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 
 	require.Equal(t, balBefore.Sub(coinSpent).Sub(delegatedAmount), balAfter)
 	require.Equal(t, valBefore.Tokens.Sub(slashedAmount).Add(delegatedAmount), valAfter.Tokens)
-	valAfter.DelegatorShares.RequireEqual(t, valBefore.DelegatorShares.Add(sharedAmount))
+	require.Equal(t, valBefore.DelegatorShares.Add(sharedAmount).String(), valAfter.DelegatorShares.String())
 
 	del := MustGetDelegation(t, from, valAddr)
 
 	require.Equal(t, delegatedAmount, del.Balance.Amount)
-	del.Delegation.Shares.RequireEqual(t, sharedAmount)
+	require.Equal(t, sharedAmount.String(), del.Delegation.Shares.String())
 }
 
 func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from string) {
@@ -198,7 +189,7 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	dstValAfter := MustGetValidator(t, dstVal)
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
-	reward := mustGetReward(t, tx.Events)
+	reward := mustGetReward(t, tx)
 	coinSpent := tx.MustGetDeductFeeAmount(t)
 	redelegatedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	srcSlashedAmount := mustGetSlashedAmount(t, srcValBefore, srcValAfter)
@@ -209,8 +200,8 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
 	require.Equal(t, srcValBefore.Tokens.Sub(srcSlashedAmount).Sub(redelegatedAmount), srcValAfter.Tokens)
 	require.Equal(t, dstValBefore.Tokens.Sub(dstSlashedAmount).Add(redelegatedAmount), dstValAfter.Tokens)
-	srcValAfter.DelegatorShares.RequireEqual(t, srcValBefore.DelegatorShares.Sub(unbondedShares))
-	dstValAfter.DelegatorShares.RequireEqual(t, dstValBefore.DelegatorShares.Add(newShares))
+	require.Equal(t, srcValBefore.DelegatorShares.Sub(unbondedShares).String(), srcValAfter.DelegatorShares.String())
+	require.Equal(t, dstValBefore.DelegatorShares.Add(newShares).String(), dstValAfter.DelegatorShares.String())
 
 	srcDelAfter, err := GetDelegation(from, srcVal)
 
@@ -221,17 +212,17 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 		require.NoError(t, err)
 		require.NotNil(t, srcDelAfter)
 		require.Equal(t, srcDelBefore.Balance.Amount.Sub(redelegatedAmount), srcDelAfter.Balance.Amount)
-		srcDelAfter.Delegation.Shares.RequireEqual(t, srcDelBefore.Delegation.Shares.Sub(unbondedShares))
+		require.Equal(t, srcDelBefore.Delegation.Shares.Sub(unbondedShares).String(), srcDelAfter.Delegation.Shares.String())
 	}
 
 	dstDelAfter := MustGetDelegation(t, from, dstVal)
 
 	if dstDelBefore == nil {
 		require.Equal(t, redelegatedAmount, dstDelAfter.Balance.Amount)
-		dstDelAfter.Delegation.Shares.RequireEqual(t, newShares)
+		require.Equal(t, newShares.String(), dstDelAfter.Delegation.Shares.String())
 	} else {
 		require.Equal(t, dstDelBefore.Balance.Amount.Add(redelegatedAmount), dstDelAfter.Balance.Amount)
-		dstDelAfter.Delegation.Shares.RequireEqual(t, dstDelBefore.Delegation.Shares.Add(newShares))
+		require.Equal(t, dstDelBefore.Delegation.Shares.Add(newShares).String(), dstDelAfter.Delegation.Shares.String())
 	}
 }
 
@@ -248,7 +239,7 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.
 	valAfter := MustGetValidator(t, valAddr)
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
-	reward := mustGetReward(t, tx.Events)
+	reward := mustGetReward(t, tx)
 	coinSpent := tx.MustGetDeductFeeAmount(t)
 	unbondedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
@@ -256,7 +247,7 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.
 
 	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
 	require.Equal(t, valBefore.Tokens.Sub(slashedAmount).Sub(unbondedAmount), valAfter.Tokens)
-	valAfter.DelegatorShares.RequireEqual(t, valBefore.DelegatorShares.Sub(unbondedShares))
+	require.Equal(t, valBefore.DelegatorShares.Sub(unbondedShares).String(), valAfter.DelegatorShares.String())
 
 	delAfter, err := GetDelegation(from, valAddr)
 
@@ -267,7 +258,7 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.
 		require.NoError(t, err)
 		require.NotNil(t, delAfter)
 		require.Equal(t, delBefore.Balance.Amount.Sub(unbondedAmount), delAfter.Balance.Amount)
-		delAfter.Delegation.Shares.RequireEqual(t, delBefore.Delegation.Shares.Sub(unbondedShares))
+		require.Equal(t, delBefore.Delegation.Shares.Sub(unbondedShares).String(), delAfter.Delegation.Shares.String())
 	}
 
 	return tx
@@ -292,7 +283,7 @@ func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeig
 	valAfter := MustGetValidator(t, valAddr)
 	balAfter := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
-	reward := mustGetReward(t, tx.Events)
+	reward := mustGetReward(t, tx)
 	coinSpent := tx.MustGetDeductFeeAmount(t)
 	unbondedAmount := testutil.MustGetBaseDenomAmount(t, amount)
 	slashedAmount := mustGetSlashedAmount(t, valBefore, valAfter)
@@ -300,44 +291,47 @@ func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeig
 
 	require.Equal(t, balBefore.Sub(coinSpent).Add(reward), balAfter)
 	require.Equal(t, valBefore.Tokens.Sub(slashedAmount).Add(unbondedAmount), valAfter.Tokens)
-	valAfter.DelegatorShares.RequireEqual(t, valBefore.DelegatorShares.Add(unbondedShares))
+	require.Equal(t, valBefore.DelegatorShares.Add(unbondedShares).String(), valAfter.DelegatorShares.String())
 
 	delAfter := MustGetDelegation(t, from, valAddr)
 
 	if delBefore == nil {
 		require.Equal(t, unbondedAmount, delAfter.Balance.Amount)
-		delAfter.Delegation.Shares.RequireEqual(t, unbondedShares)
+		require.Equal(t, unbondedShares.String(), delAfter.Delegation.Shares.String())
 	} else {
 		require.Equal(t, delBefore.Balance.Amount.Add(unbondedAmount), delAfter.Balance.Amount)
-		delAfter.Delegation.Shares.RequireEqual(t, delBefore.Delegation.Shares.Add(unbondedShares))
+		require.Equal(t, delBefore.Delegation.Shares.Add(unbondedShares).String(), delAfter.Delegation.Shares.String())
 	}
 }
 
-func mustGetReward(t testing.TB, events []txcmd.Event) testutil.BigInt {
-	reward := testutil.MakeBigInt(0)
-	for _, event := range events {
+func mustGetReward(t testing.TB, txr txcmd.TxResponse) testutil.Int {
+	reward := testutil.MakeInt(0)
+	for _, event := range txr.Events {
 		if event.Type == "withdraw_rewards" {
-			for _, att := range event.Attributes {
-				if att.Key == "amount" {
-					reward = reward.Add(testutil.MustGetBaseDenomAmount(t, att.Value))
-				}
-			}
+			attr := event.FindAttribute("amount")
+			require.NotNil(t, attr)
+			reward = reward.Add(testutil.MustGetBaseDenomAmount(t, attr.Value))
 		}
 	}
 	return reward
 }
 
-func mustGetSlashedAmount(t testing.TB, valBefore Validator, valAfter Validator) testutil.BigInt {
+func mustGetStakedAmount(t testing.TB, txr txcmd.TxResponse) testutil.Int {
+	amount := txr.MustGetEventAttributeValue(t, "create_validator", "amount")
+	return testutil.MustGetBaseDenomAmount(t, amount)
+}
+
+func mustGetSlashedAmount(t testing.TB, valBefore Validator, valAfter Validator) testutil.Int {
 	if !valAfter.Jailed || valBefore.Jailed {
 		// Validator is not jailed or was jailed before
-		return testutil.MakeBigInt(0)
+		return testutil.MakeInt(0)
 	}
 	if valAfter.Tokens.Cmp(valAfter.MinSelfDelegation) < 0 {
 		// Validator was jailed due to self delegation lower than min self delegation
-		return testutil.MakeBigInt(0)
+		return testutil.MakeInt(0)
 	}
 	params := slashing.MustGetParams(t)
-	return valBefore.Tokens.BigFloat().Mul(params.SlashFractionDowntime).BigInt()
+	return valBefore.Tokens.Float().Mul(params.SlashFractionDowntime).Int()
 }
 
 func MustGetParams(t testing.TB) StakingParams {
@@ -346,7 +340,7 @@ func MustGetParams(t testing.TB) StakingParams {
 	return params
 }
 
-func MustCreateValidatorForOther(t testing.TB, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.BigInt, from string, delAddr string) Validator {
+func MustCreateValidatorForOther(t testing.TB, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.Int, from string, delAddr string) Validator {
 	delBalBefore := bank.MustGetBalance(t, delAddr, utils.BaseDenom, 0)
 	fromBalBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
@@ -360,25 +354,13 @@ func MustCreateValidatorForOther(t testing.TB, valPk testutil.SinglePublicKey, a
 
 	coinSpent := tx.MustGetDeductFeeAmount(t)
 	stakedAmount := testutil.MustGetBaseDenomAmount(t, amount)
-	sharedAmount := stakedAmount.BigFloat()
+	sharedAmount := stakedAmount.Float()
 
 	require.Equal(t, delBalBefore, delBalAfter)
 	require.Equal(t, fromBalBefore.Sub(coinSpent).Sub(stakedAmount), fromBalAfter)
 
-	var valAddr string
-	var actualStakedAmount testutil.BigInt
-
-	for _, event := range tx.Events {
-		if event.Type == "create_validator" {
-			for _, att := range event.Attributes {
-				if att.Key == "validator" {
-					valAddr = att.Value
-				} else if att.Key == "amount" {
-					actualStakedAmount = testutil.MustGetBaseDenomAmount(t, att.Value)
-				}
-			}
-		}
-	}
+	valAddr := tx.MustGetEventAttributeValue(t, "create_validator", "validator")
+	actualStakedAmount := mustGetStakedAmount(t, tx)
 
 	require.NotEmpty(t, valAddr)
 	require.False(t, actualStakedAmount.IsZero())
@@ -394,12 +376,12 @@ func MustCreateValidatorForOther(t testing.TB, valPk testutil.SinglePublicKey, a
 	require.Equal(t, minSelfDelegation, val.MinSelfDelegation)
 	require.False(t, val.Jailed)
 	require.Equal(t, stakedAmount, val.Tokens)
-	val.DelegatorShares.RequireEqual(t, sharedAmount)
+	require.Equal(t, sharedAmount.String(), val.DelegatorShares.String())
 
 	del := MustGetDelegation(t, delAddr, valAddr)
 
 	require.Equal(t, stakedAmount, del.Balance.Amount)
-	del.Delegation.Shares.RequireEqual(t, sharedAmount)
+	require.Equal(t, sharedAmount.String(), del.Delegation.Shares.String())
 
 	return val
 }
@@ -426,10 +408,10 @@ func MustDelegateForOther(t testing.TB, valAddr string, amount string, from stri
 	require.Equal(t, delBalBefore, delBalAfter)
 	require.Equal(t, fromBalBefore.Sub(coinSpent).Sub(delegatedAmount), fromBalAfter)
 	require.Equal(t, valBefore.Tokens.Sub(slashedAmount).Add(delegatedAmount), valAfter.Tokens)
-	valAfter.DelegatorShares.RequireEqual(t, valBefore.DelegatorShares.Add(sharedAmount))
+	require.Equal(t, valBefore.DelegatorShares.Add(sharedAmount).String(), valAfter.DelegatorShares.String())
 
 	del := MustGetDelegation(t, delAddr, valAddr)
 
 	require.Equal(t, delegatedAmount, del.Balance.Amount)
-	del.Delegation.Shares.RequireEqual(t, sharedAmount)
+	require.Equal(t, sharedAmount.String(), del.Delegation.Shares.String())
 }

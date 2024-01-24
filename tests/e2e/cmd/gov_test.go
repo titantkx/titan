@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
 	"github.com/tokenize-titan/titan/testutil/cmd/gov"
 	"github.com/tokenize-titan/titan/testutil/cmd/keys"
 	"github.com/tokenize-titan/titan/testutil/cmd/staking"
@@ -23,13 +22,12 @@ type Vote struct {
 }
 
 func MustCreateVoter(t testing.TB, balance string, stakeAmount string) string {
-	del1 := keys.MustShowAddress(t, "val1")
-	val1 := testutil.MustAccountAddressToValidatorAddress(t, del1)
+	val := MustGetValidator(t)
 	del := MustCreateAccount(t, balance).Address
 
-	staking.MustDelegate(t, val1, stakeAmount, del)
+	staking.MustDelegate(t, val, stakeAmount, del)
 	t.Cleanup(func() {
-		staking.MustUnbond(t, val1, stakeAmount, del)
+		staking.MustUnbond(t, val, stakeAmount, del)
 	})
 
 	return del

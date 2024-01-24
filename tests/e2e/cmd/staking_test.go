@@ -10,14 +10,19 @@ import (
 	"github.com/tokenize-titan/titan/utils"
 )
 
-func MustGetGlobalMinSelfDelegation(t testing.TB) testutil.BigInt {
+func MustGetValidator(t testing.TB) string {
+	val1 := keys.MustShowAddress(t, "val1")
+	return testutil.MustAccountAddressToValidatorAddress(t, val1)
+}
+
+func MustGetGlobalMinSelfDelegation(t testing.TB) testutil.Int {
 	return staking.MustGetParams(t).GlobalMinSelfDelegation
 }
 
-func MustGetMinStakeAmount(t testing.TB, minSelfDelegation testutil.BigInt) testutil.BigInt {
+func MustGetMinStakeAmount(t testing.TB, minSelfDelegation testutil.Int) testutil.Int {
 	stakePower := testutil.TokensToConsensusPower(minSelfDelegation)
 	stakeAmount := testutil.TokensFromConsensusPower(stakePower)
-	return testutil.MakeBigIntFromString(stakeAmount.String())
+	return testutil.MakeIntFromString(stakeAmount.String())
 }
 
 func MustCreateValidator(t testing.TB, stakeAmount string) (del keys.Key, val staking.Validator) {

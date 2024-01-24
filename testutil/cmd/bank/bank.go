@@ -37,7 +37,7 @@ func MustSend(t testing.TB, from string, to string, amount string) txcmd.TxRespo
 
 func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.TxResponse {
 	fromBalBefore := MustGetBalance(t, from, utils.BaseDenom, 0)
-	var toBalBefore []testutil.BigInt
+	var toBalBefore []testutil.Int
 	for i := range to {
 		toBalBefore = append(toBalBefore, MustGetBalance(t, to[i], utils.BaseDenom, 0))
 	}
@@ -51,14 +51,14 @@ func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.Tx
 	tx := txcmd.MustExecTx(t, ctx, args...)
 
 	fromBalAfter := MustGetBalance(t, from, utils.BaseDenom, 0)
-	var toBalAfter []testutil.BigInt
+	var toBalAfter []testutil.Int
 	for i := range to {
 		toBalAfter = append(toBalAfter, MustGetBalance(t, to[i], utils.BaseDenom, 0))
 	}
 
 	coinSpent := tx.MustGetDeductFeeAmount(t)
 	sentAmount := testutil.MustGetBaseDenomAmount(t, amount)
-	totalSentAmount := sentAmount.Mul(testutil.MakeBigInt(int64(len(to))))
+	totalSentAmount := sentAmount.Mul(testutil.MakeInt(int64(len(to))))
 
 	require.Equal(t, fromBalBefore.Sub(coinSpent).Sub(totalSentAmount), fromBalAfter)
 	for i := range to {
@@ -68,7 +68,7 @@ func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.Tx
 	return tx
 }
 
-func MustGetBalance(t testing.TB, address string, denom string, height int64) testutil.BigInt {
+func MustGetBalance(t testing.TB, address string, denom string, height int64) testutil.Int {
 	args := []string{
 		"bank",
 		"balances",
@@ -79,7 +79,7 @@ func MustGetBalance(t testing.TB, address string, denom string, height int64) te
 		args = append(args, "--height="+testutil.FormatInt(height))
 	}
 	var data struct {
-		Amount testutil.BigInt `json:"amount"`
+		Amount testutil.Int `json:"amount"`
 	}
 	cmd.MustQuery(t, &data, args...)
 	return data.Amount

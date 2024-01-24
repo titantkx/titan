@@ -13,40 +13,40 @@ func TestMustParseAmount(t *testing.T) {
 	coins := testutil.MustParseAmount(t, "100tkx,0.5eth")
 
 	require.Len(t, coins, 2)
-	coins[0].Amount.RequireEqual(t, testutil.MakeBigFloat(100))
+	require.Equal(t, "100", coins[0].Amount.String())
 	require.Equal(t, "tkx", coins[0].Denom)
-	coins[1].Amount.RequireEqual(t, testutil.MakeBigFloat(0.5))
+	require.Equal(t, "0.5", coins[1].Amount.String())
 	require.Equal(t, "eth", coins[1].Denom)
 }
 
 func TestMustGetBaseDenomAmount(t *testing.T) {
 	tests := []struct {
 		Amount   string
-		Expected testutil.BigInt
+		Expected testutil.Int
 	}{
 		{
 			Amount:   fmt.Sprintf("100%s", utils.DisplayDenom),
-			Expected: testutil.MakeBigIntFromString("100000000000000000000"),
+			Expected: testutil.MakeIntFromString("100000000000000000000"),
 		},
 		{
 			Amount:   fmt.Sprintf("0.5%s", utils.DisplayDenom),
-			Expected: testutil.MakeBigIntFromString("500000000000000000"),
+			Expected: testutil.MakeIntFromString("500000000000000000"),
 		},
 		{
 			Amount:   fmt.Sprintf("300%s", utils.BaseDenom),
-			Expected: testutil.MakeBigIntFromString("300"),
+			Expected: testutil.MakeIntFromString("300"),
 		},
 		{
 			Amount:   "1eth",
-			Expected: testutil.MakeBigIntFromString("0"),
+			Expected: testutil.MakeIntFromString("0"),
 		},
 		{
 			Amount:   fmt.Sprintf("10%s,1eth", utils.BaseDenom),
-			Expected: testutil.MakeBigIntFromString("10"),
+			Expected: testutil.MakeIntFromString("10"),
 		},
 		{
 			Amount:   fmt.Sprintf("0.1%s,1eth", utils.DisplayDenom),
-			Expected: testutil.MakeBigIntFromString("100000000000000000"),
+			Expected: testutil.MakeIntFromString("100000000000000000"),
 		},
 	}
 

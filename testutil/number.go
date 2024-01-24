@@ -5,112 +5,81 @@ import (
 	"io"
 	"math/big"
 	"strconv"
-	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
-type Int int64
-
-func (n Int) Int64() int64 {
-	return int64(n)
-}
-
-func (n *Int) UnmarshalText(txt []byte) error {
-	if len(txt) > 2 && txt[0] == '"' && txt[len(txt)-1] == '"' {
-		txt = txt[1 : len(txt)-1]
-	}
-	i, err := strconv.ParseInt(string(txt), 10, 64)
-	if err != nil {
-		return err
-	}
-	*n = Int(i)
-	return nil
-}
-
-type Float float64
-
-func (n Float) Float64() float64 {
-	return float64(n)
-}
-
-func (n *Float) UnmarshalText(txt []byte) error {
-	if len(txt) > 2 && txt[0] == '"' && txt[len(txt)-1] == '"' {
-		txt = txt[1 : len(txt)-1]
-	}
-	f, err := strconv.ParseFloat(string(txt), 10)
-	if err != nil {
-		return err
-	}
-	*n = Float(f)
-	return nil
-}
-
-type BigInt struct {
+type Int struct {
 	v *big.Int
 }
 
-func MakeBigInt(i int64) BigInt {
-	return BigInt{big.NewInt(i)}
+func MakeInt(i int64) Int {
+	return Int{big.NewInt(i)}
 }
 
-func MakeBigIntFromString(s string) BigInt {
+func MakeIntFromString(s string) Int {
 	i, ok := new(big.Int).SetString(s, 10)
 	if !ok {
 		panic(fmt.Sprintf("invalid int: %s", s))
 	}
-	return BigInt{i}
+	return Int{i}
 }
 
-func (n BigInt) IsZero() bool {
+func (n Int) IsZero() bool {
 	return n.v == nil || (n.v.IsInt64() && n.v.Int64() == 0)
 }
 
-func (n BigInt) String() string {
+func (n Int) String() string {
 	return n.v.String()
 }
 
-func (n BigInt) Format(s fmt.State, r rune) {
+func (n Int) Format(s fmt.State, r rune) {
 	n.v.Format(s, r)
 }
 
-func (n BigInt) Cmp(i BigInt) int {
+func (n Int) Cmp(i Int) int {
 	return n.v.Cmp(i.v)
 }
 
-func (n BigInt) Neg() BigInt {
-	return BigInt{new(big.Int).Neg(n.v)}
+func (n Int) Abs() Int {
+	return Int{new(big.Int).Abs(n.v)}
 }
 
-func (n BigInt) Add(i BigInt) BigInt {
-	return BigInt{new(big.Int).Add(n.v, i.v)}
+func (n Int) Neg() Int {
+	return Int{new(big.Int).Neg(n.v)}
 }
 
-func (n BigInt) Sub(i BigInt) BigInt {
-	return BigInt{new(big.Int).Sub(n.v, i.v)}
+func (n Int) Add(i Int) Int {
+	return Int{new(big.Int).Add(n.v, i.v)}
 }
 
-func (n BigInt) Mul(i BigInt) BigInt {
-	return BigInt{new(big.Int).Mul(n.v, i.v)}
+func (n Int) Sub(i Int) Int {
+	return Int{new(big.Int).Sub(n.v, i.v)}
 }
 
-func (n BigInt) Div(i BigInt) BigInt {
-	return BigInt{new(big.Int).Div(n.v, i.v)}
+func (n Int) Mul(i Int) Int {
+	return Int{new(big.Int).Mul(n.v, i.v)}
 }
 
-func (n BigInt) DivFloat(i BigInt) BigFloat {
-	return n.BigFloat().Quo(i.BigFloat())
+func (n Int) Div(i Int) Int {
+	return Int{new(big.Int).Div(n.v, i.v)}
 }
 
-func (n BigInt) BigFloat() BigFloat {
-	return BigFloat{new(big.Float).SetPrec(100).SetInt(n.v)}
+func (n Int) DivFloat(i Int) Float {
+	return n.Float().Quo(i.Float())
 }
 
-func (n BigInt) MarshalText() ([]byte, error) {
+func (n Int) Int64() int64 {
+	return n.v.Int64()
+}
+
+func (n Int) Float() Float {
+	return Float{new(big.Float).SetPrec(100).SetInt(n.v)}
+}
+
+func (n Int) MarshalText() ([]byte, error) {
 	return n.v.MarshalText()
 }
 
-func (n *BigInt) UnmarshalText(txt []byte) error {
+func (n *Int) UnmarshalText(txt []byte) error {
 	if len(txt) > 2 && txt[0] == '"' && txt[len(txt)-1] == '"' {
 		txt = txt[1 : len(txt)-1]
 	}
@@ -123,32 +92,32 @@ func (n *BigInt) UnmarshalText(txt []byte) error {
 	return nil
 }
 
-type BigFloat struct {
+type Float struct {
 	v *big.Float
 }
 
-func MakeBigFloat(f float64) BigFloat {
-	return BigFloat{new(big.Float).SetPrec(100).SetFloat64(f)}
+func MakeFloat(f float64) Float {
+	return Float{new(big.Float).SetPrec(100).SetFloat64(f)}
 }
 
-func MakeBigFloatFromString(s string) BigFloat {
+func MakeFloatFromString(s string) Float {
 	f, ok := new(big.Float).SetPrec(100).SetString(s)
 	if !ok {
 		panic(fmt.Sprintf("invalid float: %s", s))
 	}
-	return BigFloat{f}
+	return Float{f}
 }
 
-func (n BigFloat) IsZero() bool {
+func (n Float) IsZero() bool {
 	f, acc := n.v.Float64()
 	return n.v == nil || (f == 0 && acc == big.Exact)
 }
 
-func (n BigFloat) String() string {
+func (n Float) String() string {
 	return n.v.String()
 }
 
-func (n BigFloat) Format(s fmt.State, r rune) {
+func (n Float) Format(s fmt.State, r rune) {
 	if r == 's' {
 		io.WriteString(s, n.String())
 	} else {
@@ -156,48 +125,50 @@ func (n BigFloat) Format(s fmt.State, r rune) {
 	}
 }
 
-func (n BigFloat) RequireEqual(t testing.TB, expected BigFloat) {
-	require.Conditionf(
-		t,
-		func() bool { return n.Cmp(expected) == 0 },
-		"Not equal:\nexpected: %s\nactual  : %s", expected, n,
-	)
-}
-
-func (n BigFloat) Cmp(f BigFloat) int {
+func (n Float) Cmp(f Float) int {
 	return n.v.Cmp(f.v)
 }
 
-func (n BigFloat) Neg() BigFloat {
-	return BigFloat{new(big.Float).Neg(n.v)}
+func (n Float) Abs() Float {
+	return Float{new(big.Float).Abs(n.v)}
 }
 
-func (n BigFloat) Add(f BigFloat) BigFloat {
-	return BigFloat{new(big.Float).Add(n.v, f.v)}
+func (n Float) Neg() Float {
+	return Float{new(big.Float).Neg(n.v)}
 }
 
-func (n BigFloat) Sub(f BigFloat) BigFloat {
-	return BigFloat{new(big.Float).Sub(n.v, f.v)}
+func (n Float) Add(f Float) Float {
+	return Float{new(big.Float).Add(n.v, f.v)}
 }
 
-func (n BigFloat) Mul(f BigFloat) BigFloat {
-	return BigFloat{new(big.Float).Mul(n.v, f.v)}
+func (n Float) Sub(f Float) Float {
+	return Float{new(big.Float).Sub(n.v, f.v)}
 }
 
-func (n BigFloat) Quo(f BigFloat) BigFloat {
-	return BigFloat{new(big.Float).Quo(n.v, f.v)}
+func (n Float) Mul(f Float) Float {
+	return Float{new(big.Float).Mul(n.v, f.v)}
 }
 
-func (b BigFloat) BigInt() BigInt {
+func (n Float) Quo(f Float) Float {
+	n.v.Float64()
+	return Float{new(big.Float).Quo(n.v, f.v)}
+}
+
+func (n Float) Float64() float64 {
+	v, _ := n.v.Float64()
+	return v
+}
+
+func (b Float) Int() Int {
 	i, _ := b.v.Int(nil)
-	return BigInt{i}
+	return Int{i}
 }
 
-func (n BigFloat) MarshalText() ([]byte, error) {
+func (n Float) MarshalText() ([]byte, error) {
 	return n.v.MarshalText()
 }
 
-func (n *BigFloat) UnmarshalText(txt []byte) error {
+func (n *Float) UnmarshalText(txt []byte) error {
 	if len(txt) > 2 && txt[0] == '"' && txt[len(txt)-1] == '"' {
 		txt = txt[1 : len(txt)-1]
 	}

@@ -15,6 +15,7 @@ validators:
     bonded: 100000tkx
     gentx:
       min-self-delegation: "5000000000000000000"
+
     app:
       minimum-gas-prices: 0atkx
       api.enable: true

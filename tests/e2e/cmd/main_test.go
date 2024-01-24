@@ -40,32 +40,22 @@ func TestMain(m *testing.M) {
 	}
 	defer logger.Close()
 
-	fmt.Println("Blockchain starting...")
-	process := startBlockchain(logger, appPath, homePath, configPath)
-	fmt.Println("Blockchain started")
-
 	done := make(chan struct{})
 
-	go func() {
-		state, err := process.Wait()
-		if err != nil {
-			panic(err)
-		}
-		if state.ExitCode() != 0 {
-			panic(state.String())
-		}
-		done <- struct{}{}
-	}()
+	fmt.Println("Blockchain starting...")
+	process := startBlockchain(logger, appPath, homePath, configPath, done)
+	fmt.Println("Blockchain started")
 
 	code := m.Run()
 
 	process.Signal(os.Interrupt)
 	<-done
+	fmt.Println("Blockchain stopped")
 
 	os.Exit(code)
 }
 
-func startBlockchain(w io.Writer, appPath, homePath, configPath string) *os.Process {
+func startBlockchain(w io.Writer, appPath, homePath, configPath string, done chan<- struct{}) *os.Process {
 	cmd := exec.Command("ignite", "chain", "serve", "--skip-proto", "--reset-once", "--path="+appPath, "--home="+homePath, "--config="+configPath, "-v")
 	fmt.Println("[CMD]", cmd)
 	output, err := cmd.StdoutPipe()
@@ -76,6 +66,16 @@ func startBlockchain(w io.Writer, appPath, homePath, configPath string) *os.Proc
 		panic(err)
 	}
 	ready := make(chan struct{})
+	go func() {
+		state, err := cmd.Process.Wait()
+		if err != nil {
+			panic(err)
+		}
+		if state.ExitCode() != 0 {
+			panic(state.String())
+		}
+		done <- struct{}{}
+	}()
 	go func() {
 		isRunning := false
 		r := bufio.NewReader(output)
