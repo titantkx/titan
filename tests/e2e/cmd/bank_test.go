@@ -4,7 +4,6 @@ import (
 	"context"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -36,13 +35,13 @@ func MustCreateAccount(t testing.TB, balance string) keys.Key {
 	return key
 }
 
-func MustGetTotalBalance(t testing.TB, height int64) testutil.BigInt {
+func MustGetTotalBalance(t testing.TB, height int64) testutil.Int {
 	if height <= 0 {
-		height = status.MustGetStatus(t).SyncInfo.LatestBlockHeight.Int64()
+		height = status.MustGetLatestBlockHeight(t)
 	}
 
 	accounts := auth.MustGetAccounts(t, height)
-	totalBal := testutil.MakeBigInt(0)
+	totalBal := testutil.MakeInt(0)
 
 	var mtx sync.Mutex
 	var wg sync.WaitGroup
@@ -66,19 +65,15 @@ func MustGetTotalBalance(t testing.TB, height int64) testutil.BigInt {
 func TestTotalBalanceNotChanged(t *testing.T) {
 	t.Parallel()
 
-	startHeight := status.MustGetStatus(t).SyncInfo.LatestBlockHeight.Int64()
+	startHeight := status.MustGetLatestBlockHeight(t)
+	endHeight := startHeight + 10
+
+	status.MustWait(t, endHeight)
 
 	totalBalBefore := MustGetTotalBalance(t, startHeight)
+	totalBalAfter := MustGetTotalBalance(t, endHeight)
 
-	for {
-		curHeight := status.MustGetStatus(t).SyncInfo.LatestBlockHeight.Int64()
-		if curHeight-startHeight >= 5 { // Wait for at least 5 blocks
-			totalBalAfter := MustGetTotalBalance(t, curHeight)
-			require.Equal(t, totalBalBefore, totalBalAfter)
-			break
-		}
-		time.Sleep(1 * time.Second)
-	}
+	require.Equal(t, totalBalBefore, totalBalAfter)
 }
 
 func TestSend(t *testing.T) {
@@ -197,6 +192,6 @@ func TestMultisigSend(t *testing.T) {
 	senderBal := bank.MustGetBalance(t, multisigAccount.Address, utils.BaseDenom, 0)
 	receiverBal := bank.MustGetBalance(t, receiver.Address, utils.BaseDenom, 0)
 
-	require.Equal(t, testutil.MakeBigIntFromString("500000000000000000").Sub(coinSpent), senderBal)
-	require.Equal(t, testutil.MakeBigIntFromString("500000000000000000"), receiverBal)
+	require.Equal(t, testutil.MakeIntFromString("500000000000000000").Sub(coinSpent), senderBal)
+	require.Equal(t, testutil.MakeIntFromString("500000000000000000"), receiverBal)
 }

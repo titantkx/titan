@@ -31,10 +31,10 @@ type Params struct {
 	MinDeposit                 testutil.Coins    `json:"min_deposit"`
 	MaxDepositPeriod           testutil.Duration `json:"max_deposit_period"`
 	VotingPeriod               testutil.Duration `json:"voting_period"`
-	Quorum                     testutil.BigFloat `json:"quorum"`
-	Threshold                  testutil.BigFloat `json:"threshold"`
-	VetoThreshold              testutil.BigFloat `json:"veto_threshold"`
-	MinInitialDepositRatio     testutil.BigFloat `json:"min_initial_deposit_ratio"`
+	Quorum                     testutil.Float    `json:"quorum"`
+	Threshold                  testutil.Float    `json:"threshold"`
+	VetoThreshold              testutil.Float    `json:"veto_threshold"`
+	MinInitialDepositRatio     testutil.Float    `json:"min_initial_deposit_ratio"`
 	BurnVoteQuorum             bool              `json:"burn_vote_quorum"`
 	BurnProposalDepositPrevote bool              `json:"burn_proposal_deposit_prevote"`
 	BurnVoteVeto               bool              `json:"burn_vote_veto"`
@@ -64,10 +64,10 @@ type Proposal struct {
 }
 
 type FinalTallyResult struct {
-	YesCount        testutil.BigInt `json:"yes_count"`
-	AbstainCount    testutil.BigInt `json:"abstain_count"`
-	NoCount         testutil.BigInt `json:"no_count"`
-	NoWithVetoCount testutil.BigInt `json:"no_with_veto_count"`
+	YesCount        testutil.Int `json:"yes_count"`
+	AbstainCount    testutil.Int `json:"abstain_count"`
+	NoCount         testutil.Int `json:"no_count"`
+	NoWithVetoCount testutil.Int `json:"no_with_veto_count"`
 }
 
 func GetProposal(proposalId string) (*Proposal, error) {
@@ -149,12 +149,9 @@ func MustSubmitProposal(t testing.TB, from string, proposal any) string {
 
 	tx := txcmd.MustExecTx(t, ctx, "gov", "submit-proposal", file.Name(), "--from="+from)
 
-	evt := tx.FindEvent("submit_proposal")
-	require.NotNil(t, evt)
-	attr := evt.FindAttribute("proposal_id")
-	require.NotNil(t, attr)
+	proposalId := tx.MustGetEventAttributeValue(t, "submit_proposal", "proposal_id")
 
-	return attr.Value
+	return proposalId
 }
 
 func MustDeposit(t testing.TB, from string, proposalId string, amount string) {

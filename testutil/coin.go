@@ -24,8 +24,15 @@ func init() {
 }
 
 type Coin struct {
-	Amount BigFloat `json:"amount"`
-	Denom  string   `json:"denom"`
+	Amount Float  `json:"amount"`
+	Denom  string `json:"denom"`
+}
+
+func (coin Coin) Mul(x float64) Coin {
+	return Coin{
+		Amount: coin.Amount.Mul(MakeFloat(x)),
+		Denom:  coin.Denom,
+	}
 }
 
 func (coin Coin) GetAmount() string {
@@ -36,18 +43,18 @@ func (coin Coin) String() string {
 	return coin.Amount.String() + coin.Denom
 }
 
-func (coin Coin) GetBaseDenomAmount() BigInt {
+func (coin Coin) GetBaseDenomAmount() Int {
 	switch coin.Denom {
 	case utils.DisplayDenom:
-		return coin.Amount.Mul(MakeBigFloat(1_000_000_000_000_000_000)).BigInt()
+		return coin.Amount.Mul(MakeFloat(1_000_000_000_000_000_000)).Int()
 	case utils.MilliDenom:
-		return coin.Amount.Mul(MakeBigFloat(1_000_000_000_000_000)).BigInt()
+		return coin.Amount.Mul(MakeFloat(1_000_000_000_000_000)).Int()
 	case utils.MicroDenom:
-		return coin.Amount.Mul(MakeBigFloat(1_000_000_000_000)).BigInt()
+		return coin.Amount.Mul(MakeFloat(1_000_000_000_000)).Int()
 	case utils.BaseDenom:
-		return coin.Amount.BigInt()
+		return coin.Amount.Int()
 	default:
-		return MakeBigInt(0)
+		return MakeInt(0)
 	}
 }
 
@@ -93,8 +100,8 @@ func (coins Coins) String() string {
 	return strings.Join(s, ",")
 }
 
-func (coins Coins) GetBaseDenomAmount() BigInt {
-	baseDenomAmount := MakeBigInt(0)
+func (coins Coins) GetBaseDenomAmount() Int {
+	baseDenomAmount := MakeInt(0)
 	for _, coin := range coins {
 		baseDenomAmount = baseDenomAmount.Add(coin.GetBaseDenomAmount())
 	}
@@ -122,6 +129,6 @@ func MustParseAmount(t testing.TB, amount string) Coins {
 	return coins
 }
 
-func MustGetBaseDenomAmount(t testing.TB, amount string) BigInt {
+func MustGetBaseDenomAmount(t testing.TB, amount string) Int {
 	return MustParseAmount(t, amount).GetBaseDenomAmount()
 }

@@ -11,10 +11,10 @@ import (
 
 type Params struct {
 	DowntimeJailDuration    testutil.Duration `json:"downtime_jail_duration"`
-	MinSignedPerWindow      testutil.BigFloat `json:"min_signed_per_window"`
+	MinSignedPerWindow      testutil.Float    `json:"min_signed_per_window"`
 	SignedBlocksWindow      testutil.Int      `json:"signed_blocks_window"`
-	SlashFractionDoubleSign testutil.BigFloat `json:"slash_fraction_double_sign"`
-	SlashFractionDowntime   testutil.BigFloat `json:"slash_fraction_downtime"`
+	SlashFractionDoubleSign testutil.Float    `json:"slash_fraction_double_sign"`
+	SlashFractionDowntime   testutil.Float    `json:"slash_fraction_downtime"`
 }
 
 func MustGetParams(t testing.TB) Params {

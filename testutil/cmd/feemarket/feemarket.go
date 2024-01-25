@@ -5,7 +5,7 @@ import (
 	"github.com/tokenize-titan/titan/testutil/cmd"
 )
 
-func GetBaseFee(height int64) (testutil.BigInt, error) {
+func GetBaseFee(height int64) (testutil.Int, error) {
 	args := []string{
 		"feemarket",
 		"base-fee",
@@ -14,10 +14,10 @@ func GetBaseFee(height int64) (testutil.BigInt, error) {
 		args = append(args, "--height="+testutil.FormatInt(height))
 	}
 	var data struct {
-		BaseFee testutil.BigInt `json:"base_fee"`
+		BaseFee testutil.Int `json:"base_fee"`
 	}
 	if err := cmd.Query(&data, args...); err != nil {
-		return testutil.BigInt{}, err
+		return testutil.Int{}, err
 	}
 	return data.BaseFee, nil
 }

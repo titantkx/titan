@@ -20,14 +20,14 @@ import (
 var rpcErrPattern = regexp.MustCompile(`RPC\serror\s(-?[\d]+)`)
 
 type TxResponse struct {
-	Height    testutil.Int    `json:"height"`
-	Code      int             `json:"code"`
-	Hash      string          `json:"txhash"`
-	RawLog    string          `json:"raw_log"`
-	GasUsed   testutil.BigInt `json:"gas_used"`
-	GasWanted testutil.BigInt `json:"gas_wanted"`
-	Tx        Tx              `json:"tx"`
-	Events    []Event         `json:"events"`
+	Height    testutil.Int `json:"height"`
+	Code      int          `json:"code"`
+	Hash      string       `json:"txhash"`
+	RawLog    string       `json:"raw_log"`
+	GasUsed   testutil.Int `json:"gas_used"`
+	GasWanted testutil.Int `json:"gas_wanted"`
+	Tx        Tx           `json:"tx"`
+	Events    []Event      `json:"events"`
 }
 
 func (txr TxResponse) FindEvent(typ string) *Event {
@@ -37,6 +37,14 @@ func (txr TxResponse) FindEvent(typ string) *Event {
 		}
 	}
 	return nil
+}
+
+func (txr TxResponse) MustGetEventAttributeValue(t testing.TB, eventType string, attributeKey string) string {
+	event := txr.FindEvent(eventType)
+	require.NotNil(t, event)
+	attr := event.FindAttribute(attributeKey)
+	require.NotNil(t, attr)
+	return attr.Value
 }
 
 type Tx struct {
@@ -53,10 +61,10 @@ type AuthInfo struct {
 }
 
 type Fee struct {
-	Amount   testutil.Coins  `json:"amount"`
-	GasLimit testutil.BigInt `json:"gas_limit"`
-	Payer    string          `json:"payer"`
-	Granter  string          `json:"granter"`
+	Amount   testutil.Coins `json:"amount"`
+	GasLimit testutil.Int   `json:"gas_limit"`
+	Payer    string         `json:"payer"`
+	Granter  string         `json:"granter"`
 }
 
 type Event struct {
@@ -144,32 +152,32 @@ func MustErrExecTx(t testing.TB, ctx context.Context, expErr string, args ...str
 	}
 }
 
-func (txr TxResponse) GetRefundAmount() (testutil.BigInt, error) {
+func (txr TxResponse) GetRefundAmount() (testutil.Int, error) {
 	refundEvent := txr.FindEvent("refund")
 	if refundEvent == nil {
-		return testutil.MakeBigInt(0), nil
+		return testutil.MakeInt(0), nil
 	}
 
 	amountAttr := refundEvent.FindAttribute("amount")
 	if amountAttr == nil {
-		return testutil.MakeBigInt(0), errors.New("amount attribute is required")
+		return testutil.MakeInt(0), errors.New("amount attribute is required")
 	}
 
 	amount, err := testutil.ParseAmount(amountAttr.Value)
 	if err != nil {
-		return testutil.MakeBigInt(0), err
+		return testutil.MakeInt(0), err
 	}
 
 	return amount.GetBaseDenomAmount(), nil
 }
 
-func (txr TxResponse) MustGetRefundAmount(t testing.TB) testutil.BigInt {
+func (txr TxResponse) MustGetRefundAmount(t testing.TB) testutil.Int {
 	amount, err := txr.GetRefundAmount()
 	require.NoError(t, err)
 	return amount
 }
 
-func (txr TxResponse) GetDeductFeeAmount() (testutil.BigInt, error) {
+func (txr TxResponse) GetDeductFeeAmount() (testutil.Int, error) {
 	coinSpent := txr.Tx.AuthInfo.Fee.Amount.GetBaseDenomAmount()
 
 	refundAmount, err := txr.GetRefundAmount()
@@ -180,7 +188,7 @@ func (txr TxResponse) GetDeductFeeAmount() (testutil.BigInt, error) {
 	return coinSpent.Sub(refundAmount), nil
 }
 
-func (txr TxResponse) MustGetDeductFeeAmount(t testing.TB) testutil.BigInt {
+func (txr TxResponse) MustGetDeductFeeAmount(t testing.TB) testutil.Int {
 	amount, err := txr.GetDeductFeeAmount()
 	require.NoError(t, err)
 	return amount
