@@ -165,7 +165,7 @@ func (b Float) Int() Int {
 }
 
 func (n Float) MarshalText() ([]byte, error) {
-	return n.v.MarshalText()
+	return n.v.Append(nil, 'f', 18), nil
 }
 
 func (n *Float) UnmarshalText(txt []byte) error {
