@@ -1,9 +1,29 @@
 package feemarket
 
 import (
+	"testing"
+
 	"github.com/tokenize-titan/titan/testutil"
 	"github.com/tokenize-titan/titan/testutil/cmd"
 )
+
+type Params struct {
+	BaseFee                  testutil.Int   `json:"base_fee"`
+	BaseFeeChangeDenominator int64          `json:"base_fee_change_denominator"`
+	ElasticityMultiplier     int64          `json:"elasticity_multiplier"`
+	EnableHeight             testutil.Int   `json:"enable_height"`
+	MinGasMultiplier         testutil.Float `json:"min_gas_multiplier"`
+	MinGasPrice              testutil.Float `json:"min_gas_price"`
+	NoBaseFee                bool           `json:"no_base_fee"`
+}
+
+func MustGetParams(t testing.TB) Params {
+	var v struct {
+		Params Params `json:"params"`
+	}
+	cmd.MustQuery(t, &v, "feemarket", "params")
+	return v.Params
+}
 
 func GetBaseFee(height int64) (testutil.Int, error) {
 	args := []string{

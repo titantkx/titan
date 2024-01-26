@@ -131,14 +131,21 @@ func MustQueryPassVotingPeriodProposal(t testing.TB, proposalId string) Proposal
 	}
 }
 
-type TextProposal struct {
+type ProposalMsg struct {
 	Title    string `json:"title"`
 	Summary  string `json:"summary"`
 	Metadata string `json:"metadata"`
 	Deposit  string `json:"deposit"`
+	Messages []any  `json:"messages,omitempty"`
 }
 
-func MustSubmitProposal(t testing.TB, from string, proposal any) string {
+type MsgUpdateParams struct {
+	Type      string `json:"@type"`
+	Authority string `json:"authority"`
+	Params    any    `json:"params"`
+}
+
+func MustSubmitProposal(t testing.TB, from string, proposal ProposalMsg) string {
 	file := testutil.MustCreateTemp(t, "proposal_*.json")
 	err := json.NewEncoder(file).Encode(proposal)
 
