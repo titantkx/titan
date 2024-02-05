@@ -1,7 +1,7 @@
-.git
-
 examples
 build
 local_test_data
+dist
+tmp
 
 tests

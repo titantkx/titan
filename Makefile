@@ -3,6 +3,7 @@
 export VERSION := $(shell echo $(shell git describe --always --match "v*") | sed 's/^v//')
 export TMVERSION := $(shell go list -m github.com/cometbft/cometbft | sed 's:.* ::')
 export COMMIT := $(shell git log -1 --format='%H')
+export MAKE_PROJECT_ROOT := $(CURDIR)
 LEDGER_ENABLED ?= true
 BINDIR ?= $(GOPATH)/bin
 BUILDDIR ?= $(CURDIR)/build
@@ -11,6 +12,8 @@ PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 COSMOS_VERSION = $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
 IGNITE_VERSION = v0.27.1
 MOCKS_DIR = $(CURDIR)/tests/mocks
+
+# $(info GOOS: $(GOOS), GOARCH: $(GOARCH), CC: $(CC), CXX: $(CXX))
 
 # process build tags
 build_tags = netgo
@@ -37,18 +40,35 @@ ifeq ($(LEDGER_ENABLED),true)
 	endif
 endif
 
+# this is required by ethermint
+build_tags += cgo
+
 ifeq (secp,$(findstring secp,$(COSMOS_BUILD_OPTIONS)))
   build_tags += libsecp256k1_sdk
 endif
-
-ifeq (legacy,$(findstring legacy,$(COSMOS_BUILD_OPTIONS)))
-  build_tags += app_v1
+# DB backend selection
+ifeq (cleveldb,$(findstring cleveldb,$(COSMOS_BUILD_OPTIONS)))
+  build_tags += gcc
 endif
+ifeq (badgerdb,$(findstring badgerdb,$(COSMOS_BUILD_OPTIONS)))
+  build_tags += badgerdb
+endif
+# handle rocksdb
+ifeq (rocksdb,$(findstring rocksdb,$(COSMOS_BUILD_OPTIONS)))  
+  build_tags += rocksdb
+endif
+# handle boltdb
+ifeq (boltdb,$(findstring boltdb,$(COSMOS_BUILD_OPTIONS)))
+  build_tags += boltdb
+endif
+build_tags += $(BUILD_TAGS)
+build_tags := $(strip $(build_tags))
 
 whitespace :=
 whitespace += $(whitespace)
 comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
+export MAKE_BUILD_TAGS := $(build_tags_comma_sep)
 
 # process linker flags
 
@@ -59,34 +79,19 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=titan \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
 		  -X github.com/cometbft/cometbft/version.TMCoreSemVer=$(TMVERSION)
 
-
-# DB backend selection
-ifeq (cleveldb,$(findstring cleveldb,$(COSMOS_BUILD_OPTIONS)))
-  build_tags += gcc
-endif
-ifeq (badgerdb,$(findstring badgerdb,$(COSMOS_BUILD_OPTIONS)))
-  build_tags += badgerdb
-endif
-# handle rocksdb
-ifeq (rocksdb,$(findstring rocksdb,$(COSMOS_BUILD_OPTIONS)))
-  CGO_ENABLED=1
-  build_tags += rocksdb
-endif
-# handle boltdb
-ifeq (boltdb,$(findstring boltdb,$(COSMOS_BUILD_OPTIONS)))
-  build_tags += boltdb
-endif
-
 ifeq (,$(findstring nostrip,$(COSMOS_BUILD_OPTIONS)))
   ldflags += -w -s
 endif
+ifeq (static,$(findstring static,$(COSMOS_BUILD_OPTIONS)))
+	ldflags += -linkmode=external -extldflags "-Wl,-z,muldefs -static"
+else
+	ldflags += -extldflags "-Wl,-rpath,$$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,@executable_path"
+endif
+
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
-build_tags += $(BUILD_TAGS)
-build_tags := $(strip $(build_tags))
-
-BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
+BUILD_FLAGS := -tags "$(build_tags_comma_sep)" -ldflags '$(ldflags)'
 # check for nostrip option
 ifeq (,$(findstring nostrip,$(COSMOS_BUILD_OPTIONS)))
   BUILD_FLAGS += -trimpath
@@ -125,14 +130,8 @@ BUILD_TARGETS := build install
 
 build: BUILD_ARGS=-o $(BUILDDIR)/
 
-build-linux-amd64:
-	GOOS=linux GOARCH=amd64 LEDGER_ENABLED=false $(MAKE) build
-
-build-linux-arm64:
-	GOOS=linux GOARCH=arm64 LEDGER_ENABLED=false $(MAKE) build
-
 $(BUILD_TARGETS): go.sum $(BUILDDIR)/
-	go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
+	CGO_ENABLED=1 go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 build-with-regen: proto-all lint go.sum $(BUILDDIR)/
 	go build -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
@@ -254,3 +253,22 @@ localnet-serve-reset:
 test-solidity:
 	@echo "Beginning solidity tests..."
 	./scripts/run-solidity-tests.sh
+
+
+###############################################################################
+###                                Releasing                                ###
+###############################################################################
+
+PACKAGE_NAME:=github.com/tokenize-titan/titan
+GOLANG_CROSS_VERSION  = v1.20
+GOPATH ?= '$(HOME)/go'
+release-dry-run:
+	./scripts/release.sh --dry-run
+
+release:
+	./scripts/release.sh
+
+release-gen-info:
+	@./scripts/gen-upgrade-info.sh v$(VERSION)
+
+.PHONY: release-dry-run release release-gen-info
