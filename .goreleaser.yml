@@ -1,9 +1,7 @@
 project_name: titan
 release:
-  github:
-    owner: tokenize-titan
-    name: titan
   name_template: '{{.Env.VERSION}}'
+  prerelease: auto
 
 before:
   hooks:
