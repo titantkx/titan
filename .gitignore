@@ -29,6 +29,7 @@ release/
 vue/node_modules
 vue/dist
 *_tmp
+tmp
 
 # Go
 go.work

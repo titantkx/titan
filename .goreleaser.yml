@@ -1,0 +1,137 @@
+project_name: titan
+release:
+  github:
+    owner: tokenize-titan
+    name: titan
+  name_template: '{{.Env.VERSION}}'
+
+before:
+  hooks:
+    - go mod download
+
+builds:
+  - id: "titand-darwin-amd64"
+    main: ./cmd/titand
+    binary: bin/titand
+    env:
+      - CGO_ENABLED=1
+      - CC=o64-clang
+      - CXX=o64-clang++
+    goos:
+      - darwin
+    goarch:
+      - amd64
+    flags:
+      - -tags={{.Env.BUILD_TAGS}}
+      - -trimpath
+    ldflags:
+      - -s -w 
+      - -extldflags "-Wl,-rpath,$$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,@executable_path"
+      - -X github.com/cosmos/cosmos-sdk/version.Name=titan 
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=titand 
+      - -X github.com/cosmos/cosmos-sdk/version.Version={{.Env.VERSION}} 
+      - -X github.com/cosmos/cosmos-sdk/version.Commit={{.Commit}}
+      - -X github.com/cometbft/cometbft/version.TMCoreSemVer={{.Env.TMVERSION}}
+      - -X github.com/cosmos/cosmos-sdk/version.BuildTags={{.Env.BUILD_TAGS}}
+
+  - id: "titand-darwin-arm64"
+    main: ./cmd/titand
+    binary: bin/titand
+    env:
+      - CGO_ENABLED=1
+      - CC=oa64-clang
+      - CXX=oa64-clang++
+    goos:
+      - darwin
+    goarch:
+      - arm64
+    flags:
+      - -tags={{.Env.BUILD_TAGS}}
+      - -trimpath
+    ldflags:
+      - -s -w 
+      - -extldflags "-Wl,-rpath,$$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,@executable_path"
+      - -X github.com/cosmos/cosmos-sdk/version.Name=titan 
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=titand 
+      - -X github.com/cosmos/cosmos-sdk/version.Version={{.Env.VERSION}} 
+      - -X github.com/cosmos/cosmos-sdk/version.Commit={{.Commit}}
+      - -X github.com/cometbft/cometbft/version.TMCoreSemVer={{.Env.TMVERSION}}
+      - -X github.com/cosmos/cosmos-sdk/version.BuildTags={{.Env.BUILD_TAGS}}
+  
+  - id: "titand-linux-amd64"
+    goos:
+        - linux
+    goarch:
+      - amd64
+    main: ./cmd/titand
+    binary: bin/titand
+    env:
+      - CGO_ENABLED=1
+      - CC=gcc
+      - CXX=g++    
+    flags:
+      - -tags={{.Env.BUILD_TAGS}}
+      - -trimpath
+    ldflags:
+      - -s -w 
+      - -extldflags "-Wl,-rpath,$$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,@executable_path"
+      - -X github.com/cosmos/cosmos-sdk/version.Name=titan 
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=titand 
+      - -X github.com/cosmos/cosmos-sdk/version.Version={{.Env.VERSION}} 
+      - -X github.com/cosmos/cosmos-sdk/version.Commit={{.Commit}}
+      - -X github.com/cometbft/cometbft/version.TMCoreSemVer={{.Env.TMVERSION}}
+      - -X github.com/cosmos/cosmos-sdk/version.BuildTags={{.Env.BUILD_TAGS}}
+
+  - id: "titand-linux-arm64"
+    main: ./cmd/titand
+    binary: bin/titand
+    env:
+      - CGO_ENABLED=1
+      - CC=aarch64-linux-gnu-gcc
+      - CXX=aarch64-linux-gnu-g++
+    goos:
+      - linux
+    goarch:
+      - arm64
+    flags:
+      - -tags={{.Env.BUILD_TAGS}}
+      - -trimpath
+    ldflags:
+      - -s -w 
+      - -extldflags "-Wl,-rpath,$$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,@executable_path"
+      - -X github.com/cosmos/cosmos-sdk/version.Name=titan 
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=titand 
+      - -X github.com/cosmos/cosmos-sdk/version.Version={{.Env.VERSION}} 
+      - -X github.com/cosmos/cosmos-sdk/version.Commit={{.Commit}}
+      - -X github.com/cometbft/cometbft/version.TMCoreSemVer={{.Env.TMVERSION}}
+      - -X github.com/cosmos/cosmos-sdk/version.BuildTags={{.Env.BUILD_TAGS}}
+
+archives:
+  - name_template: '{{ .ProjectName }}_{{ .Env.VERSION }}_{{- title .Os }}_{{ .Arch }}'    
+    builds:
+      - titand-darwin-amd64
+      - titand-darwin-arm64
+      - titand-linux-amd64
+      - titand-linux-arm64
+    files:      
+      - src: LICENSE*      
+      - src: README*      
+      - src: CHANGELOG*
+      - src: "tmp/lib/*.so"
+        dst: lib
+        strip_parent: true
+      - src: "tmp/lib/*.dylib"
+        dst: lib
+        strip_parent: true
+
+
+checksum:
+  name_template: 'checksums.txt'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+snapshot:
+  name_template: "{{ .Env.VERSION }}"

@@ -3,6 +3,7 @@
 export VERSION := $(shell echo $(shell git describe --always --match "v*") | sed 's/^v//')
 export TMVERSION := $(shell go list -m github.com/cometbft/cometbft | sed 's:.* ::')
 export COMMIT := $(shell git log -1 --format='%H')
+export MAKE_PROJECT_ROOT := $(CURDIR)
 LEDGER_ENABLED ?= true
 BINDIR ?= $(GOPATH)/bin
 BUILDDIR ?= $(CURDIR)/build
@@ -60,11 +61,15 @@ endif
 ifeq (boltdb,$(findstring boltdb,$(COSMOS_BUILD_OPTIONS)))
   build_tags += boltdb
 endif
+build_tags += $(BUILD_TAGS)
+build_tags := $(strip $(build_tags))
 
 whitespace :=
 whitespace += $(whitespace)
 comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
+export MAKE_BUILD_TAGS := $(build_tags_comma_sep)
+$(info MAKE_BUILD_TAGS: $(MAKE_BUILD_TAGS))
 
 # process linker flags
 
@@ -81,16 +86,13 @@ endif
 ifeq (static,$(findstring static,$(COSMOS_BUILD_OPTIONS)))
 	ldflags += -linkmode=external -extldflags "-Wl,-z,muldefs -static"
 else
-	ldflags += -extldflags "-Wl,-rpath,$$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,@executable_path"
+	ldflags += -extldflags "-Wl,-rpath,$$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,@executable_path"
 endif
 
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
-build_tags += $(BUILD_TAGS)
-build_tags := $(strip $(build_tags))
-
-BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
+BUILD_FLAGS := -tags "$(build_tags_comma_sep)" -ldflags '$(ldflags)'
 # check for nostrip option
 ifeq (,$(findstring nostrip,$(COSMOS_BUILD_OPTIONS)))
   BUILD_FLAGS += -trimpath
@@ -262,29 +264,9 @@ PACKAGE_NAME:=github.com/tokenize-titan/titan
 GOLANG_CROSS_VERSION  = v1.20
 GOPATH ?= '$(HOME)/go'
 release-dry-run:
-	docker run \
-		--rm \
-		--privileged \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		-v `pwd`:/go/src/$(PACKAGE_NAME) \
-		-v ${GOPATH}/pkg:/go/pkg \
-		-w /go/src/$(PACKAGE_NAME) \
-		ghcr.io/goreleaser/goreleaser-cross:${GOLANG_CROSS_VERSION} \
-		--clean --skip-validate --skip-publish --snapshot
+	./scripts/release.sh --dry-run
 
 release:
-	@if [ ! -f ".release-env" ]; then \
-		echo "\033[91m.release-env is required for release\033[0m";\
-		exit 1;\
-	fi
-	docker run \
-		--rm \
-		--privileged \
-		--env-file .release-env \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		-v `pwd`:/go/src/$(PACKAGE_NAME) \
-		-w /go/src/$(PACKAGE_NAME) \
-		ghcr.io/goreleaser/goreleaser-cross:${GOLANG_CROSS_VERSION} \
-		release --clean --skip-validate
+	./scripts/release.sh
 
 .PHONY: release-dry-run release
