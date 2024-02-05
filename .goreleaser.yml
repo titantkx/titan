@@ -1,6 +1,6 @@
 project_name: titan
 release:
-  name_template: '{{.Env.VERSION}}'
+  name_template: 'v{{.Env.VERSION}}'
   prerelease: auto
 
 before:

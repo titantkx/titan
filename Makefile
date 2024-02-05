@@ -13,7 +13,7 @@ COSMOS_VERSION = $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::'
 IGNITE_VERSION = v0.27.1
 MOCKS_DIR = $(CURDIR)/tests/mocks
 
-$(info GOOS: $(GOOS), GOARCH: $(GOARCH), CC: $(CC), CXX: $(CXX))
+# $(info GOOS: $(GOOS), GOARCH: $(GOARCH), CC: $(CC), CXX: $(CXX))
 
 # process build tags
 build_tags = netgo
@@ -69,7 +69,6 @@ whitespace += $(whitespace)
 comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 export MAKE_BUILD_TAGS := $(build_tags_comma_sep)
-$(info MAKE_BUILD_TAGS: $(MAKE_BUILD_TAGS))
 
 # process linker flags
 
@@ -269,4 +268,7 @@ release-dry-run:
 release:
 	./scripts/release.sh
 
-.PHONY: release-dry-run release
+release-gen-info:
+	@./scripts/gen-upgrade-info.sh v$(VERSION)
+
+.PHONY: release-dry-run release release-gen-info
