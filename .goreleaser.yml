@@ -30,7 +30,7 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.Version={{.Env.VERSION}} 
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{.Commit}}
       - -X github.com/cometbft/cometbft/version.TMCoreSemVer={{.Env.TMVERSION}}
-      - -X github.com/cosmos/cosmos-sdk/version.BuildTags={{.Env.BUILD_TAGS_COMMA_SEP}}
+      - -X "github.com/cosmos/cosmos-sdk/version.BuildTags={{.Env.BUILD_TAGS_COMMA_SEP}}"
 
   - id: "titand-darwin-arm64"
     main: ./cmd/titand
@@ -54,7 +54,7 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.Version={{.Env.VERSION}} 
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{.Commit}}
       - -X github.com/cometbft/cometbft/version.TMCoreSemVer={{.Env.TMVERSION}}
-      - -X github.com/cosmos/cosmos-sdk/version.BuildTags={{.Env.BUILD_TAGS_COMMA_SEP}}
+      - -X "github.com/cosmos/cosmos-sdk/version.BuildTags={{.Env.BUILD_TAGS_COMMA_SEP}}"
   
   - id: "titand-linux-amd64"
     goos:
@@ -78,7 +78,7 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.Version={{.Env.VERSION}} 
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{.Commit}}
       - -X github.com/cometbft/cometbft/version.TMCoreSemVer={{.Env.TMVERSION}}
-      - -X github.com/cosmos/cosmos-sdk/version.BuildTags={{.Env.BUILD_TAGS_COMMA_SEP}}
+      - -X "github.com/cosmos/cosmos-sdk/version.BuildTags={{.Env.BUILD_TAGS_COMMA_SEP}}"
 
   - id: "titand-linux-arm64"
     main: ./cmd/titand
@@ -102,7 +102,7 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.Version={{.Env.VERSION}} 
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{.Commit}}
       - -X github.com/cometbft/cometbft/version.TMCoreSemVer={{.Env.TMVERSION}}
-      - -X github.com/cosmos/cosmos-sdk/version.BuildTags={{.Env.BUILD_TAGS_COMMA_SEP}}
+      - -X "github.com/cosmos/cosmos-sdk/version.BuildTags={{.Env.BUILD_TAGS_COMMA_SEP}}"
 
 archives:
   - name_template: '{{ .ProjectName }}_{{ .Env.VERSION }}_{{- title .Os }}_{{ .Arch }}'    
