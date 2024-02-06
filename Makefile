@@ -68,7 +68,8 @@ whitespace :=
 whitespace += $(whitespace)
 comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
-export MAKE_BUILD_TAGS := $(build_tags_comma_sep)
+export MAKE_BUILD_TAGS := $(build_tags)
+export MAKE_BUILD_TAGS_COMMA_SEP := $(build_tags_comma_sep)
 
 # process linker flags
 
@@ -91,7 +92,7 @@ endif
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
-BUILD_FLAGS := -tags "$(build_tags_comma_sep)" -ldflags '$(ldflags)'
+BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 # check for nostrip option
 ifeq (,$(findstring nostrip,$(COSMOS_BUILD_OPTIONS)))
   BUILD_FLAGS += -trimpath
