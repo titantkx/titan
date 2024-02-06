@@ -69,6 +69,7 @@ whitespace += $(whitespace)
 comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 export MAKE_BUILD_TAGS := $(build_tags)
+export MAKE_BUILD_TAGS_COMMA_SEP := $(build_tags_comma_sep)
 
 # process linker flags
 

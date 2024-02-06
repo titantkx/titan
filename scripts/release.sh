@@ -11,6 +11,7 @@ fi
 
 PROJECT_ROOT=$MAKE_PROJECT_ROOT
 BUILD_TAGS=$MAKE_BUILD_TAGS
+BUILD_TAGS_COMMA_SEP=$MAKE_BUILD_TAGS_COMMA_SEP
 
 GOPATH=$(go env GOPATH)
 # get project root directory
@@ -47,6 +48,7 @@ if [ "$dry_run" -eq 1 ]; then
       -e TMVERSION=$TMVERSION \
       -e VERSION=$VERSION \
       -e BUILD_TAGS="$BUILD_TAGS" \
+      -e BUILD_TAGS_COMMA_SEP="$BUILD_TAGS_COMMA_SEP" \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -v $PROJECT_ROOT:/go/src/$PACKAGE_NAME \
       -v ${GOPATH}/pkg:/go/pkg \
@@ -66,6 +68,7 @@ else
     -e TMVERSION=$TMVERSION \
     -e VERSION=$VERSION \
     -e BUILD_TAGS="$BUILD_TAGS" \
+    -e BUILD_TAGS_COMMA_SEP="$BUILD_TAGS_COMMA_SEP" \
 		--env-file .release-env \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v $PROJECT_ROOT:/go/src/$PACKAGE_NAME \
