@@ -46,7 +46,7 @@ if [ "$dry_run" -eq 1 ]; then
       --privileged \
       -e TMVERSION=$TMVERSION \
       -e VERSION=$VERSION \
-      -e BUILD_TAGS=$BUILD_TAGS \
+      -e BUILD_TAGS="$BUILD_TAGS" \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -v $PROJECT_ROOT:/go/src/$PACKAGE_NAME \
       -v ${GOPATH}/pkg:/go/pkg \
@@ -65,7 +65,7 @@ else
 		--privileged \
     -e TMVERSION=$TMVERSION \
     -e VERSION=$VERSION \
-    -e BUILD_TAGS=$BUILD_TAGS \
+    -e BUILD_TAGS="$BUILD_TAGS" \
 		--env-file .release-env \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v $PROJECT_ROOT:/go/src/$PACKAGE_NAME \
