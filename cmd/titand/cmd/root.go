@@ -454,6 +454,8 @@ func initAppConfig() (string, interface{}) {
 	srvCfg.PruningInterval = "10"
 	srvCfg.PruningKeepRecent = "100"
 
+	srvCfg.Rosetta.DenomToSuggest = utils.BaseDenom
+
 	customAppConfig := CustomAppConfig{
 		Config: *srvCfg,
 
