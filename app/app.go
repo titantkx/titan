@@ -134,6 +134,7 @@ import (
 	"github.com/tokenize-titan/titan/app/ante"
 	"github.com/tokenize-titan/titan/app/posthandler"
 	v1 "github.com/tokenize-titan/titan/app/upgrades/v1"
+	v2 "github.com/tokenize-titan/titan/app/upgrades/v2"
 	"github.com/tokenize-titan/titan/docs"
 	"github.com/tokenize-titan/titan/utils"
 	distr "github.com/tokenize-titan/titan/x/distribution"
@@ -1170,14 +1171,17 @@ func (app *App) ModuleManager() *module.Manager {
 
 func (app *App) setupUpgradeHandlers() {
 	/** @note: SetUpgradeHandler here
-	* EXAMPLE:
-	* app.UpgradeKeeper.SetUpgradeHandler(
-	*		v1.UpgradeName,
-	*		func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
-	*			return app.mm.RunMigrations(ctx, app.configurator, vm)
-	*		},
-	*	)
+	EXAMPLE:
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v1.UpgradeName,
+		v1.CreateUpgradeHandler(app.mm, app.configurator),
+	)
 	**/
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v2.UpgradeName,
+		v2.CreateUpgradeHandler(app.mm, app.configurator),
+	)
 
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
@@ -1195,6 +1199,10 @@ func (app *App) setupUpgradeHandlers() {
 
 	switch upgradeInfo.Name {
 	case v1.UpgradeName:
+	case v2.UpgradeName:
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{ibcfeetypes.StoreKey},
+		}
 	}
 
 	if storeUpgrades != nil {

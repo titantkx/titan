@@ -4,11 +4,11 @@ Every change to the chain state is a breaking change. This means that the chain 
 
 ## Versioning
 
-In cosmos base chain, we have version of application and version for each module. 
+In cosmos base chain, we have version of application and version for each module.
 
 ### App version
 
-Version of application will be store in `app/upgrades/[version]/keys.go`. We declare constant `UpgradeName` for each version. 
+Version of application will be store in `app/upgrades/[version]/keys.go`. We declare constant `UpgradeName` for each version.
 
 App version will use format `v[major].[minor]`. Where major will be increase when we add new module. Minor will be increase when we change the logic of existing module. **NOTE: But we will use format `v[major]_[minor]` for every where in code base because cosmos proposal only accept `_` character**
 
@@ -23,7 +23,7 @@ In `app.go` we declare method `setupUpgradeHandlers` to clarify what must todo w
   )
   ```
 
-  Or maybe when add new module, we need call `InitGenesis` method of new module. Example:
+  Or maybe when add new module, we need call `InitGenesis` method of new module (**Only necessary if module is not init from default genesis**) . Example:
 
   ```go
   app.UpgradeKeeper.SetUpgradeHandler(
@@ -63,7 +63,7 @@ Module `github.com/cosmos/cosmos-sdk/x/upgrade` will store version map for every
 
 In `x/[module]/module.go` method `ConsensusVersion` will return current module version.
 
-In `RegisterServices` method we need to use `cfg.RegisterMigration` to register migration for each module version. 
+In `RegisterServices` method we need to use `cfg.RegisterMigration` to register migration for each module version.
   
   ```go
   if err := cfg.RegisterMigration(types.ModuleName, cv1Types.ConsensusVersion, func(ctx sdk.Context) error {
