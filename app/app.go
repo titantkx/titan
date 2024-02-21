@@ -1257,7 +1257,11 @@ func (app *App) setupUpgradeHandlers() {
 	case v1.UpgradeName:
 	case v2.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{ibcfeetypes.StoreKey},
+			Added: []string{
+				ibcfeetypes.StoreKey,
+				nftmintmoduletypes.StoreKey,
+				nfttransfertypes.StoreKey,
+			},
 		}
 	}
 

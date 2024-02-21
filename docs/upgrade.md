@@ -10,7 +10,7 @@ In cosmos base chain, we have version of application and version for each module
 
 Version of application will be store in `app/upgrades/[version]/keys.go`. We declare constant `UpgradeName` for each version.
 
-App version will use format `v[major].[minor]`. Where major will be increase when we add new module. Minor will be increase when we change the logic of existing module. **NOTE: But we will use format `v[major]_[minor]` for every where in code base because cosmos proposal only accept `_` character**
+App version will use format `v[major].[minor].[patch]`. Where major will be increase when we add new module. Minor will be increase when we change the logic of existing module. Patch will increase when there is a patch without changing the logic of existing modules. **NOTE: But we will use format `v[major]_[minor]_[patch]` for every where in code base because cosmos proposal only accept `_` character**
 
 In `app.go` we declare method `setupUpgradeHandlers` to clarify what must todo when upgrade to specific version. We use `app.UpgradeKeeper.SetUpgradeHandler` to register upgrade handler for each version.
 
