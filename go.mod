@@ -8,6 +8,7 @@ require (
 	cosmossdk.io/math v1.2.0
 	cosmossdk.io/tools/rosetta v0.2.1
 	github.com/CosmWasm/wasmd v0.45.0
+	github.com/bianjieai/nft-transfer v1.1.3-ibc-v7.3.0
 	github.com/cometbft/cometbft v0.37.4
 	github.com/cometbft/cometbft-db v0.8.0
 	github.com/cosmos/btcutil v1.0.5
