@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package titan.nftmint;
+
+import "gogoproto/gogo.proto";
+import "titan/nftmint/params.proto";
+import "titan/nftmint/system_info.proto";
+import "titan/nftmint/minting_info.proto";
+
+option go_package = "github.com/tokenize-titan/titan/x/nftmint/types";
+
+// GenesisState defines the nftmint module's genesis state.
+message GenesisState {
+  Params               params            = 1 [(gogoproto.nullable) = false];
+  SystemInfo           system_info       = 2 [(gogoproto.nullable) = false];
+  repeated MintingInfo minting_info_list = 3 [(gogoproto.nullable) = false];
+}

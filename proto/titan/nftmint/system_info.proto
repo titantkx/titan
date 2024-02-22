@@ -1,0 +1,10 @@
+syntax = "proto3";
+package titan.nftmint;
+
+option go_package = "github.com/tokenize-titan/titan/x/nftmint/types";
+
+// SystemInfo defines the system info of this module.
+message SystemInfo {
+  // next_class_id is the unique identifier of the next class that will created.
+  uint64 next_class_id = 1;
+}

@@ -1,0 +1,30 @@
+syntax = "proto3";
+package titan.nftmint;
+
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/tokenize-titan/titan/x/nftmint/types";
+
+// EventCreateClass is emitted on CreateClass.
+message EventCreateClass {
+  // id is a unique identifier of the class.
+  string id = 1;
+  // owner is the owner address of the class.
+  string owner = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// EventUpdateClass is emitted on UpdateClass.
+message EventUpdateClass {
+  // id is a unique identifier of the class.
+  string id = 1;
+}
+
+// EventTransferClass is emitted on TransferClass.
+message EventTransferClass {
+  // id is a unique identifier of the class.
+  string id = 1;
+  // old_owner is the old owner address of the class.
+  string old_owner = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  // new_owner is the new owner address of the class.
+  string new_owner = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}

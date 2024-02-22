@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package titan.nftmint;
+
+option go_package = "github.com/tokenize-titan/titan/x/nftmint/types";
+
+import "cosmos_proto/cosmos.proto";
+
+// Msg defines the Msg service.
+service Msg {
+  // CreateClass defines a method to create new class.
+  rpc CreateClass(MsgCreateClass) returns (MsgCreateClassResponse);
+
+  // UpdateClass defines a method to update a class.
+  rpc UpdateClass(MsgUpdateClass) returns (MsgUpdateClassResponse);
+
+  // TransferClass defines a method to transfer a class to new owner.
+  rpc TransferClass(MsgTransferClass) returns (MsgTransferClassResponse);
+
+  // Mint defines a method to mint new NFT.
+  rpc Mint(MsgMint) returns (MsgMintResponse);
+}
+// MsgCreateClass represents a message to create new class.
+message MsgCreateClass {
+  string creator     = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string name        = 2;
+  string symbol      = 3;
+  string description = 4;
+  string uri         = 5;
+  string uri_hash    = 6;
+  string data        = 7;
+}
+
+// MsgCreateClassResponse defines the Msg/CreateClass response type.
+message MsgCreateClassResponse {
+  string id = 1;
+}
+
+// MsgUpdateClass represents a message to update a class.
+message MsgUpdateClass {
+  string creator     = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string id          = 2;
+  string name        = 3;
+  string symbol      = 4;
+  string description = 5;
+  string uri         = 6;
+  string uri_hash    = 7;
+  string data        = 8;
+}
+
+// MsgUpdateClassResponse defines the Msg/UpdateClass response type.
+message MsgUpdateClassResponse {}
+
+// MsgTransferClass represents a message to transfer a class to new owner.
+message MsgTransferClass {
+  string creator  = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string class_id = 2;
+  string receiver = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// MsgTransferClassResponse defines the Msg/TransferClass response type.
+message MsgTransferClassResponse {}
+
+// MsgMint represents a message to mint new NFT.
+message MsgMint {
+  string creator  = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string receiver = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string class_id = 3;
+  string uri      = 4;
+  string uri_hash = 5;
+  string data     = 6;
+}
+
+// MsgMintResponse defines the Msg/Mint response type.
+message MsgMintResponse {
+  string id = 1;
+}

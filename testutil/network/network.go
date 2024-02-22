@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 
@@ -51,7 +52,7 @@ func New(t *testing.T, configs ...Config) *Network {
 func DefaultConfig() network.Config {
 	var (
 		encoding = app.MakeEncodingConfig()
-		chainID  = "chain-" + tmrand.NewRand().Str(6)
+		chainID  = "titan_" + strconv.Itoa(tmrand.Intn(99999)+1) + "-1"
 	)
 	return network.Config{
 		Codec:             encoding.Marshaler,

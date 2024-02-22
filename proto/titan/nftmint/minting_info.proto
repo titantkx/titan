@@ -1,0 +1,17 @@
+syntax = "proto3";
+package titan.nftmint;
+
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/tokenize-titan/titan/x/nftmint/types";
+
+// MintingInfo defines the minting info for a class.
+message MintingInfo {
+  // class_id is a unique identifier of the class.
+  string class_id = 1;
+  // owner is the owner address of the class.
+  string owner = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  // next_token_id is the unique identifier of the next token that will be
+  // minted under this class.
+  uint64 next_token_id = 3;
+}
