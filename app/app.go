@@ -137,6 +137,7 @@ import (
 	v2 "github.com/tokenize-titan/titan/app/upgrades/v2"
 	"github.com/tokenize-titan/titan/docs"
 	"github.com/tokenize-titan/titan/utils"
+	nftutil "github.com/tokenize-titan/titan/utils/nft"
 	distr "github.com/tokenize-titan/titan/x/distribution"
 	distrkeeper "github.com/tokenize-titan/titan/x/distribution/keeper"
 	gov "github.com/tokenize-titan/titan/x/gov"
@@ -146,6 +147,14 @@ import (
 	"github.com/tokenize-titan/titan/x/validatorreward"
 	validatorrewardkeeper "github.com/tokenize-titan/titan/x/validatorreward/keeper"
 	validatorrewardtypes "github.com/tokenize-titan/titan/x/validatorreward/types"
+
+	nftmintmodule "github.com/tokenize-titan/titan/x/nftmint"
+	nftmintmodulekeeper "github.com/tokenize-titan/titan/x/nftmint/keeper"
+	nftmintmoduletypes "github.com/tokenize-titan/titan/x/nftmint/types"
+
+	nfttransfer "github.com/bianjieai/nft-transfer"
+	nfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
+	nfttransfertypes "github.com/bianjieai/nft-transfer/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
@@ -218,6 +227,8 @@ var (
 		wasm.AppModuleBasic{},
 		//
 		validatorreward.AppModuleBasic{},
+		nftmintmodule.AppModuleBasic{},
+		nfttransfer.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -297,16 +308,21 @@ type App struct {
 	WasmKeeper            wasmkeeper.Keeper
 
 	// make scoped keepers public for test purposes
-	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
-	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
-	ScopedWasmKeeper     capabilitykeeper.ScopedKeeper
+	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper    capabilitykeeper.ScopedKeeper
+	ScopedICAHostKeeper     capabilitykeeper.ScopedKeeper
+	ScopedWasmKeeper        capabilitykeeper.ScopedKeeper
+	ScopedNFTTransferKeeper capabilitykeeper.ScopedKeeper
 
 	// Ethermint keepers
 	EvmKeeper       *evmkeeper.Keeper
 	FeeMarketKeeper feemarketkeeper.Keeper
 
 	ValidatorrewardKeeper validatorrewardkeeper.Keeper
+
+	NftmintKeeper nftmintmodulekeeper.Keeper
+
+	NFTTransferKeeper nfttransferkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -369,6 +385,8 @@ func New(
 		evmtypes.StoreKey, feemarkettypes.StoreKey,
 
 		validatorrewardtypes.StoreKey,
+		nftmintmoduletypes.StoreKey,
+		nfttransfertypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
@@ -410,6 +428,7 @@ func New(
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
 	scopedWasmKeeper := app.CapabilityKeeper.ScopeToModule(wasmtypes.ModuleName)
+	scopedNFTTransferKeeper := app.CapabilityKeeper.ScopeToModule(nfttransfertypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/scopedKeeper
 
 	// add keepers
@@ -656,6 +675,27 @@ func New(
 	)
 	validatorrewardModule := validatorreward.NewAppModule(appCodec, app.ValidatorrewardKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.NftmintKeeper = *nftmintmodulekeeper.NewKeeper(
+		appCodec,
+		keys[nftmintmoduletypes.StoreKey],
+		keys[nftmintmoduletypes.MemStoreKey],
+		app.NFTKeeper,
+	)
+	nftmintModule := nftmintmodule.NewAppModule(appCodec, app.NftmintKeeper, app.AccountKeeper, app.BankKeeper)
+
+	app.NFTTransferKeeper = nfttransferkeeper.NewKeeper(
+		appCodec,
+		keys[nfttransfertypes.StoreKey],
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		app.IBCFeeKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		nftutil.NewKeeper(appCodec, app.NFTKeeper),
+		scopedNFTTransferKeeper,
+	)
+	nfttransferModule := nfttransfer.NewAppModule(app.NFTTransferKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	/**** IBC Routing ****/
@@ -684,12 +724,18 @@ func New(
 	wasmIBCModule = wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCFeeKeeper)
 	wasmIBCModule = ibcfee.NewIBCMiddleware(wasmIBCModule, app.IBCFeeKeeper)
 
+	// Create nft-transfer ibc Stack
+	var nfttransferIBCModule ibcporttypes.IBCModule
+	nfttransferIBCModule = nfttransfer.NewIBCModule(app.NFTTransferKeeper)
+	nfttransferIBCModule = ibcfee.NewIBCMiddleware(nfttransferIBCModule, app.IBCFeeKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(icacontrollertypes.SubModuleName, icaControllerIBCModule).
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
-		AddRoute(wasmtypes.ModuleName, wasmIBCModule)
+		AddRoute(wasmtypes.ModuleName, wasmIBCModule).
+		AddRoute(nfttransfertypes.ModuleName, nfttransferIBCModule)
 
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
@@ -747,6 +793,8 @@ func New(
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper, evmSs),
 
 		validatorrewardModule,
+		nftmintModule,
+		nfttransferModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
@@ -784,6 +832,8 @@ func New(
 		consensusparamtypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		wasmtypes.ModuleName,
+		nftmintmoduletypes.ModuleName,
+		nfttransfertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -813,6 +863,8 @@ func New(
 		ibcfeetypes.ModuleName,
 		wasmtypes.ModuleName,
 		validatorrewardtypes.ModuleName,
+		nftmintmoduletypes.ModuleName,
+		nfttransfertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -853,6 +905,8 @@ func New(
 		// wasm must after ibc transfer
 		wasmtypes.ModuleName,
 		validatorrewardtypes.ModuleName,
+		nftmintmoduletypes.ModuleName,
+		nfttransfertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -936,6 +990,7 @@ func New(
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	app.ScopedICAHostKeeper = scopedICAHostKeeper
 	app.ScopedWasmKeeper = scopedWasmKeeper
+	app.ScopedNFTTransferKeeper = scopedNFTTransferKeeper
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 
 	return app
@@ -1154,6 +1209,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(feemarkettypes.ModuleName).WithKeyTable(feemarkettypes.ParamKeyTable())
 
 	paramsKeeper.Subspace(validatorrewardtypes.ModuleName)
+	paramsKeeper.Subspace(nftmintmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
@@ -1201,7 +1257,11 @@ func (app *App) setupUpgradeHandlers() {
 	case v1.UpgradeName:
 	case v2.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{ibcfeetypes.StoreKey},
+			Added: []string{
+				ibcfeetypes.StoreKey,
+				nftmintmoduletypes.StoreKey,
+				nfttransfertypes.StoreKey,
+			},
 		}
 	}
 

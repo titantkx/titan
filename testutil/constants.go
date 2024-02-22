@@ -9,3 +9,9 @@ const (
 )
 
 const MaxBlockTime = 10 * time.Second
+
+const (
+	Alice = "titan1e70m4567cpvlnh3x3ttlhxvw86ad2awtv09gv7"
+	Bob   = "titan1ra2sxv5zl7lnk28230fuzef4jk2txegfaye3qt"
+	Carol = "titan1n73mgqtdc4c84xa6ec90e3tnsnwrmdwwml9lh3"
+)

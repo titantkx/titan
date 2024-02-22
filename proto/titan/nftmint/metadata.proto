@@ -1,0 +1,9 @@
+syntax = "proto3";
+package titan.nftmint;
+
+option go_package = "github.com/tokenize-titan/titan/x/nftmint/types";
+
+// Metadata represents class's and token's metadata.
+message Metadata {
+  string data = 1;
+}

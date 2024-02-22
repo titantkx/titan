@@ -7,7 +7,10 @@
   },
   "apis": [
     {
-      "url": "./tmp-swagger-gen/titan/titan/query.swagger.json"
+      "url": "./tmp-swagger-gen/titan/validatorreward/query.swagger.json"
+    },
+    {
+      "url": "./tmp-swagger-gen/titan/nftmint/query.swagger.json"
     }
   ]
 }

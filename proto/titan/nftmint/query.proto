@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package titan.nftmint;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "titan/nftmint/params.proto";
+import "titan/nftmint/system_info.proto";
+import "titan/nftmint/minting_info.proto";
+
+option go_package = "github.com/tokenize-titan/titan/x/nftmint/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/tokenize-titan/titan/nftmint/params";
+  }
+
+  // SystemInfo queries the system info of the module.
+  rpc SystemInfo(QuerySystemInfoRequest) returns (QuerySystemInfoResponse) {
+    option (google.api.http).get = "/tokenize-titan/titan/nftmint/system_info";
+  }
+
+  // MintingInfo queries the minting info of a given class.
+  rpc MintingInfo(QueryMintingInfoRequest) returns (QueryMintingInfoResponse) {
+    option (google.api.http).get =
+        "/tokenize-titan/titan/nftmint/minting_info/{class_id}";
+  }
+
+  // MintingInfos queries a list of minting info.
+  rpc MintingInfos(QueryMintingInfosRequest)
+      returns (QueryMintingInfosResponse) {
+    option (google.api.http).get = "/tokenize-titan/titan/nftmint/minting_info";
+  }
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+// QuerySystemInfoRequest is request type for the Query/QuerySystemInfo RPC
+// method.
+message QuerySystemInfoRequest {}
+
+// QuerySystemInfoResponse is response type for the Query/QuerySystemInfo
+// RPC method.
+message QuerySystemInfoResponse {
+  SystemInfo system_info = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryMintingInfoRequest is request type for the Query/QueryMintingInfo RPC
+// method.
+message QueryMintingInfoRequest {
+  string class_id = 1;
+}
+
+// QueryMintingInfoResponse is response type for the Query/QueryMintingInfo RPC
+// method.
+message QueryMintingInfoResponse {
+  MintingInfo minting_info = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryMintingInfosRequest is request type for the Query/QueryMintingInfos RPC
+// method.
+message QueryMintingInfosRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryMintingInfosResponse is response type for the Query/QueryMintingInfos
+// RPC method.
+message QueryMintingInfosResponse {
+  repeated MintingInfo minting_info = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

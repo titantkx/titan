@@ -1,7 +1,7 @@
 package v2
 
 const (
-	UpgradeName = "v2.0.0"
+	UpgradeName = "v2_0_0"
 
 	IBCFeeModuleVersion = 1
 )
