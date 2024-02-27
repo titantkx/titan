@@ -24,7 +24,8 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // SystemInfo defines the system info of this module.
 type SystemInfo struct {
-	// next_class_id is the unique identifier of the next class that will created.
+	// next_class_id is the unique identifier of the next class that will be
+	// created.
 	NextClassId uint64 `protobuf:"varint,1,opt,name=next_class_id,json=nextClassId,proto3" json:"next_class_id,omitempty"`
 }
 
