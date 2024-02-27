@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"reflect"
@@ -93,4 +94,98 @@ func UnmarshalJSON(data []byte, v any) error {
 		}
 	}
 	return fmt.Errorf("cannot unmarshal %s from: %s", reflect.TypeOf(v), string(data))
+}
+
+// Execute a command and write its output to w
+func ExecWrite(w io.Writer, name string, args ...string) (*os.ProcessState, error) {
+	cmd := exec.Command(name, args...)
+	fmt.Fprintln(w, cmd.String())
+	stdoutPipe, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, err
+	}
+	stderrPipe, err := cmd.StderrPipe()
+	if err != nil {
+		return nil, err
+	}
+	if err := cmd.Start(); err != nil {
+		return nil, err
+	}
+	type result struct {
+		state *os.ProcessState
+		err   error
+	}
+	done := make(chan result)
+	go func() {
+		state, err := cmd.Process.Wait()
+		done <- result{state: state, err: err}
+	}()
+	go func() {
+		r := bufio.NewReader(stdoutPipe)
+		for {
+			line, isPrefix, err := r.ReadLine()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				panic(err)
+			}
+			w.Write(line)
+			if !isPrefix {
+				fmt.Fprintln(w)
+			}
+		}
+	}()
+	go func() {
+		r := bufio.NewReader(stderrPipe)
+		for {
+			line, isPrefix, err := r.ReadLine()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				panic(err)
+			}
+			w.Write(line)
+			if !isPrefix {
+				fmt.Fprintln(w)
+			}
+		}
+	}()
+	r := <-done
+	return r.state, r.err
+}
+
+// Must execute a command and write its output to w, panics on error
+func MustExecWrite(w io.Writer, name string, args ...string) {
+	state, err := ExecWrite(w, name, args...)
+	if err != nil {
+		panic(err)
+	}
+	if state.ExitCode() != 0 {
+		panic(state.String())
+	}
+}
+
+func Chdir(dir string) {
+	err := os.Chdir(dir)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func Getwd() string {
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	return wd
+}
+
+func UserHomeDir() string {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	return homeDir
 }
