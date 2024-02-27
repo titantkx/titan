@@ -5,17 +5,21 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/tokenize-titan/titan/testutil"
 	"github.com/tokenize-titan/titan/testutil/cmd"
 	"github.com/tokenize-titan/titan/utils"
 )
 
 func TestMain(m *testing.M) {
 	utils.InitSDKConfig()
+
+	if err := os.MkdirAll("tmp", os.ModePerm); err != nil {
+		panic(err)
+	}
 
 	rootDir, err := filepath.Abs("../../..")
 	if err != nil {
@@ -68,50 +72,36 @@ func TestMain(m *testing.M) {
 }
 
 func install(w io.Writer, rootDir string) {
-	cwd := Getwd()
-	Chdir(w, rootDir)
-	defer Chdir(w, cwd)
-	Exec(w, "make", "build")
-	Exec(w, "cp", rootDir+"/build/titand", UserHomeDir()+"/go/bin")
+	cwd := cmd.Getwd()
+	cmd.Chdir(rootDir)
+	defer cmd.Chdir(cwd)
+	cmd.MustExecWrite(w, "make", "build")
+	cmd.MustExecWrite(w, "cp", rootDir+"/build/titand", cmd.UserHomeDir()+"/go/bin")
 }
 
 func buildImage(w io.Writer, rootDir string) {
-	Exec(w, "docker", "build", rootDir, "-t=e2e/titand")
+	cmd.MustExecWrite(w, "docker", "build", rootDir, "-t=e2e/titand")
 }
 
 func initChain(w io.Writer) {
-	Exec(w, "sh", "init.sh")
+	cmd.MustExecWrite(w, "sh", "init.sh")
 }
 
 func startChain(w io.Writer) (ready <-chan struct{}, done <-chan struct{}) {
-	cmd := exec.Command("docker", "compose", "up")
-	fmt.Fprintln(w, cmd.String())
-	stdoutPipe, err := cmd.StdoutPipe()
-	if err != nil {
-		panic(err)
-	}
-	stderrPipe, err := cmd.StderrPipe()
-	if err != nil {
-		panic(err)
-	}
-	if err := cmd.Start(); err != nil {
-		panic(err)
-	}
 	readyCh := make(chan struct{})
 	doneCh := make(chan struct{})
+
+	s := testutil.NewStreamer()
+
 	go func() {
-		state, err := cmd.Process.Wait()
-		if err != nil {
-			panic(err)
-		}
-		if state.ExitCode() != 0 {
-			panic(state.String())
-		}
+		cmd.MustExecWrite(s, "docker", "compose", "up")
+		s.Close()
 		doneCh <- struct{}{}
 	}()
+
 	go func() {
 		isRunning := false
-		r := bufio.NewReader(stdoutPipe)
+		r := bufio.NewReader(s)
 		for {
 			line, isPrefix, err := r.ReadLine()
 			if err == io.EOF {
@@ -130,109 +120,10 @@ func startChain(w io.Writer) (ready <-chan struct{}, done <-chan struct{}) {
 			}
 		}
 	}()
-	go func() {
-		r := bufio.NewReader(stderrPipe)
-		for {
-			line, isPrefix, err := r.ReadLine()
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				panic(err)
-			}
-			w.Write(line)
-			if !isPrefix {
-				fmt.Fprintln(w)
-			}
-		}
-	}()
+
 	return readyCh, doneCh
 }
 
 func stopChain(w io.Writer) {
-	Exec(w, "docker", "compose", "down")
-}
-
-func Exec(w io.Writer, name string, args ...string) {
-	cmd := exec.Command(name, args...)
-	fmt.Fprintln(w, cmd.String())
-	stdoutPipe, err := cmd.StdoutPipe()
-	if err != nil {
-		panic(err)
-	}
-	stderrPipe, err := cmd.StderrPipe()
-	if err != nil {
-		panic(err)
-	}
-	if err := cmd.Start(); err != nil {
-		panic(err)
-	}
-	done := make(chan struct{})
-	go func() {
-		state, err := cmd.Process.Wait()
-		if err != nil {
-			panic(err)
-		}
-		if state.ExitCode() != 0 {
-			panic(state.String())
-		}
-		done <- struct{}{}
-	}()
-	go func() {
-		r := bufio.NewReader(stdoutPipe)
-		for {
-			line, isPrefix, err := r.ReadLine()
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				panic(err)
-			}
-			w.Write(line)
-			if !isPrefix {
-				fmt.Fprintln(w)
-			}
-		}
-	}()
-	go func() {
-		r := bufio.NewReader(stderrPipe)
-		for {
-			line, isPrefix, err := r.ReadLine()
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				panic(err)
-			}
-			w.Write(line)
-			if !isPrefix {
-				fmt.Fprintln(w)
-			}
-		}
-	}()
-	<-done
-}
-
-func Chdir(w io.Writer, dir string) {
-	err := os.Chdir(dir)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Fprintf(w, "cd %s\n", dir)
-}
-
-func Getwd() string {
-	wd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	return wd
-}
-
-func UserHomeDir() string {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}
-	return homeDir
+	cmd.MustExecWrite(w, "docker", "compose", "down")
 }
