@@ -45,11 +45,11 @@ func TestSubmitProposals(t *testing.T) {
 	require.Equal(t, govParams.Threshold.String(), "0.5")
 	require.Equal(t, govParams.VetoThreshold.String(), "0.334")
 
-	proposer := keys.MustShowAddress(t, "val1") // Will represent others if they do not vote
-	voter1 := MustCreateVoter(t, "1000000"+utils.DisplayDenom, "100000"+utils.DisplayDenom)
-	voter2 := MustCreateVoter(t, "1000000"+utils.DisplayDenom, "100000"+utils.DisplayDenom)
+	voter1 := keys.MustShowAddress(t, "val1") // Will represent voter3, voter4, voter5 if they do not vote
+	voter2 := keys.MustShowAddress(t, "val2")
 	voter3 := MustCreateVoter(t, "1000000"+utils.DisplayDenom, "100000"+utils.DisplayDenom)
 	voter4 := MustCreateVoter(t, "1000000"+utils.DisplayDenom, "100000"+utils.DisplayDenom)
+	voter5 := MustCreateVoter(t, "1000000"+utils.DisplayDenom, "100000"+utils.DisplayDenom)
 
 	originalFeeMarketParams := feemarket.MustGetParams(t)
 
@@ -65,7 +65,7 @@ func TestSubmitProposals(t *testing.T) {
 		// PROPOSAL_STATUS_PASSED
 		{
 			"TestSubmitTextProposalAllYesPassed",
-			proposer,
+			voter1,
 			gov.ProposalMsg{
 				Title:    "TestSubmitTextProposalAllYesPassed",
 				Summary:  "TestSubmitTextProposalAllYesPassed",
@@ -74,14 +74,18 @@ func TestSubmitProposals(t *testing.T) {
 			},
 			nil,
 			[]Vote{
-				{proposer, gov.VOTE_OPTION_YES},
+				{voter1, gov.VOTE_OPTION_YES},
+				{voter2, gov.VOTE_OPTION_YES},
+				{voter3, gov.VOTE_OPTION_YES},
+				{voter4, gov.VOTE_OPTION_YES},
+				{voter5, gov.VOTE_OPTION_YES},
 			},
 			gov.PROPOSAL_STATUS_PASSED,
 			nil,
 		},
 		{
 			"TestSubmitTextProposalDepositLaterAllYesPassed",
-			proposer,
+			voter1,
 			gov.ProposalMsg{
 				Title:    "TestSubmitTextProposalDepositLaterAllYesPassed",
 				Summary:  "TestSubmitTextProposalDepositLaterAllYesPassed",
@@ -89,18 +93,22 @@ func TestSubmitProposals(t *testing.T) {
 				Deposit:  "150" + utils.DisplayDenom,
 			},
 			[]Deposit{
-				{voter1, "50" + utils.DisplayDenom},
 				{voter2, "50" + utils.DisplayDenom},
+				{voter3, "50" + utils.DisplayDenom},
 			},
 			[]Vote{
-				{proposer, gov.VOTE_OPTION_YES},
+				{voter1, gov.VOTE_OPTION_YES},
+				{voter2, gov.VOTE_OPTION_YES},
+				{voter3, gov.VOTE_OPTION_YES},
+				{voter4, gov.VOTE_OPTION_YES},
+				{voter5, gov.VOTE_OPTION_YES},
 			},
 			gov.PROPOSAL_STATUS_PASSED,
 			nil,
 		},
 		{
 			"TestSubmitTextProposalTwoYesOneNoPassed",
-			proposer,
+			voter1,
 			gov.ProposalMsg{
 				Title:    "TestSubmitTextProposalTwoYesOneNoPassed",
 				Summary:  "TestSubmitTextProposalTwoYesOneNoPassed",
@@ -109,16 +117,16 @@ func TestSubmitProposals(t *testing.T) {
 			},
 			nil,
 			[]Vote{
-				{voter1, gov.VOTE_OPTION_YES},
 				{voter2, gov.VOTE_OPTION_YES},
-				{voter3, gov.VOTE_OPTION_NO},
+				{voter3, gov.VOTE_OPTION_YES},
+				{voter4, gov.VOTE_OPTION_NO},
 			},
 			gov.PROPOSAL_STATUS_PASSED,
 			nil,
 		},
 		{
 			"TestSubmitTextProposalOneYesTwoAbstainPassed",
-			proposer,
+			voter1,
 			gov.ProposalMsg{
 				Title:    "TestSubmitTextProposalOneYesTwoAbstainPassed",
 				Summary:  "TestSubmitTextProposalOneYesTwoAbstainPassed",
@@ -127,16 +135,16 @@ func TestSubmitProposals(t *testing.T) {
 			},
 			nil,
 			[]Vote{
-				{voter1, gov.VOTE_OPTION_YES},
-				{voter2, gov.VOTE_OPTION_ABSTAIN},
+				{voter2, gov.VOTE_OPTION_YES},
 				{voter3, gov.VOTE_OPTION_ABSTAIN},
+				{voter4, gov.VOTE_OPTION_ABSTAIN},
 			},
 			gov.PROPOSAL_STATUS_PASSED,
 			nil,
 		},
 		{
 			"TestSubmitTextProposalTwoYesPassed",
-			proposer,
+			voter1,
 			gov.ProposalMsg{
 				Title:    "TestSubmitTextProposalTwoYesPassed",
 				Summary:  "TestSubmitTextProposalTwoYesPassed",
@@ -145,15 +153,15 @@ func TestSubmitProposals(t *testing.T) {
 			},
 			nil,
 			[]Vote{
-				{voter1, gov.VOTE_OPTION_YES},
 				{voter2, gov.VOTE_OPTION_YES},
+				{voter3, gov.VOTE_OPTION_YES},
 			},
 			gov.PROPOSAL_STATUS_PASSED,
 			nil,
 		},
 		{
 			"TestSubmitUpdateParamsProposalSetMinGasPriceToZeroPassed",
-			proposer,
+			voter1,
 			gov.ProposalMsg{
 				Title:    "TestSubmitUpdateParamsProposalSetMinGasPriceToZeroPassed",
 				Summary:  "TestSubmitUpdateParamsProposalSetMinGasPriceToZeroPassed",
@@ -177,7 +185,8 @@ func TestSubmitProposals(t *testing.T) {
 			},
 			nil,
 			[]Vote{
-				{proposer, gov.VOTE_OPTION_YES},
+				{voter1, gov.VOTE_OPTION_YES},
+				{voter2, gov.VOTE_OPTION_YES},
 			},
 			gov.PROPOSAL_STATUS_PASSED,
 			func() {
@@ -187,7 +196,7 @@ func TestSubmitProposals(t *testing.T) {
 		},
 		{
 			"TestSubmitUpdateParamsProposalSetMinGasPriceToOriginalPassed",
-			proposer,
+			voter1,
 			gov.ProposalMsg{
 				Title:    "TestSubmitUpdateParamsProposalSetMinGasPriceToOriginalPassed",
 				Summary:  "TestSubmitUpdateParamsProposalSetMinGasPriceToOriginalPassed",
@@ -203,7 +212,8 @@ func TestSubmitProposals(t *testing.T) {
 			},
 			nil,
 			[]Vote{
-				{proposer, gov.VOTE_OPTION_YES},
+				{voter1, gov.VOTE_OPTION_YES},
+				{voter2, gov.VOTE_OPTION_YES},
 			},
 			gov.PROPOSAL_STATUS_PASSED,
 			func() {
@@ -214,7 +224,7 @@ func TestSubmitProposals(t *testing.T) {
 		// PROPOSAL_STATUS_REJECTED
 		{
 			"TestSubmitTextProposalOneYesTwoNoRejected",
-			proposer,
+			voter1,
 			gov.ProposalMsg{
 				Title:    "TestSubmitTextProposalOneYesTwoNoRejected",
 				Summary:  "TestSubmitTextProposalOneYesTwoNoRejected",
@@ -223,16 +233,16 @@ func TestSubmitProposals(t *testing.T) {
 			},
 			nil,
 			[]Vote{
-				{voter1, gov.VOTE_OPTION_YES},
-				{voter2, gov.VOTE_OPTION_NO},
+				{voter2, gov.VOTE_OPTION_YES},
 				{voter3, gov.VOTE_OPTION_NO},
+				{voter4, gov.VOTE_OPTION_NO},
 			},
 			gov.PROPOSAL_STATUS_REJECTED,
 			nil,
 		},
 		{
 			"TestSubmitTextProposalOneYesOneNoOneAbstainRejected",
-			proposer,
+			voter1,
 			gov.ProposalMsg{
 				Title:    "TestSubmitTextProposalOneYesOneNoOneAbstainRejected",
 				Summary:  "TestSubmitTextProposalOneYesOneNoOneAbstainRejected",
@@ -241,16 +251,16 @@ func TestSubmitProposals(t *testing.T) {
 			},
 			nil,
 			[]Vote{
-				{voter1, gov.VOTE_OPTION_YES},
-				{voter2, gov.VOTE_OPTION_NO},
-				{voter3, gov.VOTE_OPTION_ABSTAIN},
+				{voter2, gov.VOTE_OPTION_YES},
+				{voter3, gov.VOTE_OPTION_NO},
+				{voter4, gov.VOTE_OPTION_ABSTAIN},
 			},
 			gov.PROPOSAL_STATUS_REJECTED,
 			nil,
 		},
 		{
 			"TestSubmitTextProposalOneYesRejected",
-			proposer,
+			voter1,
 			gov.ProposalMsg{
 				Title:    "TestSubmitTextProposalOneYesRejected",
 				Summary:  "TestSubmitTextProposalOneYesRejected",
@@ -259,14 +269,14 @@ func TestSubmitProposals(t *testing.T) {
 			},
 			nil,
 			[]Vote{
-				{voter1, gov.VOTE_OPTION_YES},
+				{voter2, gov.VOTE_OPTION_YES},
 			},
 			gov.PROPOSAL_STATUS_REJECTED,
 			nil,
 		},
 		{
 			"TestSubmitTextProposalThreeYesTwoVetoRejected",
-			proposer,
+			voter1,
 			gov.ProposalMsg{
 				Title:    "TestSubmitTextProposalThreeYesTwoVetoRejected",
 				Summary:  "TestSubmitTextProposalThreeYesTwoVetoRejected",
@@ -275,11 +285,11 @@ func TestSubmitProposals(t *testing.T) {
 			},
 			nil,
 			[]Vote{
-				{proposer, gov.VOTE_OPTION_YES},
 				{voter1, gov.VOTE_OPTION_YES},
 				{voter2, gov.VOTE_OPTION_YES},
-				{voter3, gov.VOTE_OPTION_NO_WITH_VETO},
+				{voter3, gov.VOTE_OPTION_YES},
 				{voter4, gov.VOTE_OPTION_NO_WITH_VETO},
+				{voter5, gov.VOTE_OPTION_NO_WITH_VETO},
 			},
 			gov.PROPOSAL_STATUS_REJECTED,
 			nil,
@@ -287,7 +297,7 @@ func TestSubmitProposals(t *testing.T) {
 		// PROPOSAL_STATUS_DEPOSIT_FAILED
 		{
 			"TestSubmitTextProposalNotEnoughDepositFailed",
-			proposer,
+			voter1,
 			gov.ProposalMsg{
 				Title:    "TestSubmitTextProposalNotEnoughDepositFailed",
 				Summary:  "TestSubmitTextProposalNotEnoughDepositFailed",

@@ -20,7 +20,9 @@ func TestDistributeTransactionFees(t *testing.T) {
 	reward.MustSetRate(t, rewardPoolAdmin, testutil.MakeFloat(0)) // Set interest rate to zero
 	defer reward.MustSetRate(t, rewardPoolAdmin, oldInterestRate)
 
-	startHeight := status.MustGetLatestBlockHeight(t)
+	// Wait for one block to distribute previous transaction's fee
+	startHeight := status.MustGetLatestBlockHeight(t) + 1
+	status.MustWait(t, startHeight)
 
 	// Make some transactions and collect their fees
 	txFees := testutil.MakeInt(0)
@@ -31,14 +33,15 @@ func TestDistributeTransactionFees(t *testing.T) {
 		txFees = txFees.Add(txr.MustGetDeductFeeAmount(t))
 	}
 
-	// Should wait for at least one block after the last transaction so that transaction's fee can be included
+	// Wait for one block to distribute transaction's fee
 	endHeight := status.MustGetLatestBlockHeight(t) + 1
-
 	status.MustWait(t, endHeight)
 
-	// There is only one delegator so all rewards should go to this delegator
 	del := keys.MustShowAddress(t, "val1")
 	val := testutil.MustAccountAddressToValidatorAddress(t, del)
+
+	valShares := staking.MustGetValidator(t, val).Tokens.Float()
+	totalShares := staking.MustGetStakingPool(t).BondedTokens.Float()
 
 	rewardBefore := distribution.MustGetRewards(t, del, val, startHeight).GetBaseDenomAmount()
 	rewardAfter := distribution.MustGetRewards(t, del, val, endHeight).GetBaseDenomAmount()
@@ -46,7 +49,7 @@ func TestDistributeTransactionFees(t *testing.T) {
 	communityTax := distribution.MustGetParams(t).CommunityTax
 	commissionRate := staking.MustGetValidator(t, val).Commission.CommissionRates.Rate
 
-	expectedReward := txFees.Float().Mul(testutil.MakeFloat(1).Sub(communityTax)).Mul(testutil.MakeFloat(1).Sub(commissionRate))
+	expectedReward := txFees.Float().Mul(valShares).Quo(totalShares).Mul(testutil.MakeFloat(1).Sub(communityTax)).Mul(testutil.MakeFloat(1).Sub(commissionRate))
 	actualReward := rewardAfter.Sub(rewardBefore).Float()
 
 	require.Equal(t, expectedReward.String(), actualReward.String())

@@ -6,11 +6,10 @@ RUN echo "Building for $TARGETOS/$TARGETARCH"
 ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev file build-base binutils
 RUN apk add --no-cache $PACKAGES
 
-WORKDIR /go/src/github.com/tokenize-titan/titan
-COPY go.mod go.sum ./
-RUN go mod download
+ENV GOCACHE=/root/.cache/go-build
 
-COPY ./ .
+WORKDIR /go/src/github.com/tokenize-titan/titan
+
 # See https://github.com/CosmWasm/wasmvm/releases
 ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.5.0/libwasmvm_muslc.aarch64.a /lib/libwasmvm_muslc.aarch64.a
 RUN sha256sum /lib/libwasmvm_muslc.aarch64.a | grep 2687afbdae1bc6c7c8b05ae20dfb8ffc7ddc5b4e056697d0f37853dfe294e913
@@ -29,7 +28,12 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     fi && \
     cp "/lib/libwasmvm_muslc.$ARCH.a" "/lib/libwasmvm.$ARCH.a"
 
-RUN GOOS=$TARGETOS GOARCH=$TARGETARCH COSMOS_BUILD_OPTIONS="nostrip static" make build
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY ./ .
+
+RUN --mount=type=cache,target="/root/.cache/go-build" GOOS=$TARGETOS GOARCH=$TARGETARCH COSMOS_BUILD_OPTIONS="nostrip static" make build
 
 #############################################
 

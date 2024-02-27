@@ -6,9 +6,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/tokenize-titan/titan/testutil/cmd/bank"
 	"github.com/tokenize-titan/titan/testutil/cmd/distribution"
 	"github.com/tokenize-titan/titan/testutil/cmd/slashing"
 	"github.com/tokenize-titan/titan/testutil/cmd/staking"
+	"github.com/tokenize-titan/titan/testutil/cmd/status"
+	"github.com/tokenize-titan/titan/utils"
 )
 
 func TestValidatorInactive(t *testing.T) {
@@ -17,8 +20,11 @@ func TestValidatorInactive(t *testing.T) {
 	// Create validator
 	_, valBefore := MustCreateValidator(t, "")
 
-	totalBalBefore := MustGetTotalBalance(t, 0)
-	distPoolBefore := distribution.MustGetCommunityPool(t)
+	// Wait for one block to collect previous transaction fee's tax
+	status.MustWait(t, status.MustGetLatestBlockHeight(t)+1)
+
+	totalBalBefore := bank.MustGetTotalBalance(t, utils.BaseDenom, 0)
+	distPoolBefore := distribution.MustGetCommunityPool(t).GetBaseDenomAmount()
 
 	// Wait until validator is jailed for being inactive
 	var valAfter staking.Validator
@@ -34,9 +40,9 @@ func TestValidatorInactive(t *testing.T) {
 
 	require.Equal(t, valBefore.Tokens.Sub(slashedAmount), valAfter.Tokens)
 
-	totalBalAfter := MustGetTotalBalance(t, 0)
-	distPoolAfter := distribution.MustGetCommunityPool(t)
+	totalBalAfter := bank.MustGetTotalBalance(t, utils.BaseDenom, 0)
+	distPoolAfter := distribution.MustGetCommunityPool(t).GetBaseDenomAmount()
 
 	require.Equal(t, totalBalBefore, totalBalAfter)
-	require.Equal(t, distPoolBefore.Pool.GetBaseDenomAmount().Add(slashedAmount), distPoolAfter.Pool.GetBaseDenomAmount())
+	require.Equal(t, distPoolBefore.Add(slashedAmount), distPoolAfter)
 }

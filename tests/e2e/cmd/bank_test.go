@@ -11,7 +11,6 @@ import (
 
 	"github.com/tokenize-titan/titan/testutil"
 	"github.com/tokenize-titan/titan/testutil/cmd"
-	"github.com/tokenize-titan/titan/testutil/cmd/auth"
 	"github.com/tokenize-titan/titan/testutil/cmd/bank"
 	"github.com/tokenize-titan/titan/testutil/cmd/keys"
 	"github.com/tokenize-titan/titan/testutil/cmd/status"
@@ -35,33 +34,6 @@ func MustCreateAccount(t testing.TB, balance string) keys.Key {
 	return key
 }
 
-func MustGetTotalBalance(t testing.TB, height int64) testutil.Int {
-	if height <= 0 {
-		height = status.MustGetLatestBlockHeight(t)
-	}
-
-	accounts := auth.MustGetAccounts(t, height)
-	totalBal := testutil.MakeInt(0)
-
-	var mtx sync.Mutex
-	var wg sync.WaitGroup
-	for i := 0; i < 100; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for account := range accounts {
-				bal := bank.MustGetBalance(t, account.GetAddress(), utils.BaseDenom, height)
-				mtx.Lock()
-				totalBal = totalBal.Add(bal)
-				mtx.Unlock()
-			}
-		}()
-	}
-	wg.Wait()
-
-	return totalBal
-}
-
 func TestTotalBalanceNotChanged(t *testing.T) {
 	t.Parallel()
 
@@ -70,8 +42,8 @@ func TestTotalBalanceNotChanged(t *testing.T) {
 
 	status.MustWait(t, endHeight)
 
-	totalBalBefore := MustGetTotalBalance(t, startHeight)
-	totalBalAfter := MustGetTotalBalance(t, endHeight)
+	totalBalBefore := bank.MustGetTotalBalance(t, utils.BaseDenom, startHeight)
+	totalBalAfter := bank.MustGetTotalBalance(t, utils.BaseDenom, endHeight)
 
 	require.Equal(t, totalBalBefore, totalBalAfter)
 }

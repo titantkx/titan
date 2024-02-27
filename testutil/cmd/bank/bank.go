@@ -78,9 +78,25 @@ func MustGetBalance(t testing.TB, address string, denom string, height int64) te
 	if height > 0 {
 		args = append(args, "--height="+testutil.FormatInt(height))
 	}
-	var data struct {
+	var v struct {
 		Amount testutil.Int `json:"amount"`
 	}
-	cmd.MustQuery(t, &data, args...)
-	return data.Amount
+	cmd.MustQuery(t, &v, args...)
+	return v.Amount
+}
+
+func MustGetTotalBalance(t testing.TB, denom string, height int64) testutil.Int {
+	args := []string{
+		"bank",
+		"total",
+		"--denom=" + denom,
+	}
+	if height > 0 {
+		args = append(args, "--height="+testutil.FormatInt(height))
+	}
+	var v struct {
+		Amount testutil.Int `json:"amount"`
+	}
+	cmd.MustQuery(t, &v, args...)
+	return v.Amount
 }

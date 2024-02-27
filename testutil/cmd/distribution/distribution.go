@@ -18,14 +18,12 @@ func MustGetParams(t testing.TB) Params {
 	return v
 }
 
-type Pool struct {
-	Pool testutil.Coins `json:"pool"`
-}
-
-func MustGetCommunityPool(t testing.TB) Pool {
-	var pool Pool
-	cmd.MustQuery(t, &pool, "distribution", "community-pool")
-	return pool
+func MustGetCommunityPool(t testing.TB) testutil.Coins {
+	var v struct {
+		Pool testutil.Coins `json:"pool"`
+	}
+	cmd.MustQuery(t, &v, "distribution", "community-pool")
+	return v.Pool
 }
 
 func MustGetRewards(t testing.TB, del string, val string, height int64) testutil.Coins {

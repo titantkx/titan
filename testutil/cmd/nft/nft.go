@@ -193,11 +193,11 @@ func MustTransferClass(t testing.TB, classId, receiver, sender string) {
 
 	tx := txcmd.MustExecTx(t, ctx, "nft-mint", "transfer-class", classId, receiver, "--from="+sender)
 
-	transferedClassId := strings.Trim(tx.MustGetEventAttributeValue(t, "titan.nftmint.EventTransferClass", "id"), "\"")
+	transferredClassId := strings.Trim(tx.MustGetEventAttributeValue(t, "titan.nftmint.EventTransferClass", "id"), "\"")
 	oldOwner := strings.Trim(tx.MustGetEventAttributeValue(t, "titan.nftmint.EventTransferClass", "old_owner"), "\"")
 	newOwner := strings.Trim(tx.MustGetEventAttributeValue(t, "titan.nftmint.EventTransferClass", "new_owner"), "\"")
 
-	require.Equal(t, classId, transferedClassId)
+	require.Equal(t, classId, transferredClassId)
 	require.Equal(t, sender, oldOwner)
 	require.Equal(t, receiver, newOwner)
 
