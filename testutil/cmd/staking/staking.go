@@ -415,3 +415,14 @@ func MustDelegateForOther(t testing.TB, valAddr string, amount string, from stri
 	require.Equal(t, delegatedAmount, del.Balance.Amount)
 	require.Equal(t, sharedAmount.String(), del.Delegation.Shares.String())
 }
+
+type Pool struct {
+	BondedTokens    testutil.Int `json:"bonded_tokens"`
+	NotBondedTokens testutil.Int `json:"not_bonded_tokens"`
+}
+
+func MustGetStakingPool(t testing.TB) Pool {
+	var pool Pool
+	cmd.MustQuery(t, &pool, "staking", "pool")
+	return pool
+}

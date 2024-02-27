@@ -2,22 +2,22 @@
 
 ## Prerequisites
 
-- Install ignite CLI v0.27.2+
+Required tools:
 
-```
-curl https://get.ignite.com/cli@v0.27.2! | bash
-```
+- jq
+- docker
+- docker compose
 
 ## Start testing
 
-- From the project root directory run:
+From the project root directory run:
 
 ```
 go test github.com/tokenize-titan/titan/tests/e2e/cmd -v
 ```
 
-- To view blockchain logs during the test:
+To view blockchain logs during the test:
 
 ```
-tail -f tests/e2e/cmd/titand.log
+tail -f tests/e2e/cmd/tmp/titand.log
 ```

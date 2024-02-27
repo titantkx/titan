@@ -28,7 +28,7 @@ func TestSetRate(t *testing.T) {
 	reward.MustSetRate(t, rewardPoolAdmin, oldRate)
 }
 
-func TestSetRateInvalidAuthority(t *testing.T) {
+func TestSetRateUnauthorized(t *testing.T) {
 	t.Parallel()
 
 	someone := MustCreateAccount(t, "1"+utils.DisplayDenom).Address
@@ -47,7 +47,7 @@ func TestSetAuthority(t *testing.T) {
 	reward.MustSetAuthority(t, newAdmin, oldAdmin)
 }
 
-func TestSetAuthorityInvalidAuthority(t *testing.T) {
+func TestSetAuthorityUnauthorized(t *testing.T) {
 	t.Parallel()
 
 	someone := MustCreateAccount(t, "1"+utils.DisplayDenom).Address
@@ -96,6 +96,11 @@ func TestDistributeRewards(t *testing.T) {
 
 	expectedReward := interest.Sub(commission)
 	actualReward := rewardAfter.Sub(rewardBefore).Float()
+
+	if expectedReward.IsZero() { // If interest rate is zero
+		require.True(t, actualReward.IsZero())
+		return
+	}
 
 	diff := actualReward.Sub(expectedReward).Quo(expectedReward)
 	maxDiff := testutil.MakeFloat(1e-10)
