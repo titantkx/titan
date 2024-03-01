@@ -2,7 +2,6 @@ package reward
 
 import (
 	"context"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/tokenize-titan/titan/testutil"
@@ -17,7 +16,7 @@ type Params struct {
 	Rate      testutil.Float `json:"rate"`
 }
 
-func MustGetParams(t testing.TB) Params {
+func MustGetParams(t testutil.TestingT) Params {
 	var v struct {
 		Params Params `json:"params"`
 	}
@@ -25,7 +24,7 @@ func MustGetParams(t testing.TB) Params {
 	return v.Params
 }
 
-func MustFundRewardPool(t testing.TB, from string, amount string) {
+func MustFundRewardPool(t testutil.TestingT, from string, amount string) {
 	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
@@ -48,7 +47,7 @@ func SetRate(from string, newRate testutil.Float) error {
 	return err
 }
 
-func MustSetRate(t testing.TB, from string, newRate testutil.Float) {
+func MustSetRate(t testutil.TestingT, from string, newRate testutil.Float) {
 	err := SetRate(from, newRate)
 	require.NoError(t, err)
 	params := MustGetParams(t)
@@ -63,7 +62,7 @@ func SetAuthority(from string, newAuthority string) error {
 	return err
 }
 
-func MustSetAuthority(t testing.TB, from string, newAuthority string) {
+func MustSetAuthority(t testutil.TestingT, from string, newAuthority string) {
 	err := SetAuthority(from, newAuthority)
 	require.NoError(t, err)
 	params := MustGetParams(t)

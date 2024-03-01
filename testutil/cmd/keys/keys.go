@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/tokenize-titan/titan/testutil"
@@ -31,13 +30,12 @@ func (pk *PublicKey) UnmarshalText(txt []byte) error {
 	return json.Unmarshal(txt, (*testutil.SinglePublicKey)(pk))
 }
 
-func MustShowAddress(t testing.TB, name string) string {
+func MustShowAddress(t testutil.TestingT, name string) string {
 	output := cmd.MustExec(t, "titand", "keys", "show", name, "--address")
-	require.NotEmpty(t, output)
 	return strings.TrimSuffix(string(output), "\n")
 }
 
-func MustShow(t testing.TB, name string) Key {
+func MustShow(t testutil.TestingT, name string) Key {
 	output := cmd.MustExec(t, "titand", "keys", "show", name, "--output=json")
 	require.NotNil(t, output)
 	var key Key
@@ -52,7 +50,7 @@ func MustShow(t testing.TB, name string) Key {
 	return key
 }
 
-func MustAdd(t testing.TB, name string) Key {
+func MustAdd(t testutil.TestingT, name string) Key {
 	output := cmd.MustExec(t, "titand", "keys", "add", name, "--output=json")
 	require.NotNil(t, output)
 	var key Key
@@ -67,15 +65,15 @@ func MustAdd(t testing.TB, name string) Key {
 	return key
 }
 
-func MustDelete(t testing.TB, name string) {
+func MustDelete(t testutil.TestingT, name string) {
 	cmd.MustExec(t, "titand", "keys", "delete", name, "-y")
 }
 
-func MustRename(t testing.TB, oldName string, newName string) {
+func MustRename(t testutil.TestingT, oldName string, newName string) {
 	cmd.MustExec(t, "titand", "keys", "rename", oldName, newName, "-y")
 }
 
-func MustList(t testing.TB) []Key {
+func MustList(t testutil.TestingT) []Key {
 	output := cmd.MustExec(t, "titand", "keys", "list", "--output=json")
 	require.NotNil(t, output)
 	var keys []Key
@@ -84,7 +82,7 @@ func MustList(t testing.TB) []Key {
 	return keys
 }
 
-func MustExport(t testing.TB, name string, password string) []byte {
+func MustExport(t testutil.TestingT, name string, password string) []byte {
 	command := exec.Command("titand", "keys", "export", name, "--home="+cmd.HomeDir, "--keyring-backend=test")
 	stdin, err := command.StdinPipe()
 	if err != nil {
@@ -104,7 +102,7 @@ func MustExport(t testing.TB, name string, password string) []byte {
 	return output
 }
 
-func MustImport(t testing.TB, name string, fileName string, password string) {
+func MustImport(t testutil.TestingT, name string, fileName string, password string) {
 	command := exec.Command("titand", "keys", "import", name, fileName, "--home="+cmd.HomeDir, "--keyring-backend=test")
 	stdin, err := command.StdinPipe()
 	if err != nil {
@@ -138,7 +136,7 @@ func (pk *MultisigPublicKey) UnmarshalText(txt []byte) error {
 	return json.Unmarshal(txt, (*testutil.MultisigPublicKey)(pk))
 }
 
-func MustAddMultisig(t testing.TB, name string, threshold int, keys ...string) MultisigKey {
+func MustAddMultisig(t testutil.TestingT, name string, threshold int, keys ...string) MultisigKey {
 	output := cmd.MustExec(t, "titand", "keys", "add", name, "--multisig="+strings.Join(keys, ","), "--multisig-threshold="+strconv.Itoa(threshold), "--output=json")
 	require.NotNil(t, output)
 	var mutisigKey MultisigKey

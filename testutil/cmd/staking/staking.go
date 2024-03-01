@@ -2,7 +2,6 @@ package staking
 
 import (
 	"context"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/tokenize-titan/titan/testutil"
@@ -50,7 +49,7 @@ type StakingParams struct {
 	GlobalMinSelfDelegation testutil.Int      `json:"global_min_self_delegation"`
 }
 
-func MustGetValidator(t testing.TB, address string) Validator {
+func MustGetValidator(t testutil.TestingT, address string) Validator {
 	var val Validator
 	cmd.MustQuery(t, &val, "staking", "validator", address)
 	require.Equal(t, address, val.OperatorAddress)
@@ -82,7 +81,7 @@ func GetDelegation(delegator string, validator string) (*DelegationResponse, err
 	return &resp, nil
 }
 
-func MustGetDelegation(t testing.TB, delegator string, validator string) DelegationResponse {
+func MustGetDelegation(t testutil.TestingT, delegator string, validator string) DelegationResponse {
 	var resp DelegationResponse
 	cmd.MustQuery(t, &resp, "staking", "delegation", delegator, validator)
 	require.Equal(t, delegator, resp.Delegation.DelegatorAddress)
@@ -90,7 +89,7 @@ func MustGetDelegation(t testing.TB, delegator string, validator string) Delegat
 	return resp
 }
 
-func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.Int, from string) Validator {
+func MustCreateValidator(t testutil.TestingT, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.Int, from string) Validator {
 	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
@@ -133,14 +132,14 @@ func MustCreateValidator(t testing.TB, valPk testutil.SinglePublicKey, amount st
 	return val
 }
 
-func MustErrCreateValidator(t testing.TB, expErr string, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.Int, from string) {
+func MustErrCreateValidator(t testutil.TestingT, expErr string, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.Int, from string) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
 	txcmd.MustErrExecTx(t, ctx, expErr, "staking", "create-validator", "--pubkey="+valPk.String(), "--amount="+amount, "--commission-rate="+testutil.FormatFloat(commissionRate), "--commission-max-rate="+testutil.FormatFloat(commissionMaxRate), "--commission-max-change-rate="+testutil.FormatFloat(commissionMaxChangeRate), "--min-self-delegation="+minSelfDelegation.String(), "--from="+from)
 }
 
-func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
+func MustDelegate(t testutil.TestingT, valAddr string, amount string, from string) {
 	valBefore := MustGetValidator(t, valAddr)
 	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
@@ -167,7 +166,7 @@ func MustDelegate(t testing.TB, valAddr string, amount string, from string) {
 	require.Equal(t, sharedAmount.String(), del.Delegation.Shares.String())
 }
 
-func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from string) {
+func MustRedelegate(t testutil.TestingT, srcVal string, dstVal, amount string, from string) {
 	srcValBefore := MustGetValidator(t, srcVal)
 	dstValBefore := MustGetValidator(t, dstVal)
 	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
@@ -226,7 +225,7 @@ func MustRedelegate(t testing.TB, srcVal string, dstVal, amount string, from str
 	}
 }
 
-func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.TxResponse {
+func MustUnbond(t testutil.TestingT, valAddr string, amount string, from string) txcmd.TxResponse {
 	valBefore := MustGetValidator(t, valAddr)
 	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 	delBefore := MustGetDelegation(t, from, valAddr)
@@ -264,7 +263,7 @@ func MustUnbond(t testing.TB, valAddr string, amount string, from string) txcmd.
 	return tx
 }
 
-func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeight int64, from string) {
+func MustCancelUnbound(t testutil.TestingT, valAddr string, amount string, creationHeight int64, from string) {
 	valBefore := MustGetValidator(t, valAddr)
 	balBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 	delBefore, err := GetDelegation(from, valAddr)
@@ -304,7 +303,7 @@ func MustCancelUnbound(t testing.TB, valAddr string, amount string, creationHeig
 	}
 }
 
-func mustGetReward(t testing.TB, txr txcmd.TxResponse) testutil.Int {
+func mustGetReward(t testutil.TestingT, txr txcmd.TxResponse) testutil.Int {
 	reward := testutil.MakeInt(0)
 	for _, event := range txr.Events {
 		if event.Type == "withdraw_rewards" {
@@ -316,12 +315,12 @@ func mustGetReward(t testing.TB, txr txcmd.TxResponse) testutil.Int {
 	return reward
 }
 
-func mustGetStakedAmount(t testing.TB, txr txcmd.TxResponse) testutil.Int {
+func mustGetStakedAmount(t testutil.TestingT, txr txcmd.TxResponse) testutil.Int {
 	amount := txr.MustGetEventAttributeValue(t, "create_validator", "amount")
 	return testutil.MustGetBaseDenomAmount(t, amount)
 }
 
-func mustGetSlashedAmount(t testing.TB, valBefore Validator, valAfter Validator) testutil.Int {
+func mustGetSlashedAmount(t testutil.TestingT, valBefore Validator, valAfter Validator) testutil.Int {
 	if !valAfter.Jailed || valBefore.Jailed {
 		// Validator is not jailed or was jailed before
 		return testutil.MakeInt(0)
@@ -334,13 +333,13 @@ func mustGetSlashedAmount(t testing.TB, valBefore Validator, valAfter Validator)
 	return valBefore.Tokens.Float().Mul(params.SlashFractionDowntime).Int()
 }
 
-func MustGetParams(t testing.TB) StakingParams {
+func MustGetParams(t testutil.TestingT) StakingParams {
 	var params StakingParams
 	cmd.MustQuery(t, &params, "staking", "params")
 	return params
 }
 
-func MustCreateValidatorForOther(t testing.TB, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.Int, from string, delAddr string) Validator {
+func MustCreateValidatorForOther(t testutil.TestingT, valPk testutil.SinglePublicKey, amount string, commissionRate float64, commissionMaxRate float64, commissionMaxChangeRate float64, minSelfDelegation testutil.Int, from string, delAddr string) Validator {
 	delBalBefore := bank.MustGetBalance(t, delAddr, utils.BaseDenom, 0)
 	fromBalBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
 
@@ -386,7 +385,7 @@ func MustCreateValidatorForOther(t testing.TB, valPk testutil.SinglePublicKey, a
 	return val
 }
 
-func MustDelegateForOther(t testing.TB, valAddr string, amount string, from string, delAddr string) {
+func MustDelegateForOther(t testutil.TestingT, valAddr string, amount string, from string, delAddr string) {
 	valBefore := MustGetValidator(t, valAddr)
 	delBalBefore := bank.MustGetBalance(t, delAddr, utils.BaseDenom, 0)
 	fromBalBefore := bank.MustGetBalance(t, from, utils.BaseDenom, 0)
@@ -421,7 +420,7 @@ type Pool struct {
 	NotBondedTokens testutil.Int `json:"not_bonded_tokens"`
 }
 
-func MustGetStakingPool(t testing.TB) Pool {
+func MustGetStakingPool(t testutil.TestingT) Pool {
 	var pool Pool
 	cmd.MustQuery(t, &pool, "staking", "pool")
 	return pool

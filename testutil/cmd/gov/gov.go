@@ -3,7 +3,6 @@ package gov
 import (
 	"context"
 	"encoding/json"
-	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -40,7 +39,7 @@ type Params struct {
 	BurnVoteVeto               bool              `json:"burn_vote_veto"`
 }
 
-func MustGetParams(t testing.TB) Params {
+func MustGetParams(t testutil.TestingT) Params {
 	var v struct {
 		Params Params `json:"params"`
 	}
@@ -79,14 +78,14 @@ func GetProposal(proposalId string) (*Proposal, error) {
 	return &proposal, nil
 }
 
-func MustGetProposal(t testing.TB, proposalId string) Proposal {
+func MustGetProposal(t testutil.TestingT, proposalId string) Proposal {
 	var proposal Proposal
 	cmd.MustQuery(t, &proposal, "gov", "proposal", proposalId)
 	require.Equal(t, proposalId, proposal.Id)
 	return proposal
 }
 
-func MustNotPassDepositPeriod(t testing.TB, proposalId string) {
+func MustNotPassDepositPeriod(t testutil.TestingT, proposalId string) {
 	for {
 		proposal, err := GetProposal(proposalId)
 		if err != nil {
@@ -103,7 +102,7 @@ func MustNotPassDepositPeriod(t testing.TB, proposalId string) {
 	}
 }
 
-func MustQueryPassDepositPeriodProposal(t testing.TB, proposalId string) Proposal {
+func MustQueryPassDepositPeriodProposal(t testutil.TestingT, proposalId string) Proposal {
 	for {
 		proposal := MustGetProposal(t, proposalId)
 		if proposal.Status != PROPOSAL_STATUS_DEPOSIT_PERIOD {
@@ -117,7 +116,7 @@ func MustQueryPassDepositPeriodProposal(t testing.TB, proposalId string) Proposa
 	}
 }
 
-func MustQueryPassVotingPeriodProposal(t testing.TB, proposalId string) Proposal {
+func MustQueryPassVotingPeriodProposal(t testutil.TestingT, proposalId string) Proposal {
 	for {
 		proposal := MustGetProposal(t, proposalId)
 		if proposal.Status != PROPOSAL_STATUS_DEPOSIT_PERIOD && proposal.Status != PROPOSAL_STATUS_VOTING_PERIOD {
@@ -145,7 +144,19 @@ type MsgUpdateParams struct {
 	Params    any    `json:"params"`
 }
 
-func MustSubmitProposal(t testing.TB, from string, proposal ProposalMsg) string {
+type MsgSoftwareUpgrade struct {
+	Type      string              `json:"@type"`
+	Authority string              `json:"authority"`
+	Plan      SoftwareUpgradePlan `json:"plan"`
+}
+
+type SoftwareUpgradePlan struct {
+	Name   string       `json:"name"`
+	Height testutil.Int `json:"height"`
+	Info   string       `json:"info"`
+}
+
+func MustSubmitProposal(t testutil.TestingT, from string, proposal ProposalMsg) string {
 	file := testutil.MustCreateTemp(t, "proposal_*.json")
 	err := json.NewEncoder(file).Encode(proposal)
 
@@ -161,13 +172,13 @@ func MustSubmitProposal(t testing.TB, from string, proposal ProposalMsg) string 
 	return proposalId
 }
 
-func MustDeposit(t testing.TB, from string, proposalId string, amount string) {
+func MustDeposit(t testutil.TestingT, from string, proposalId string, amount string) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 	txcmd.MustExecTx(t, ctx, "gov", "deposit", proposalId, amount, "--from="+from)
 }
 
-func MustVote(t testing.TB, from string, proposalId string, option string) {
+func MustVote(t testutil.TestingT, from string, proposalId string, option string) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 	txcmd.MustExecTx(t, ctx, "gov", "vote", proposalId, option, "--from="+from)

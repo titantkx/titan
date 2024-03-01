@@ -2,7 +2,6 @@ package block
 
 import (
 	"encoding/json"
-	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -18,7 +17,7 @@ type BlockHeader struct {
 	Time time.Time `json:"time"`
 }
 
-func MustGetBlockTime(t testing.TB, height int64) time.Time {
+func MustGetBlockTime(t testutil.TestingT, height int64) time.Time {
 	output := cmd.MustExec(t, "titand", "query", "block", testutil.FormatInt(height))
 	var v struct {
 		Block Block `json:"block"`

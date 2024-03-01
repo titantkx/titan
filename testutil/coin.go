@@ -4,7 +4,6 @@ import (
 	"errors"
 	"regexp"
 	"strings"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 
@@ -72,7 +71,7 @@ func ParseCoin(txt string) (Coin, error) {
 	return coin, nil
 }
 
-func MustParseCoin(t testing.TB, txt string) Coin {
+func MustParseCoin(t TestingT, txt string) Coin {
 	var coin Coin
 	matches := coinPattern.FindStringSubmatch(txt)
 	require.Len(t, matches, 3)
@@ -120,7 +119,7 @@ func ParseAmount(txt string) (Coins, error) {
 	return coins, nil
 }
 
-func MustParseAmount(t testing.TB, amount string) Coins {
+func MustParseAmount(t TestingT, amount string) Coins {
 	var coins Coins
 	for _, txt := range strings.Split(amount, ",") {
 		coin := MustParseCoin(t, txt)
@@ -129,6 +128,6 @@ func MustParseAmount(t testing.TB, amount string) Coins {
 	return coins
 }
 
-func MustGetBaseDenomAmount(t testing.TB, amount string) Int {
+func MustGetBaseDenomAmount(t TestingT, amount string) Int {
 	return MustParseAmount(t, amount).GetBaseDenomAmount()
 }

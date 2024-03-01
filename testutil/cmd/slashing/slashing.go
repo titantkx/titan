@@ -1,7 +1,6 @@
 package slashing
 
 import (
-	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -17,7 +16,7 @@ type Params struct {
 	SlashFractionDowntime   testutil.Float    `json:"slash_fraction_downtime"`
 }
 
-func MustGetParams(t testing.TB) Params {
+func MustGetParams(t testutil.TestingT) Params {
 	var params Params
 	cmd.MustQuery(t, &params, "slashing", "params")
 	require.Greater(t, params.DowntimeJailDuration.StdDuration(), 0*time.Second)

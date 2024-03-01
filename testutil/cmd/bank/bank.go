@@ -2,7 +2,6 @@ package bank
 
 import (
 	"context"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 
@@ -14,7 +13,7 @@ import (
 	txcmd "github.com/tokenize-titan/titan/testutil/cmd/tx"
 )
 
-func MustSend(t testing.TB, from string, to string, amount string) txcmd.TxResponse {
+func MustSend(t testutil.TestingT, from string, to string, amount string) txcmd.TxResponse {
 	fromBalBefore := MustGetBalance(t, from, utils.BaseDenom, 0)
 	toBalBefore := MustGetBalance(t, to, utils.BaseDenom, 0)
 
@@ -35,7 +34,7 @@ func MustSend(t testing.TB, from string, to string, amount string) txcmd.TxRespo
 	return tx
 }
 
-func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.TxResponse {
+func MustMultiSend(t testutil.TestingT, from string, amount string, to ...string) tx.TxResponse {
 	fromBalBefore := MustGetBalance(t, from, utils.BaseDenom, 0)
 	var toBalBefore []testutil.Int
 	for i := range to {
@@ -68,7 +67,7 @@ func MustMultiSend(t testing.TB, from string, amount string, to ...string) tx.Tx
 	return tx
 }
 
-func MustGetBalance(t testing.TB, address string, denom string, height int64) testutil.Int {
+func MustGetBalance(t testutil.TestingT, address string, denom string, height int64) testutil.Int {
 	args := []string{
 		"bank",
 		"balances",
@@ -85,7 +84,7 @@ func MustGetBalance(t testing.TB, address string, denom string, height int64) te
 	return v.Amount
 }
 
-func MustGetTotalBalance(t testing.TB, denom string, height int64) testutil.Int {
+func MustGetTotalBalance(t testutil.TestingT, denom string, height int64) testutil.Int {
 	args := []string{
 		"bank",
 		"total",

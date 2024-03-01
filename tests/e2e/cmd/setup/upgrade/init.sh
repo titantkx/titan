@@ -3,38 +3,37 @@ rm -rf tmp/val1/.titand/*
 rm -rf tmp/val2/.titand/*
 
 # Init val1
-docker compose run --rm -i val1 init val1 --chain-id=titan_18887-1 --overwrite
-docker compose run --rm -i val1 config keyring-backend test
+docker compose -f docker-compose-genesis.yml run --rm -i val1 init val1 --chain-id=titan_18887-1 --overwrite
+docker compose -f docker-compose-genesis.yml run --rm -i val1 config keyring-backend test
 sed -i '' 's/^indexer = ".*"/indexer = "kv"/' tmp/val1/.titand/config/config.toml
 sed -i '' 's/^timeout_commit = ".*"/timeout_commit = "1s"/' tmp/val1/.titand/config/config.toml
 # Init val2
-docker compose run --rm -i val2 init val2 --chain-id=titan_18887-1 --overwrite
-docker compose run --rm -i val2 config keyring-backend test
+docker compose -f docker-compose-genesis.yml run --rm -i val2 init val2 --chain-id=titan_18887-1 --overwrite
+docker compose -f docker-compose-genesis.yml run --rm -i val2 config keyring-backend test
 sed -i '' 's/^indexer = ".*"/indexer = "kv"/' tmp/val2/.titand/config/config.toml
 sed -i '' 's/^timeout_commit = ".*"/timeout_commit = "1s"/' tmp/val2/.titand/config/config.toml
-
 
 ### On val1 machine
 
 # Add faucet account
-docker compose run --rm -i val1 keys add faucet
-faucet=$(docker compose run --rm -i val1 keys show faucet --address)
+docker compose -f docker-compose-genesis.yml run --rm -i val1 keys add faucet
+faucet=$(docker compose -f docker-compose-genesis.yml run --rm -i val1 keys show faucet --address)
 # Add balance to faucet
-docker compose run --rm -i val1 add-genesis-account $faucet 97999000tkx
+docker compose -f docker-compose-genesis.yml run --rm -i val1 add-genesis-account $faucet 97999000tkx
 
 # Add val1 account
-docker compose run --rm -i val1 keys add val1
-val1=$(docker compose run --rm -i val1 keys show val1 --address)
+docker compose -f docker-compose-genesis.yml run --rm -i val1 keys add val1
+val1=$(docker compose -f docker-compose-genesis.yml run --rm -i val1 keys show val1 --address)
 # Add balance to val1
-docker compose run --rm -i val1 add-genesis-account $val1 1000000tkx
+docker compose -f docker-compose-genesis.yml run --rm -i val1 add-genesis-account $val1 1000000tkx
 # val1 stakes tkx
-docker compose run --rm -i val1 gentx val1 100000tkx --min-self-delegation 5000000000000000000
+docker compose -f docker-compose-genesis.yml run --rm -i val1 gentx val1 100000tkx --min-self-delegation 5000000000000000000
 
 # Add reward-pool-admin account
-docker compose run --rm -i val1 keys add reward-pool-admin
-reward_pool_admin=$(docker compose run --rm -i val1 keys show reward-pool-admin --address)
+docker compose -f docker-compose-genesis.yml run --rm -i val1 keys add reward-pool-admin
+reward_pool_admin=$(docker compose -f docker-compose-genesis.yml run --rm -i val1 keys show reward-pool-admin --address)
 # Add balance to reward-pool-admin
-docker compose run --rm -i val1 add-genesis-account $reward_pool_admin 1000tkx
+docker compose -f docker-compose-genesis.yml run --rm -i val1 add-genesis-account $reward_pool_admin 1000tkx
 
 # Config genesis file
 config="
@@ -80,16 +79,15 @@ echo $(jq "$config" tmp/val1/.titand/config/genesis.json) > tmp/val1/.titand/con
 # Copy genesis file from val1 machine to val2 machine
 cp tmp/val1/.titand/config/genesis.json tmp/val2/.titand/config/genesis.json
 
-
 ### On val2 machine
 
 # Add val2 account
-docker compose run --rm -i val2 keys add val2
-val2=$(docker compose run --rm -i val2 keys show val2 --address)
+docker compose -f docker-compose-genesis.yml run --rm -i val2 keys add val2
+val2=$(docker compose -f docker-compose-genesis.yml run --rm -i val2 keys show val2 --address)
 # Add balance to val2
-docker compose run --rm -i val2 add-genesis-account $val2 1000000tkx
+docker compose -f docker-compose-genesis.yml run --rm -i val2 add-genesis-account $val2 1000000tkx
 # val2 stakes tkx
-docker compose run --rm -i val2 gentx val2 100000tkx --min-self-delegation 5000000000000000000
+docker compose -f docker-compose-genesis.yml run --rm -i val2 gentx val2 100000tkx --min-self-delegation 5000000000000000000
 
 # Copy val2 key to val1 machine
 cp tmp/val2/.titand/keyring-test/* tmp/val1/.titand/keyring-test
@@ -98,27 +96,25 @@ cp tmp/val2/.titand/keyring-test/* tmp/val1/.titand/keyring-test
 cp tmp/val2/.titand/config/gentx/gentx-* tmp/val1/.titand/config/gentx
 cp tmp/val2/.titand/config/genesis.json tmp/val1/.titand/config/genesis.json
 
-
 ### On val1 machine
 
 # Collect all generated transactions into genesis file
-docker compose run --rm -i val1 collect-gentxs
+docker compose -f docker-compose-genesis.yml run --rm -i val1 collect-gentxs
 # Validate the genesis file
-docker compose run --rm -i val1 validate-genesis
+docker compose -f docker-compose-genesis.yml run --rm -i val1 validate-genesis
 
 # Copy final genesis file from val1 machine to val2 machine
 cp tmp/val1/.titand/config/genesis.json tmp/val2/.titand/config/genesis.json
 
 # Add val2 node to seed peers
-val2id=$(docker compose run --rm -i val2 tendermint show-node-id)
+val2id=$(docker compose -f docker-compose-genesis.yml run --rm -i val2 tendermint show-node-id)
 sed -i '' "s/^seeds = \"\"/seeds = \"$val2id@val2:26656\"/" tmp/val1/.titand/config/config.toml
 
 # Expose rpc endpoint
 sed -i '' 's/^laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/' tmp/val1/.titand/config/config.toml
 
-
 ### On val2 machine
 
 # Add val1 node to seed peers
-val1id=$(docker compose run --rm -i val1 tendermint show-node-id)
+val1id=$(docker compose -f docker-compose-genesis.yml run --rm -i val1 tendermint show-node-id)
 sed -i '' "s/^seeds = \"\"/seeds = \"$val1id@val1:26656\"/" tmp/val2/.titand/config/config.toml

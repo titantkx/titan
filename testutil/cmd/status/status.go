@@ -2,7 +2,6 @@ package status
 
 import (
 	"encoding/json"
-	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -32,7 +31,7 @@ type SyncInfo struct {
 
 type ValidatorInfo struct{}
 
-func MustGetStatus(t testing.TB) Status {
+func MustGetStatus(t testutil.TestingT) Status {
 	output := cmd.MustExec(t, "titand", "status")
 	var status Status
 	err := json.Unmarshal(output, &status)
@@ -40,12 +39,12 @@ func MustGetStatus(t testing.TB) Status {
 	return status
 }
 
-func MustGetLatestBlockHeight(t testing.TB) int64 {
+func MustGetLatestBlockHeight(t testutil.TestingT) int64 {
 	return MustGetStatus(t).SyncInfo.LatestBlockHeight.Int64()
 }
 
 // Wait until block height
-func MustWait(t testing.TB, height int64) {
+func MustWait(t testutil.TestingT, height int64) {
 	for {
 		curHeight := MustGetLatestBlockHeight(t)
 		if curHeight >= height {

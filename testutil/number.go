@@ -114,7 +114,7 @@ func (n Float) IsZero() bool {
 }
 
 func (n Float) String() string {
-	return n.v.String()
+	return n.v.Text('f', 18)
 }
 
 func (n Float) Format(s fmt.State, r rune) {

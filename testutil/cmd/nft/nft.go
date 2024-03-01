@@ -3,7 +3,6 @@ package nft
 import (
 	"context"
 	"strings"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/tokenize-titan/titan/testutil"
@@ -17,7 +16,7 @@ type MintingInfo struct {
 	NextTokenId testutil.Int `json:"next_token_id"`
 }
 
-func MustGetMintingInfo(t testing.TB, classId string) MintingInfo {
+func MustGetMintingInfo(t testutil.TestingT, classId string) MintingInfo {
 	var v struct {
 		MintingInfo MintingInfo `json:"minting_info"`
 	}
@@ -49,7 +48,7 @@ type Metadata struct {
 	Data string `json:"data"`
 }
 
-func MustGetClass(t testing.TB, classId string) Class {
+func MustGetClass(t testutil.TestingT, classId string) Class {
 	var v struct {
 		Class Class `json:"class"`
 	}
@@ -58,7 +57,7 @@ func MustGetClass(t testing.TB, classId string) Class {
 	return v.Class
 }
 
-func MustGetNFT(t testing.TB, classId string, tokenId string) NFT {
+func MustGetNFT(t testutil.TestingT, classId string, tokenId string) NFT {
 	var v struct {
 		NFT NFT `json:"nft"`
 	}
@@ -68,7 +67,7 @@ func MustGetNFT(t testing.TB, classId string, tokenId string) NFT {
 	return v.NFT
 }
 
-func MustCreateClass(t testing.TB, uri, uriHash, name, symbol, description, data, creator string) Class {
+func MustCreateClass(t testutil.TestingT, uri, uriHash, name, symbol, description, data, creator string) Class {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
@@ -117,7 +116,7 @@ func MustCreateClass(t testing.TB, uri, uriHash, name, symbol, description, data
 	return class
 }
 
-func MustUpdateClass(t testing.TB, classId, uri, uriHash, name, symbol, description, data, owner string) {
+func MustUpdateClass(t testutil.TestingT, classId, uri, uriHash, name, symbol, description, data, owner string) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
@@ -159,7 +158,7 @@ func MustUpdateClass(t testing.TB, classId, uri, uriHash, name, symbol, descript
 	require.Equal(t, data, class.Data.Data)
 }
 
-func MustErrUpdateClass(t testing.TB, errExpr, classId, uri, uriHash, name, symbol, description, data, owner string) {
+func MustErrUpdateClass(t testutil.TestingT, errExpr, classId, uri, uriHash, name, symbol, description, data, owner string) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
@@ -187,7 +186,7 @@ func MustErrUpdateClass(t testing.TB, errExpr, classId, uri, uriHash, name, symb
 	txcmd.MustErrExecTx(t, ctx, errExpr, args...)
 }
 
-func MustTransferClass(t testing.TB, classId, receiver, sender string) {
+func MustTransferClass(t testutil.TestingT, classId, receiver, sender string) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
@@ -206,14 +205,14 @@ func MustTransferClass(t testing.TB, classId, receiver, sender string) {
 	require.Equal(t, receiver, mintingInfo.Owner)
 }
 
-func MustErrTransferClass(t testing.TB, errExpr, classId, receiver, sender string) {
+func MustErrTransferClass(t testutil.TestingT, errExpr, classId, receiver, sender string) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
 	txcmd.MustErrExecTx(t, ctx, errExpr, "nft-mint", "transfer-class", classId, receiver, "--from="+sender)
 }
 
-func MustMint(t testing.TB, receiver, classId, uri, uriHash, data, minter string) NFT {
+func MustMint(t testutil.TestingT, receiver, classId, uri, uriHash, data, minter string) NFT {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
@@ -237,7 +236,7 @@ func MustMint(t testing.TB, receiver, classId, uri, uriHash, data, minter string
 	return token
 }
 
-func MustErrMint(t testing.TB, errExpr, receiver, classId, uri, uriHash, data, minter string) {
+func MustErrMint(t testutil.TestingT, errExpr, receiver, classId, uri, uriHash, data, minter string) {
 	ctx, cancel := context.WithTimeout(context.Background(), testutil.MaxBlockTime)
 	defer cancel()
 
