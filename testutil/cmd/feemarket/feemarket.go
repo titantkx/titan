@@ -1,8 +1,6 @@
 package feemarket
 
 import (
-	"testing"
-
 	"github.com/tokenize-titan/titan/testutil"
 	"github.com/tokenize-titan/titan/testutil/cmd"
 )
@@ -17,7 +15,7 @@ type Params struct {
 	NoBaseFee                bool           `json:"no_base_fee"`
 }
 
-func MustGetParams(t testing.TB) Params {
+func MustGetParams(t testutil.TestingT) Params {
 	var v struct {
 		Params Params `json:"params"`
 	}

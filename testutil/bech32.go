@@ -1,14 +1,12 @@
 package testutil
 
 import (
-	"testing"
-
 	"github.com/cosmos/btcutil/bech32"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )
 
-func MustAccountAddressToValidatorAddress(t testing.TB, accountAddr string) string {
+func MustAccountAddressToValidatorAddress(t TestingT, accountAddr string) string {
 	config := sdk.GetConfig()
 
 	s, b, err := bech32.DecodeNoLimit(accountAddr)

@@ -19,5 +19,5 @@ go test github.com/tokenize-titan/titan/tests/e2e/cmd -v
 To view blockchain logs during the test:
 
 ```
-tail -f tests/e2e/cmd/tmp/titand.log
+tail -f tests/e2e/cmd/titand.log
 ```

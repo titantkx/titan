@@ -2,7 +2,6 @@ package auth
 
 import (
 	"strconv"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/tokenize-titan/titan/testutil"
@@ -64,7 +63,7 @@ type Pagination struct {
 	Total   testutil.Int `json:"total"`
 }
 
-func MustGetAccounts(t testing.TB, height int64) <-chan Account {
+func MustGetAccounts(t testutil.TestingT, height int64) <-chan Account {
 	ch := make(chan Account, 100)
 	go func() {
 		defer close(ch)

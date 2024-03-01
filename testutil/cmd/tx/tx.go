@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -39,7 +38,7 @@ func (txr TxResponse) FindEvent(typ string) *Event {
 	return nil
 }
 
-func (txr TxResponse) MustGetEventAttributeValue(t testing.TB, eventType string, attributeKey string) string {
+func (txr TxResponse) MustGetEventAttributeValue(t testutil.TestingT, eventType string, attributeKey string) string {
 	event := txr.FindEvent(eventType)
 	require.NotNil(t, event)
 	attr := event.FindAttribute(attributeKey)
@@ -136,14 +135,14 @@ func ExecTx(ctx context.Context, args ...string) (*TxResponse, error) {
 	return QueryTx(ctx, tx.Hash)
 }
 
-func MustExecTx(t testing.TB, ctx context.Context, args ...string) TxResponse {
+func MustExecTx(t testutil.TestingT, ctx context.Context, args ...string) TxResponse {
 	tx, err := ExecTx(ctx, args...)
 	require.NoError(t, err)
 	require.Equal(t, 0, tx.Code, tx.RawLog)
 	return *tx
 }
 
-func MustErrExecTx(t testing.TB, ctx context.Context, expErr string, args ...string) {
+func MustErrExecTx(t testutil.TestingT, ctx context.Context, expErr string, args ...string) {
 	tx, err := ExecTx(ctx, args...)
 	require.Nil(t, tx)
 	require.Error(t, err)
@@ -171,7 +170,7 @@ func (txr TxResponse) GetRefundAmount() (testutil.Int, error) {
 	return amount.GetBaseDenomAmount(), nil
 }
 
-func (txr TxResponse) MustGetRefundAmount(t testing.TB) testutil.Int {
+func (txr TxResponse) MustGetRefundAmount(t testutil.TestingT) testutil.Int {
 	amount, err := txr.GetRefundAmount()
 	require.NoError(t, err)
 	return amount
@@ -188,7 +187,7 @@ func (txr TxResponse) GetDeductFeeAmount() (testutil.Int, error) {
 	return coinSpent.Sub(refundAmount), nil
 }
 
-func (txr TxResponse) MustGetDeductFeeAmount(t testing.TB) testutil.Int {
+func (txr TxResponse) MustGetDeductFeeAmount(t testutil.TestingT) testutil.Int {
 	amount, err := txr.GetDeductFeeAmount()
 	require.NoError(t, err)
 	return amount
@@ -212,7 +211,7 @@ func GenerateTx(args ...string) ([]byte, error) {
 	return nil, fmt.Errorf("invalid output: %s", string(output))
 }
 
-func MustGenerateTx(t testing.TB, args ...string) []byte {
+func MustGenerateTx(t testutil.TestingT, args ...string) []byte {
 	output, err := GenerateTx(args...)
 	require.NoError(t, err)
 	require.NotEmpty(t, output)
@@ -234,7 +233,7 @@ func BroadcastTx(ctx context.Context, filePath string) (*TxResponse, error) {
 	return QueryTx(ctx, tx.Hash)
 }
 
-func MustBroadcastTx(t testing.TB, ctx context.Context, filePath string) TxResponse {
+func MustBroadcastTx(t testutil.TestingT, ctx context.Context, filePath string) TxResponse {
 	tx, err := BroadcastTx(ctx, filePath)
 	require.NoError(t, err)
 	require.Equal(t, 0, tx.Code, tx.RawLog)

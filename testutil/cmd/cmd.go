@@ -10,9 +10,9 @@ import (
 	"os/exec"
 	"reflect"
 	"strings"
-	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/tokenize-titan/titan/testutil"
 )
 
 var HomeDir string
@@ -26,6 +26,11 @@ type Tx struct {
 func Init(homeDir string) error {
 	HomeDir = homeDir
 	return os.Setenv("PATH", os.Getenv("HOME")+"/go/bin:"+os.Getenv("PATH"))
+}
+
+func MustInit(t testutil.TestingT, homeDir string) {
+	err := Init(homeDir)
+	require.NoError(t, err)
 }
 
 type ExecError struct {
@@ -63,7 +68,7 @@ func Exec(name string, args ...string) ([]byte, error) {
 	return output, nil
 }
 
-func MustExec(t testing.TB, name string, args ...string) []byte {
+func MustExec(t testutil.TestingT, name string, args ...string) []byte {
 	output, err := Exec(name, args...)
 	require.NoError(t, err)
 	return output
@@ -79,7 +84,7 @@ func Query(v any, args ...string) error {
 	return json.Unmarshal(output, v)
 }
 
-func MustQuery(t testing.TB, v any, args ...string) {
+func MustQuery(t testutil.TestingT, v any, args ...string) {
 	err := Query(v, args...)
 	require.NoError(t, err)
 }
@@ -157,35 +162,8 @@ func ExecWrite(w io.Writer, name string, args ...string) (*os.ProcessState, erro
 }
 
 // Must execute a command and write its output to w, panics on error
-func MustExecWrite(w io.Writer, name string, args ...string) {
+func MustExecWrite(t testutil.TestingT, w io.Writer, name string, args ...string) {
 	state, err := ExecWrite(w, name, args...)
-	if err != nil {
-		panic(err)
-	}
-	if state.ExitCode() != 0 {
-		panic(state.String())
-	}
-}
-
-func Chdir(dir string) {
-	err := os.Chdir(dir)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func Getwd() string {
-	wd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	return wd
-}
-
-func UserHomeDir() string {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}
-	return homeDir
+	require.NoError(t, err)
+	require.Equal(t, 0, state.ExitCode(), state.String())
 }

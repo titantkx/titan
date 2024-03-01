@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 )
@@ -56,7 +55,7 @@ func (pk SinglePublicKey) String() string {
 	return string(txt)
 }
 
-func MustGenerateEd25519PK(t testing.TB) SinglePublicKey {
+func MustGenerateEd25519PK(t TestingT) SinglePublicKey {
 	b := make([]byte, 32)
 	_, err := rand.Read(b)
 	require.NoError(t, err)

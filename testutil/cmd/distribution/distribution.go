@@ -1,8 +1,6 @@
 package distribution
 
 import (
-	"testing"
-
 	"github.com/tokenize-titan/titan/testutil"
 	"github.com/tokenize-titan/titan/testutil/cmd"
 )
@@ -12,13 +10,13 @@ type Params struct {
 	WithdrawAddrEnabled bool           `json:"withdraw_addr_enabled"`
 }
 
-func MustGetParams(t testing.TB) Params {
+func MustGetParams(t testutil.TestingT) Params {
 	var v Params
 	cmd.MustQuery(t, &v, "distribution", "params")
 	return v
 }
 
-func MustGetCommunityPool(t testing.TB) testutil.Coins {
+func MustGetCommunityPool(t testutil.TestingT) testutil.Coins {
 	var v struct {
 		Pool testutil.Coins `json:"pool"`
 	}
@@ -26,7 +24,7 @@ func MustGetCommunityPool(t testing.TB) testutil.Coins {
 	return v.Pool
 }
 
-func MustGetRewards(t testing.TB, del string, val string, height int64) testutil.Coins {
+func MustGetRewards(t testutil.TestingT, del string, val string, height int64) testutil.Coins {
 	args := []string{"distribution", "rewards", del}
 	if val != "" {
 		args = append(args, val)

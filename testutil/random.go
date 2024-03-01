@@ -3,12 +3,11 @@ package testutil
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
-func MustRandomString(t testing.TB, n int) string {
+func MustRandomString(t TestingT, n int) string {
 	b := make([]byte, n)
 	_, err := rand.Read(b)
 	require.NoError(t, err)

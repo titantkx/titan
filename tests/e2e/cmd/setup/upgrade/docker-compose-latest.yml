@@ -1,0 +1,17 @@
+version: '3'
+
+name: e2e-test-titan
+
+services:
+  val1:
+    command: start
+    image: titanlab/titand:latest
+    volumes:
+      - ./tmp/val1/.titand:/root/.titand
+    ports:
+      - "26657:26657"
+  val2:
+    command: start
+    image: titanlab/titand:latest
+    volumes:
+      - ./tmp/val2/.titand:/root/.titand
