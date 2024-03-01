@@ -148,12 +148,12 @@ func initTendermintConfig() *tmcfg.Config {
 
 	cfg.Consensus.CreateEmptyBlocks = false
 	cfg.Consensus.CreateEmptyBlocksInterval = 120 * time.Second
-	cfg.Consensus.TimeoutPropose = 30 * time.Second
-	cfg.Consensus.TimeoutProposeDelta = 5 * time.Second
-	cfg.Consensus.TimeoutPrevote = 10 * time.Second
-	cfg.Consensus.TimeoutPrevoteDelta = 5 * time.Second
-	cfg.Consensus.TimeoutPrecommit = 10 * time.Second
-	cfg.Consensus.TimeoutPrecommitDelta = 5 * time.Second
+	cfg.Consensus.TimeoutPropose = 3 * time.Second
+	cfg.Consensus.TimeoutProposeDelta = 500 * time.Millisecond
+	cfg.Consensus.TimeoutPrevote = 3 * time.Second
+	cfg.Consensus.TimeoutPrevoteDelta = 500 * time.Millisecond
+	cfg.Consensus.TimeoutPrecommit = 3 * time.Second
+	cfg.Consensus.TimeoutPrecommitDelta = 500 * time.Millisecond
 	cfg.Consensus.TimeoutCommit = 5 * time.Second
 	cfg.RPC.TimeoutBroadcastTxCommit = 20 * time.Second
 	cfg.TxIndex.Indexer = "null"
