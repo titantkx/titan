@@ -5,6 +5,7 @@ import (
 	"io"
 	"math/big"
 	"strconv"
+	"strings"
 )
 
 type Int struct {
@@ -97,7 +98,7 @@ type Float struct {
 }
 
 func MakeFloat(f float64) Float {
-	return Float{new(big.Float).SetPrec(100).SetFloat64(f)}
+	return MakeFloatFromString(strconv.FormatFloat(f, 'f', -1, 64))
 }
 
 func MakeFloatFromString(s string) Float {
@@ -114,7 +115,12 @@ func (n Float) IsZero() bool {
 }
 
 func (n Float) String() string {
-	return n.v.Text('f', 18)
+	s := n.v.Text('f', -1)
+	a := strings.Split(s, ".")
+	if len(a) < 2 || len(a[1]) <= 18 {
+		return s
+	}
+	return fmt.Sprintf("%s.%s", a[0], a[1][:18])
 }
 
 func (n Float) Format(s fmt.State, r rune) {
