@@ -182,32 +182,15 @@ proto-format:
 proto-lint:
 	@$(protoFormatImage) buf lint --error-format=json
 
-proto-swagger-gen:
-	@echo "Generating Protobuf Swagger"
-	@$(protoFormatImage) sh ./scripts/protoc-swagger-gen.sh	
-	$(MAKE) update-swagger-docs
 
 ###############################################################################
 ###                              Documentation                              ###
 ###############################################################################
 
-statik: 
-	@echo "Installing statik..."	
-	@go install github.com/rakyll/statik@v0.1.6
-
-update-swagger-docs: statik
-	statik -src=client/docs/swagger-ui -dest=client/docs -f -m
-	@if [ -n "$(git status --porcelain)" ]; then \
-		echo "\033[91mSwagger docs are out of sync!!!\033[0m";\
-		exit 1;\
-	else \
-		echo "\033[92mSwagger docs are in sync\033[0m";\
-	fi
-.PHONY: update-swagger-docs
-
 update-swagger-docs-by-ignite:
 	@ignite generate openapi -y
 
+.PHONY: update-swagger-docs-by-ignite
 
 ###############################################################################
 ###                              Dev tools		                              ###

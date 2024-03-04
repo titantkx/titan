@@ -23,7 +23,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	runtimeservices "github.com/cosmos/cosmos-sdk/runtime/services"
-	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -159,9 +158,6 @@ import (
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/tokenize-titan/titan/app/params"
-
-	// unnamed import of statik for swagger UI support
-	_ "github.com/tokenize-titan/titan/client/docs/statik"
 )
 
 const (
@@ -1158,11 +1154,6 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	// Register grpc-gateway routes for all modules.
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// TODO : need to use only one of openapi routes
-	// register swagger API from root so that other applications can override easily
-	if err := server.RegisterSwaggerAPI(apiSvr.ClientCtx, apiSvr.Router, apiConfig.Swagger); err != nil {
-		panic(err)
-	}
 	if apiConfig.Swagger {
 		// register app's OpenAPI routes (generate by ignite).
 		docs.RegisterOpenAPIService(Name, apiSvr.Router)
