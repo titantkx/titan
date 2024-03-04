@@ -29,29 +29,29 @@ const chainInfo: ChainInfo = {
   },
   currencies: [
     {
-      coinDenom: "tkx",
+      coinDenom: "TKX",
       coinMinimalDenom: "atkx",
       coinDecimals: 18,
     },
   ],
   feeCurrencies: [
     {
-      coinDenom: "tkx",
+      coinDenom: "TKX",
       coinMinimalDenom: "atkx",
       coinDecimals: 18,      
       gasPriceStep: {
         low: 10 * 1e10,
-        average: 10 * 1e10,
+        average: 11 * 1e10,
         high: 20 * 1e10,
       },
     },
   ],
   stakeCurrency: {
-    coinDenom: "tkx",
+    coinDenom: "TKX",
     coinMinimalDenom: "atkx",
     coinDecimals: 18,
   },
-  features: ["eth-address-gen", "eth-key-sign"],
+  features: ["cosmwasm", "eth-address-gen", "eth-key-sign"],
 };
 
 const KeplrView = () => {
