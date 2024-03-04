@@ -31,6 +31,9 @@ do
     fi
 done
 
+# Get directory of this script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # remove tmp directory
 rm -rf tmp
 # copy lib file to `dist/lib`
@@ -74,6 +77,9 @@ else
 		-v $PROJECT_ROOT:/go/src/$PACKAGE_NAME \
 		-w /go/src/$PACKAGE_NAME ghcr.io/goreleaser/goreleaser-cross:${GOLANG_CROSS_VERSION} \
 		--clean --skip-validate
+  
+  # upload upgrade info to github
+  "$SCRIPT_DIR/gen-upgrade-info.sh" v$VERSION --upload
 fi
 
 # remove tmp directory

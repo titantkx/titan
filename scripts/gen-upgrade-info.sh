@@ -2,6 +2,13 @@
 
 #  get version as first parameter
 VERSION=$1
+# Check if include upload to github `--upload`
+if [ "$2" = "--upload" ]; then
+  UPLOAD=1
+fi
+
+
+
 
 if [ -z "$VERSION" ]; then
   echo "Usage: $0 <version>"
@@ -69,6 +76,32 @@ done
 upgrade_info=$(echo $upgrade_info | sed 's/,$//')
 upgrade_info="$upgrade_info}}"
 
-echo $upgrade_info
 
+if [[ "$UPLOAD" -eq 1 ]]; then
+  # upload upgrade info to github
+  echo "Uploading upgrade info to github"
+  
+  # check file `.release-env` exists
+  if [ ! -f .release-env ]; then
+    echo "File .release-env not found"
+    exit 1
+  fi
 
+  # read `GITHUB_TOKEN` from .release-env
+  GITHUB_TOKEN=$(grep GITHUB_TOKEN .release-env | cut -d '=' -f 2)
+  if [ -z "$GITHUB_TOKEN" ]; then
+    echo "GITHUB_TOKEN not found in .release-env"
+    exit 1
+  fi
+
+  # create temp file
+  tmpfile=$(mktemp /tmp/upgrade-info.XXXXXX)
+  echo $upgrade_info > $tmpfile
+  # upload to github
+  upload_url=$(echo $release_info | jq -r '.upload_url' | sed 's/{?name,label}//')
+  curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" --data-binary @$tmpfile $upload_url?name=upgrade-info.json
+  # remove temp file
+  rm $tmpfile
+else
+  echo $upgrade_info
+fi
