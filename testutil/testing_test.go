@@ -11,7 +11,7 @@ import (
 	"github.com/tokenize-titan/titan/testutil"
 )
 
-func TestMockTestErrorf(t *testing.T) {
+func TestMockTest_Errorf(t *testing.T) {
 	var output bytes.Buffer
 
 	mt := testutil.NewMockTest(&output)

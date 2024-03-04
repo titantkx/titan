@@ -40,10 +40,10 @@ func TestSubmitProposals(t *testing.T) {
 
 	govParams := gov.MustGetParams(t)
 
-	require.Equal(t, govParams.MinDeposit.String(), "2.5e+20"+utils.BaseDenom)
-	require.Equal(t, govParams.Quorum.String(), "0.334")
-	require.Equal(t, govParams.Threshold.String(), "0.5")
-	require.Equal(t, govParams.VetoThreshold.String(), "0.334")
+	require.Equal(t, "0.334", govParams.Quorum.String())
+	require.Equal(t, "0.5", govParams.Threshold.String())
+	require.Equal(t, "0.334", govParams.VetoThreshold.String())
+	require.Equal(t, "250000000000000000000"+utils.BaseDenom, govParams.MinDeposit.String())
 
 	voter1 := keys.MustShowAddress(t, "val1") // Will represent voter3, voter4, voter5 if they do not vote
 	voter2 := keys.MustShowAddress(t, "val2")
