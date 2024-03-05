@@ -161,7 +161,7 @@ func getRecipient(feeTx sdk.FeeTx) sdk.AccAddress {
 func getGasPrice(feeTx sdk.FeeTx) sdk.DecCoin {
 	feeCoins := feeTx.GetFee()
 	gas := feeTx.GetGas()
-	gasPrice := sdk.NewDecFromInt(feeCoins.AmountOf(utils.BondDenom)).Quo(sdk.NewDec(int64(gas)))
+	gasPrice := sdk.NewDecFromInt(feeCoins.AmountOf(utils.BondDenom)).Quo(sdk.NewDecFromInt(sdk.NewIntFromUint64(gas)))
 	return sdk.NewDecCoinFromDec(utils.BondDenom, gasPrice)
 }
 
