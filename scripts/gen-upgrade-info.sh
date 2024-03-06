@@ -19,7 +19,7 @@ GITHUB_REPO=tokenize-titan/titan
 
 # verify release version exists on github
 
-# Get the latest release
+# Get the release info
 release_url="https://api.github.com/repos/$GITHUB_REPO/releases/tags/$VERSION"
 release_info=$(curl -s $release_url)
 
