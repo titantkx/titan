@@ -13,6 +13,16 @@ Required tools:
 From the project root directory run:
 
 ```
+# Basic test
+export TEST_TYPE=basic
+go test github.com/tokenize-titan/titan/tests/e2e/cmd -v
+
+# Upgrade test
+export TEST_TYPE=upgrade
+go test github.com/tokenize-titan/titan/tests/e2e/cmd -v
+
+# Upgrade test from an exported genesis file
+export TEST_TYPE=upgrade-from-genesis
 go test github.com/tokenize-titan/titan/tests/e2e/cmd -v
 ```
 
