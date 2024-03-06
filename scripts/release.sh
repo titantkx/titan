@@ -2,6 +2,7 @@
 
 PACKAGE_NAME=github.com/tokenize-titan/titan
 GOLANG_CROSS_VERSION=v1.20
+GITHUB_REPO=tokenize-titan/titan
 
 # verify if `MAKE_PROJECT_ROOT` and `MAKE_BUILD_TAGS` is set
 if [ -z "$MAKE_PROJECT_ROOT" ] || [ -z "$MAKE_BUILD_TAGS" ]; then
@@ -42,7 +43,6 @@ cp $WASM_PATH/internal/api/*.so tmp/lib
 cp $WASM_PATH/internal/api/*.dylib tmp/lib
 
 
-
 # if `--dry-run` is set then skip publishing
 if [ "$dry_run" -eq 1 ]; then
   docker run \
@@ -65,6 +65,23 @@ else
     exit 1
   fi
 
+  # abort if current commit do not have version tag
+  current_tag=$(git describe --tags --exact-match --match "v*" 2>/dev/null)
+  if [ -z "$current_tag" ]; then
+    echo "ERROR: current commit do not have version tag"
+    exit 1
+  fi
+
+  # Go releaser use this for name release name and tag, so we use it to check if release already exists
+  CURRENT_VERSION_USED_BY_GO_RELEASER=$(git describe --tags --abbrev=0 --match "v*" 2>/dev/null)
+  release_url="https://api.github.com/repos/$GITHUB_REPO/releases/tags/$CURRENT_VERSION_USED_BY_GO_RELEASER"
+  release_info=$(curl -s $release_url)
+  # abort if VERSION is already exists
+  if ! echo $release_info | jq '.message' | grep -q "Not Found"; then
+    echo "ERROR: release $CURRENT_VERSION_USED_BY_GO_RELEASER already exists"
+    exit 1
+  fi
+  
   docker run \
 		--rm \
 		--privileged \

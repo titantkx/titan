@@ -16,10 +16,10 @@ if [ -z "$VERSION" ]; then
 fi
 
 GITHUB_REPO=tokenize-titan/titan
-
+UPGRADE_INFO_FILE_NAME="upgrade-info.json"
 # verify release version exists on github
 
-# Get the latest release
+# Get the release info
 release_url="https://api.github.com/repos/$GITHUB_REPO/releases/tags/$VERSION"
 release_info=$(curl -s $release_url)
 
@@ -31,6 +31,7 @@ fi
 
 # Extract asset checksums
 asset_checksums=$(echo $release_info | jq -r '.assets[] | select(.name=="checksums.txt") | .browser_download_url')
+asset_checksums_id=$(echo $release_info | jq -r '.assets[] | select(.name=="checksums.txt") | .id')
 
 # check if checksums.txt is not exists in assets
 if [ -z "$asset_checksums" ]; then
@@ -56,6 +57,10 @@ files=$(echo "$checksums" | awk '{print $2}')
 
 upgrade_info='{"binaries":{'
 for file in $files; do
+  # ignore if file is `upgrade-info.json`
+  if [ "$file" = "$UPGRADE_INFO_FILE_NAME" ]; then
+    continue
+  fi
   # get checksum for file
   checksum=$(echo "$checksums" | grep $file | awk '{print $1}')  
   # get file name without extension
@@ -94,14 +99,39 @@ if [[ "$UPLOAD" -eq 1 ]]; then
     exit 1
   fi
 
-  # create temp file
-  tmpfile=$(mktemp /tmp/upgrade-info.XXXXXX)
-  echo $upgrade_info > $tmpfile
-  # upload to github
+  # check if upgrade-info.json is already exists
+  upgrade_info_file_url=$(echo $release_info | jq -r ".assets[] | select(.name==\"upgrade-info.json\") | .browser_download_url")
+  if [ ! -z "$upgrade_info_file_url" ]; then
+    echo "ERROR: upgrade-info.json already exists in release $VERSION"
+    exit 1
+  fi
+  
+  # create temp file for upgrade info
+  upgrade_info_tmpfile=$(mktemp /tmp/$UPGRADE_INFO_FILE_NAME.XXXXXX)
+  echo $upgrade_info > $upgrade_info_tmpfile
+
+  # calculate checksum for upgrade info temp file
+  upgrade_info_sha256=$(sha256sum $upgrade_info_tmpfile | awk '{print $1}')
+  
   upload_url=$(echo $release_info | jq -r '.upload_url' | sed 's/{?name,label}//')
-  curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" --data-binary @$tmpfile $upload_url?name=upgrade-info.json
+  # upload upgrade info to github
+  curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" --data-binary @$upgrade_info_tmpfile $upload_url?name=$UPGRADE_INFO_FILE_NAME  
+
+  # appen upgrade-info checksum into `checksums`
+  checksums="$checksums\n$upgrade_info_sha256  $UPGRADE_INFO_FILE_NAME"
+  # create temp file for new checksums
+  checksums_tmpfile=$(mktemp /tmp/checksums.XXXXXX)
+  echo -e "$checksums" > $checksums_tmpfile
+  
+  # delete old checksums.txt
+  delete_checksums_url="https://api.github.com/repos/$GITHUB_REPO/releases/assets/$asset_checksums_id"
+  curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" $delete_checksums_url
+  # upload new checksums.txt
+  curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" --data-binary @$checksums_tmpfile $upload_url?name=checksums.txt
+
   # remove temp file
-  rm $tmpfile
+  rm $upgrade_info_tmpfile
+  rm $checksums_tmpfile
 else
   echo $upgrade_info
 fi
