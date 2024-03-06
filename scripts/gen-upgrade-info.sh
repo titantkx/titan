@@ -97,9 +97,16 @@ if [[ "$UPLOAD" -eq 1 ]]; then
   # create temp file
   tmpfile=$(mktemp /tmp/upgrade-info.XXXXXX)
   echo $upgrade_info > $tmpfile
+  # calculate checksum for temp file
+  sha256=$(sha256sum $tmpfile | awk '{print $1}')
+  checsumTmpFile=$(mktemp /tmp/upgrade-info-sha256.XXXXXX)
+  echo "$sha256 upgrade-info.json" > $checsumTmpFile
+
   # upload to github
   upload_url=$(echo $release_info | jq -r '.upload_url' | sed 's/{?name,label}//')
   curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" --data-binary @$tmpfile $upload_url?name=upgrade-info.json
+  curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" --data-binary @$checsumTmpFile $upload_url?name=upgrade-info-checksum.txt
+
   # remove temp file
   rm $tmpfile
 else
