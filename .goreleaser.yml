@@ -24,7 +24,7 @@ builds:
       - -trimpath
     ldflags:
       - -s -w 
-      - -extldflags "-Wl,-rpath,$$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,@executable_path"
+      - -extldflags "-Wl,-rpath,$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$ORIGIN -Wl,-rpath,@executable_path"
       - -X github.com/cosmos/cosmos-sdk/version.Name=titan 
       - -X github.com/cosmos/cosmos-sdk/version.AppName=titand 
       - -X github.com/cosmos/cosmos-sdk/version.Version={{.Env.VERSION}} 
@@ -48,7 +48,7 @@ builds:
       - -trimpath
     ldflags:
       - -s -w 
-      - -extldflags "-Wl,-rpath,$$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,@executable_path"
+      - -extldflags "-Wl,-rpath,$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$ORIGIN -Wl,-rpath,@executable_path"
       - -X github.com/cosmos/cosmos-sdk/version.Name=titan 
       - -X github.com/cosmos/cosmos-sdk/version.AppName=titand 
       - -X github.com/cosmos/cosmos-sdk/version.Version={{.Env.VERSION}} 
@@ -72,7 +72,7 @@ builds:
       - -trimpath
     ldflags:
       - -s -w 
-      - -extldflags "-Wl,-rpath,$$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,@executable_path"
+      - -extldflags "-Wl,-rpath,$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$ORIGIN -Wl,-rpath,@executable_path"
       - -X github.com/cosmos/cosmos-sdk/version.Name=titan 
       - -X github.com/cosmos/cosmos-sdk/version.AppName=titand 
       - -X github.com/cosmos/cosmos-sdk/version.Version={{.Env.VERSION}} 
@@ -96,7 +96,7 @@ builds:
       - -trimpath
     ldflags:
       - -s -w 
-      - -extldflags "-Wl,-rpath,$$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$$ORIGIN -Wl,-rpath,@executable_path"
+      - -extldflags "-Wl,-rpath,$ORIGIN/../lib -Wl,-rpath,@executable_path/../lib -Wl,-rpath,$ORIGIN/lib -Wl,-rpath,@executable_path/lib -Wl,-rpath,$ORIGIN -Wl,-rpath,@executable_path"
       - -X github.com/cosmos/cosmos-sdk/version.Name=titan 
       - -X github.com/cosmos/cosmos-sdk/version.AppName=titand 
       - -X github.com/cosmos/cosmos-sdk/version.Version={{.Env.VERSION}} 
