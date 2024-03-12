@@ -24,7 +24,7 @@ const Send = ({ client }: SendProps) => {
     receiver: "titan1zhxfglgt5ch2sls6gx346vvy4kn7w26jxy3xju",
     amount: "1tkx",
     gas: "auto",
-    gasPrice:  `${10 * 1e10}atkx`,
+    gasPrice: `${10 * 1e10}atkx`,
   };
 
   const sendSchema = Yup.object().shape({
@@ -61,8 +61,10 @@ const Send = ({ client }: SendProps) => {
         },
         memo
       );
-      if (resp.code === 0) window.alert("Sent successfully");
-      else window.alert(JSON.stringify(resp));
+      if (resp.code === 0) {
+        window.alert("Sent successfully");
+        console.log(resp.transactionHash);
+      } else window.alert(JSON.stringify(resp));
     } catch (e) {
       window.alert(e);
     }

@@ -24,7 +24,7 @@ const Stake = ({ client }: StakeProps) => {
     validator: "titanvaloper1cxjpv02d4cg7jp9qvh2her2lz5ljut0ulc3dua",
     amount: "10tkx",
     gas: "auto",
-    gasPrice:  `${10 * 1e10}atkx`,
+    gasPrice: `${10 * 1e10}atkx`,
   };
 
   const stakeSchema = Yup.object().shape({
@@ -51,7 +51,6 @@ const Stake = ({ client }: StakeProps) => {
     memo,
   }: StakeInputs) => {
     try {
-      console.log("stake");
       const resp = await client.delegateTokens(
         delegator,
         validator,
@@ -62,8 +61,10 @@ const Stake = ({ client }: StakeProps) => {
         },
         memo
       );
-      if (resp.code === 0) window.alert("Staked successfully");
-      else window.alert(JSON.stringify(resp));
+      if (resp.code === 0) {
+        window.alert("Staked successfully");
+        console.log(resp.transactionHash);
+      } else window.alert(JSON.stringify(resp));
     } catch (e) {
       window.alert(e);
     }
