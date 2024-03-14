@@ -6,7 +6,7 @@ import (
 	errortypes "github.com/cosmos/cosmos-sdk/types/errors"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 
-	ethermintante "github.com/tokenize-titan/ethermint/app/ante"
+	ethermintante "github.com/titantkx/ethermint/app/ante"
 )
 
 func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {

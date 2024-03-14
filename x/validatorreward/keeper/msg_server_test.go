@@ -5,9 +5,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-	keepertest "github.com/tokenize-titan/titan/testutil/keeper"
-	"github.com/tokenize-titan/titan/x/validatorreward/keeper"
-	"github.com/tokenize-titan/titan/x/validatorreward/types"
+	keepertest "github.com/titantkx/titan/testutil/keeper"
+	"github.com/titantkx/titan/x/validatorreward/keeper"
+	"github.com/titantkx/titan/x/validatorreward/types"
 )
 
 func setupMsgServer(t testing.TB) (types.MsgServer, sdk.Context, *keeper.Keeper) {

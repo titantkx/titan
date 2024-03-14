@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"github.com/tokenize-titan/titan/tests/e2e/cmd/setup/basic"
-	"github.com/tokenize-titan/titan/tests/e2e/cmd/setup/upgrade"
-	upgradefromgenesis "github.com/tokenize-titan/titan/tests/e2e/cmd/setup/upgrade-from-genesis"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/tests/e2e/cmd/setup/basic"
+	"github.com/titantkx/titan/tests/e2e/cmd/setup/upgrade"
+	upgradefromgenesis "github.com/titantkx/titan/tests/e2e/cmd/setup/upgrade-from-genesis"
+	"github.com/titantkx/titan/utils"
 )
 
 const (

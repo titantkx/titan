@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov/types"
 	v1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
-	"github.com/tokenize-titan/titan/x/gov/keeper"
+	"github.com/titantkx/titan/x/gov/keeper"
 )
 
 // EndBlocker called every block, process inflation, update validator set.

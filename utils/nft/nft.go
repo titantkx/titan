@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
-	nftminttypes "github.com/tokenize-titan/titan/x/nftmint/types"
+	nftminttypes "github.com/titantkx/titan/x/nftmint/types"
 )
 
 type Class struct {

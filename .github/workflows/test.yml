@@ -18,6 +18,7 @@ concurrency:
 jobs:
   test-testutil:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -29,6 +30,7 @@ jobs:
 
   test-unit:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -40,6 +42,7 @@ jobs:
 
   test-app:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -51,6 +54,7 @@ jobs:
 
   test-integration:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -70,5 +74,13 @@ jobs:
         with:
           go-version: '1.20'
           check-latest: true
+      - uses: technote-space/get-diff-action@v6.1.2
+        with:
+          PATTERNS: |
+            **/**.go
+            go.mod
+            go.sum
       - run: echo "$GITHUB_WORKSPACE/build" >> $GITHUB_PATH
+        if: env.GIT_DIFF
       - run: sudo -E make test-e2e-cmd
+        if: env.GIT_DIFF

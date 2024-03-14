@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil/sample"
+	"github.com/titantkx/titan/testutil/sample"
 )
 
 func TestMsgTransferClass_ValidateBasic(t *testing.T) {

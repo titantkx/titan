@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd/feemarket"
-	"github.com/tokenize-titan/titan/testutil/cmd/gov"
-	"github.com/tokenize-titan/titan/testutil/cmd/keys"
-	"github.com/tokenize-titan/titan/testutil/cmd/staking"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd/feemarket"
+	"github.com/titantkx/titan/testutil/cmd/gov"
+	"github.com/titantkx/titan/testutil/cmd/keys"
+	"github.com/titantkx/titan/testutil/cmd/staking"
+	"github.com/titantkx/titan/utils"
 )
 
 type Deposit struct {
@@ -36,8 +36,6 @@ func MustCreateVoter(t testing.TB, balance string, stakeAmount string) string {
 }
 
 func TestSubmitProposals(t *testing.T) {
-	t.Parallel()
-
 	govParams := gov.MustGetParams(t)
 
 	require.Equal(t, "0.334", govParams.Quorum.String())

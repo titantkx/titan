@@ -54478,7 +54478,7 @@ paths:
                         }
       tags:
         - Query
-  /tokenize-titan/titan/nftmint/minting_info:
+  /titantkx/titan/nftmint/minting_info:
     get:
       summary: MintingInfos queries a list of minting info.
       operationId: TitanNftmintMintingInfos
@@ -54618,7 +54618,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /tokenize-titan/titan/nftmint/minting_info/{class_id}:
+  /titantkx/titan/nftmint/minting_info/{class_id}:
     get:
       summary: MintingInfo queries the minting info of a given class.
       operationId: TitanNftmintMintingInfo
@@ -54676,7 +54676,7 @@ paths:
           type: string
       tags:
         - Query
-  /tokenize-titan/titan/nftmint/params:
+  /titantkx/titan/nftmint/params:
     get:
       summary: Parameters queries the parameters of the module.
       operationId: TitanNftmintParams
@@ -54712,7 +54712,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /tokenize-titan/titan/nftmint/system_info:
+  /titantkx/titan/nftmint/system_info:
     get:
       summary: SystemInfo queries the system info of the module.
       operationId: TitanNftmintSystemInfo
@@ -54759,7 +54759,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /tokenize-titan/titan/validatorreward/params:
+  /titantkx/titan/validatorreward/params:
     get:
       summary: Parameters queries the parameters of the module.
       operationId: TitanValidatorrewardParams
@@ -54800,7 +54800,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /tokenize-titan/titan/validatorreward/reward_pool:
+  /titantkx/titan/validatorreward/reward_pool:
     get:
       summary: Queries a list of RewardPool items.
       operationId: TitanValidatorrewardRewardPool

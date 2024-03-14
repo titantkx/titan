@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/utils"
 )
 
 func TestMain(m *testing.M) {

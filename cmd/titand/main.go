@@ -6,9 +6,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
-	"github.com/tokenize-titan/titan/app"
-	"github.com/tokenize-titan/titan/cmd/titand/cmd"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/app"
+	"github.com/titantkx/titan/cmd/titand/cmd"
+	"github.com/titantkx/titan/utils"
 )
 
 func main() {

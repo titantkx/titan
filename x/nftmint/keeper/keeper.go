@@ -8,7 +8,7 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 type (
@@ -25,7 +25,6 @@ func NewKeeper(
 	storeKey,
 	memKey storetypes.StoreKey,
 	nftKeeper types.NFTKeeper,
-
 ) *Keeper {
 	return &Keeper{
 		cdc:       cdc,

@@ -6,13 +6,13 @@ rm -rf tmp/val2/.titand/*
 docker compose -f docker-compose-genesis.yml run --rm -i val1 init val1 --chain-id=titan_18887-1 --overwrite
 docker compose -f docker-compose-genesis.yml run --rm -i val1 config keyring-backend test
 sed -i '' 's/^indexer = ".*"/indexer = "kv"/' tmp/val1/.titand/config/config.toml
-sed -i '' 's/^timeout_commit = ".*"/timeout_commit = "1s"/' tmp/val1/.titand/config/config.toml
+sed -i '' 's/^timeout_commit = ".*"/timeout_commit = "0.5s"/' tmp/val1/.titand/config/config.toml
 
 # Init val2
 docker compose -f docker-compose-genesis.yml run --rm -i val2 init val2 --chain-id=titan_18887-1 --overwrite
 docker compose -f docker-compose-genesis.yml run --rm -i val2 config keyring-backend test
 sed -i '' 's/^indexer = ".*"/indexer = "kv"/' tmp/val2/.titand/config/config.toml
-sed -i '' 's/^timeout_commit = ".*"/timeout_commit = "1s"/' tmp/val2/.titand/config/config.toml
+sed -i '' 's/^timeout_commit = ".*"/timeout_commit = "0.5s"/' tmp/val2/.titand/config/config.toml
 
 ### On val1 machine
 

@@ -24,5 +24,5 @@ done
 cd ..
 
 # move proto files to the right places
-cp -r ./github.com/tokenize-titan/titan/* ./
+cp -r ./github.com/titantkx/titan/* ./
 rm -rf ./github.com

@@ -5,8 +5,8 @@ import (
 
 	"github.com/cometbft/cometbft/types/time"
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/utils"
-	"github.com/tokenize-titan/titan/x/validatorreward/types"
+	"github.com/titantkx/titan/utils"
+	"github.com/titantkx/titan/x/validatorreward/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {

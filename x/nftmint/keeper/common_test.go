@@ -1,6 +1,6 @@
 package keeper_test
 
-import "github.com/tokenize-titan/titan/testutil"
+import "github.com/titantkx/titan/testutil"
 
 const (
 	alice = testutil.Alice

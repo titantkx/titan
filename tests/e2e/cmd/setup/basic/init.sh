@@ -16,12 +16,12 @@ rm -rf tmp/val2/.titand/*
 docker compose run --rm -i val1 init val1 --chain-id=titan_18887-1 --overwrite
 docker compose run --rm -i val1 config keyring-backend test
 $SED_INPLACE 's/^indexer = ".*"/indexer = "kv"/' tmp/val1/.titand/config/config.toml
-$SED_INPLACE 's/^timeout_commit = ".*"/timeout_commit = "1s"/' tmp/val1/.titand/config/config.toml
+$SED_INPLACE 's/^timeout_commit = ".*"/timeout_commit = "0.5s"/' tmp/val1/.titand/config/config.toml
 # Init val2
 docker compose run --rm -i val2 init val2 --chain-id=titan_18887-1 --overwrite
 docker compose run --rm -i val2 config keyring-backend test
 $SED_INPLACE 's/^indexer = ".*"/indexer = "kv"/' tmp/val2/.titand/config/config.toml
-$SED_INPLACE 's/^timeout_commit = ".*"/timeout_commit = "1s"/' tmp/val2/.titand/config/config.toml
+$SED_INPLACE 's/^timeout_commit = ".*"/timeout_commit = "0.5s"/' tmp/val2/.titand/config/config.toml
 
 ### On val1 machine
 

@@ -12,6 +12,7 @@ PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 COSMOS_VERSION = $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
 IGNITE_VERSION = v0.27.1
 MOCKS_DIR = $(CURDIR)/tests/mocks
+DOCKER_IMAGE := titantkx/titand
 
 # $(info GOOS: $(GOOS), GOARCH: $(GOARCH), CC: $(CC), CXX: $(CXX))
 
@@ -156,6 +157,14 @@ $(MOCKS_DIR):
 	mkdir -p $(MOCKS_DIR)
 
 ###############################################################################
+###                                Docker                                   ###
+###############################################################################
+
+docker-build:
+	@echo "Building Docker image"
+	@docker build -t $(DOCKER_IMAGE):v$(VERSION) .
+
+###############################################################################
 ###                                Protobuf                                 ###
 ###############################################################################
 
@@ -177,7 +186,7 @@ proto-gen:
 	
 
 proto-format:
-	@$(protoFormatImage) find ./ -name "*.proto" -exec clang-format --style="{ IndentWidth: 2, BasedOnStyle: google, AlignConsecutiveAssignments: true, AlignConsecutiveDeclarations: Consecutive }" -i {} \;
+	@$(protoFormatImage) find ./ -name "*.proto" -exec clang-format --style="{ IndentWidth: 2, BasedOnStyle: google, AlignConsecutiveAssignments: true, AlignConsecutiveDeclarations: Consecutive, ColumnLimit: 120 }" -i {} \;
 
 proto-lint:
 	@$(protoFormatImage) buf lint --error-format=json
@@ -248,19 +257,19 @@ go.sum: go.mod
 	go mod tidy
 
 test-testutil:
-	go test -timeout 1200s -cover github.com/tokenize-titan/titan/testutil -v
+	go test -timeout 1200s -cover github.com/titantkx/titan/testutil -v
 
 test-unit:
-	go test -v -timeout 1200s -cover github.com/tokenize-titan/titan/x/...
+	go test -v -timeout 1200s -cover github.com/titantkx/titan/x/...
 
 test-app:
-	go test -timeout 1200s -cover github.com/tokenize-titan/titan/app -v
+	go test -timeout 1200s -cover github.com/titantkx/titan/app -v
 
 test-integration:	
-	go test -timeout 1200s -cover github.com/tokenize-titan/titan/tests/integration/... -v
+	go test -timeout 1200s -cover github.com/titantkx/titan/tests/integration/... -v
 
 test-e2e-cmd: 
-	TEST_TYPE=basic go test -timeout 1200s -count=1 github.com/tokenize-titan/titan/tests/e2e/cmd -v
+	TEST_TYPE=basic go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
 
 test-all: test-testutil test-unit test-app test-integration test-e2e-cmd
 
@@ -268,7 +277,7 @@ test-all: test-testutil test-unit test-app test-integration test-e2e-cmd
 ###                                Releasing                                ###
 ###############################################################################
 
-PACKAGE_NAME:=github.com/tokenize-titan/titan
+PACKAGE_NAME:=github.com/titantkx/titan
 GOLANG_CROSS_VERSION  = v1.20
 GOPATH ?= '$(HOME)/go'
 release-dry-run:

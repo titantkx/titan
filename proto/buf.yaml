@@ -1,6 +1,6 @@
-# This module represents buf.build/tokenize-titan/titan
+# This module represents buf.build/titantkx/titan
 version: v1
-# name: buf.build/tokenize-titan/titan
+# name: buf.build/titantkx/titan
 deps:
   - buf.build/cosmos/cosmos-sdk
   - buf.build/cosmos/cosmos-proto

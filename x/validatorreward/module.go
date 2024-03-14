@@ -17,9 +17,9 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/tokenize-titan/titan/x/validatorreward/client/cli"
-	"github.com/tokenize-titan/titan/x/validatorreward/keeper"
-	"github.com/tokenize-titan/titan/x/validatorreward/types"
+	"github.com/titantkx/titan/x/validatorreward/client/cli"
+	"github.com/titantkx/titan/x/validatorreward/keeper"
+	"github.com/titantkx/titan/x/validatorreward/types"
 )
 
 var (

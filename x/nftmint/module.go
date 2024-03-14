@@ -17,9 +17,9 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/tokenize-titan/titan/x/nftmint/client/cli"
-	"github.com/tokenize-titan/titan/x/nftmint/keeper"
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	"github.com/titantkx/titan/x/nftmint/client/cli"
+	"github.com/titantkx/titan/x/nftmint/keeper"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 var (

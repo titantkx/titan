@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {
@@ -39,7 +39,6 @@ func TestGenesisState_Validate(t *testing.T) {
 		{
 			desc: "duplicated mintingInfo",
 			genState: &types.GenesisState{
-
 				SystemInfo: types.SystemInfo{
 					NextClassId: 8,
 				},

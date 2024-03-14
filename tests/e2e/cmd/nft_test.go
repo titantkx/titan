@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/tokenize-titan/titan/testutil/cmd/nft"
-	"github.com/tokenize-titan/titan/testutil/sample"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/testutil/cmd/nft"
+	"github.com/titantkx/titan/testutil/sample"
+	"github.com/titantkx/titan/utils"
 )
 
 func MustCreateClass(t testing.TB, creator string) nft.Class {

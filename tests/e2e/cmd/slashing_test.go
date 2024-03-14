@@ -6,12 +6,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/tokenize-titan/titan/testutil/cmd/bank"
-	"github.com/tokenize-titan/titan/testutil/cmd/distribution"
-	"github.com/tokenize-titan/titan/testutil/cmd/slashing"
-	"github.com/tokenize-titan/titan/testutil/cmd/staking"
-	"github.com/tokenize-titan/titan/testutil/cmd/status"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/testutil/cmd/bank"
+	"github.com/titantkx/titan/testutil/cmd/distribution"
+	"github.com/titantkx/titan/testutil/cmd/slashing"
+	"github.com/titantkx/titan/testutil/cmd/staking"
+	"github.com/titantkx/titan/testutil/cmd/status"
+	"github.com/titantkx/titan/utils"
 )
 
 func TestValidatorInactive(t *testing.T) {
