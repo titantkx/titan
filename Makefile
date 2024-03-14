@@ -177,7 +177,7 @@ proto-gen:
 	
 
 proto-format:
-	@$(protoFormatImage) find ./ -name "*.proto" -exec clang-format --style="{ IndentWidth: 2, BasedOnStyle: google, AlignConsecutiveAssignments: true, AlignConsecutiveDeclarations: Consecutive }" -i {} \;
+	@$(protoFormatImage) find ./ -name "*.proto" -exec clang-format --style="{ IndentWidth: 2, BasedOnStyle: google, AlignConsecutiveAssignments: true, AlignConsecutiveDeclarations: Consecutive, ColumnLimit: 120 }" -i {} \;
 
 proto-lint:
 	@$(protoFormatImage) buf lint --error-format=json
