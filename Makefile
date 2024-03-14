@@ -12,7 +12,7 @@ PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 COSMOS_VERSION = $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
 IGNITE_VERSION = v0.27.1
 MOCKS_DIR = $(CURDIR)/tests/mocks
-DOCKER_IMAGE := titantkx/titan
+DOCKER_IMAGE := titantkx/titand
 
 # $(info GOOS: $(GOOS), GOARCH: $(GOARCH), CC: $(CC), CXX: $(CXX))
 
