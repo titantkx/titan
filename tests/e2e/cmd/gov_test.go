@@ -36,8 +36,6 @@ func MustCreateVoter(t testing.TB, balance string, stakeAmount string) string {
 }
 
 func TestSubmitProposals(t *testing.T) {
-	t.Parallel()
-
 	govParams := gov.MustGetParams(t)
 
 	require.Equal(t, "0.334", govParams.Quorum.String())
