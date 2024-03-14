@@ -1,0 +1,31 @@
+name: Protobuf
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - release/**
+    paths:
+      - "proto/**"
+      - go.mod
+      - go.sum
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          check-latest: true
+      - run: make ignite
+      - run: make update-swagger-docs-by-ignite
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: update swagger docs"

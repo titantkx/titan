@@ -42,6 +42,7 @@ func StartChain(t testutil.TestingT, w io.Writer, dcFile string) (ready chan str
 	go func() {
 		isRunning := false
 		r := bufio.NewReader(s)
+		numberIndexBlocksNeeded := 4
 		for {
 			line, isPrefix, err := r.ReadLine()
 			if err == io.EOF {
@@ -52,9 +53,13 @@ func StartChain(t testutil.TestingT, w io.Writer, dcFile string) (ready chan str
 			if !isPrefix {
 				fmt.Fprintln(w)
 			}
-			if !isRunning && strings.Contains(string(line), "executed block") {
-				isRunning = true
-				readyCh <- struct{}{}
+			if !isRunning && strings.Contains(string(line), "indexed block") {
+				fmt.Printf("Indexed block %d\n", numberIndexBlocksNeeded)
+				numberIndexBlocksNeeded--
+				if numberIndexBlocksNeeded == 0 {
+					isRunning = true
+					readyCh <- struct{}{}
+				}
 			}
 		}
 	}()

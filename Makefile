@@ -162,15 +162,15 @@ $(MOCKS_DIR):
 protoVer=0.11.2
 protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
 protoContainerName=protobuilder-titan-$(subst /,_,$(subst \,_,$(CURDIR)))
-protoImage=$(DOCKER) run -v $(CURDIR):/workspace --workdir /workspace --name $(protoContainerName) $(protoImageName)
-protoFormatImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(protoImageName)
+protoImage=$(DOCKER) run -v $(CURDIR):/workspace --workdir /workspace --user 0 --name $(protoContainerName) $(protoImageName)
+protoFormatImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace --user 0 $(protoImageName)
 
 proto-all: proto-format proto-lint proto-gen
 
 proto-gen:
-	@echo "Generating Protobuf files"
+	@echo "Generating Protobuf files"	
 	@if [ ! "$(shell docker ps -aq -f name=$(protoContainerName))" ]; then \
-    $(protoImage) sh ./scripts/protocgen.sh ; \
+		$(protoImage) sh ./scripts/protocgen.sh ; \
 	else \
 		$(DOCKER) start -a $(protoContainerName) ; \
 	fi
@@ -238,6 +238,31 @@ test-solidity:
 	@echo "Beginning solidity tests..."
 	./scripts/run-solidity-tests.sh
 
+vulncheck: $(BUILDDIR)/
+	GOBIN=$(BUILDDIR) go install golang.org/x/vuln/cmd/govulncheck@latest
+	$(BUILDDIR)/govulncheck ./...
+
+go.sum: go.mod
+	@echo "Ensure dependencies have not been modified ..." >&2
+	go mod verify
+	go mod tidy
+
+test-testutil:
+	go test -timeout 1200s -cover github.com/tokenize-titan/titan/testutil -v
+
+test-unit:
+	go test -v -timeout 1200s -cover github.com/tokenize-titan/titan/x/...
+
+test-app:
+	go test -timeout 1200s -cover github.com/tokenize-titan/titan/app -v
+
+test-integration:	
+	go test -timeout 1200s -cover github.com/tokenize-titan/titan/tests/integration/... -v
+
+test-e2e-cmd: 
+	TEST_TYPE=basic go test -timeout 1200s -count=1 github.com/tokenize-titan/titan/tests/e2e/cmd -v
+
+test-all: test-testutil test-unit test-app test-integration test-e2e-cmd
 
 ###############################################################################
 ###                                Releasing                                ###

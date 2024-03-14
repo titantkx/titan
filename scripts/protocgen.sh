@@ -24,9 +24,5 @@ done
 cd ..
 
 # move proto files to the right places
-cp -r github.com/tokenize-titan/titan/* ./
-rm -rf github.com
-
-go mod tidy
-
-# ./scripts/protocgen-pulsar.sh
+cp -r ./github.com/tokenize-titan/titan/* ./
+rm -rf ./github.com
