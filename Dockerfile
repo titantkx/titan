@@ -8,7 +8,7 @@ RUN apk add --no-cache $PACKAGES
 
 ENV GOCACHE=/root/.cache/go-build
 
-WORKDIR /go/src/github.com/tokenize-titan/titan
+WORKDIR /go/src/github.com/titantkx/titan
 
 # See https://github.com/CosmWasm/wasmvm/releases
 ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.5.0/libwasmvm_muslc.aarch64.a /lib/libwasmvm_muslc.aarch64.a
@@ -42,7 +42,7 @@ FROM alpine:3
 # install netcat
 RUN apk add --no-cache netcat-openbsd binutils
 
-COPY --from=builder /go/src/github.com/tokenize-titan/titan/build/titand /usr/bin/titand
+COPY --from=builder /go/src/github.com/titantkx/titan/build/titand /usr/bin/titand
 
 EXPOSE 26656 26657 1317 9090
 ENTRYPOINT [ "titand" ]

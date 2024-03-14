@@ -10,8 +10,8 @@ import (
 	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 
-	ethermintante "github.com/tokenize-titan/ethermint/app/ante"
-	evmtypes "github.com/tokenize-titan/ethermint/x/evm/types"
+	ethermintante "github.com/titantkx/ethermint/app/ante"
+	evmtypes "github.com/titantkx/ethermint/x/evm/types"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"

@@ -2,8 +2,8 @@ package validatorreward
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tokenize-titan/titan/x/validatorreward/keeper"
-	"github.com/tokenize-titan/titan/x/validatorreward/types"
+	"github.com/titantkx/titan/x/validatorreward/keeper"
+	"github.com/titantkx/titan/x/validatorreward/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.

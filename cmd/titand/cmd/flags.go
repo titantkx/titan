@@ -9,8 +9,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 
-	ethermintsrvflags "github.com/tokenize-titan/ethermint/server/flags"
-	"github.com/tokenize-titan/titan/utils"
+	ethermintsrvflags "github.com/titantkx/ethermint/server/flags"
+	"github.com/titantkx/titan/utils"
 )
 
 func UpdateFlags(cmd *cobra.Command) (*cobra.Command, error) {

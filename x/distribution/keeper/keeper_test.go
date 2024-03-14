@@ -18,7 +18,7 @@ import (
 	distrtestutil "github.com/cosmos/cosmos-sdk/x/distribution/testutil"
 	"github.com/cosmos/cosmos-sdk/x/distribution/types"
 
-	"github.com/tokenize-titan/titan/x/distribution/keeper"
+	"github.com/titantkx/titan/x/distribution/keeper"
 )
 
 func TestSetWithdrawAddr(t *testing.T) {

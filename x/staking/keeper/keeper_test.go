@@ -20,8 +20,8 @@ import (
 	sdkstakingtestutil "github.com/cosmos/cosmos-sdk/x/staking/testutil"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	stakingkeeper "github.com/tokenize-titan/titan/x/staking/keeper"
-	stakingtestutil "github.com/tokenize-titan/titan/x/staking/testutil"
+	stakingkeeper "github.com/titantkx/titan/x/staking/keeper"
+	stakingtestutil "github.com/titantkx/titan/x/staking/testutil"
 )
 
 var (

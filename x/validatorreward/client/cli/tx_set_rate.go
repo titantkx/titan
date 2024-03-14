@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
-	"github.com/tokenize-titan/titan/x/validatorreward/types"
+	"github.com/titantkx/titan/x/validatorreward/types"
 )
 
 var _ = strconv.Itoa(0)

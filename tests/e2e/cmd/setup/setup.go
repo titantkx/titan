@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd"
-	"github.com/tokenize-titan/titan/testutil/cmd/gov"
-	"github.com/tokenize-titan/titan/testutil/cmd/status"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd"
+	"github.com/titantkx/titan/testutil/cmd/gov"
+	"github.com/titantkx/titan/testutil/cmd/status"
 )
 
 const ImageName = "titanlab/titand"

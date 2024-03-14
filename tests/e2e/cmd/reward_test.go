@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd/block"
-	"github.com/tokenize-titan/titan/testutil/cmd/distribution"
-	"github.com/tokenize-titan/titan/testutil/cmd/reward"
-	"github.com/tokenize-titan/titan/testutil/cmd/staking"
-	"github.com/tokenize-titan/titan/testutil/cmd/status"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd/block"
+	"github.com/titantkx/titan/testutil/cmd/distribution"
+	"github.com/titantkx/titan/testutil/cmd/reward"
+	"github.com/titantkx/titan/testutil/cmd/staking"
+	"github.com/titantkx/titan/testutil/cmd/status"
+	"github.com/titantkx/titan/utils"
 )
 
 func MustGetRewardPoolAdmin(t testing.TB) string {

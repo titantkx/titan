@@ -9,7 +9,7 @@ import (
 	sdkdistributionexported "github.com/cosmos/cosmos-sdk/x/distribution/exported"
 	sdkdistributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
-	"github.com/tokenize-titan/titan/x/distribution/keeper"
+	"github.com/titantkx/titan/x/distribution/keeper"
 )
 
 // AppModuleBasic defines the basic application module used by the distribution module.

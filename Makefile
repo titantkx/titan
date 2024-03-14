@@ -248,19 +248,19 @@ go.sum: go.mod
 	go mod tidy
 
 test-testutil:
-	go test -timeout 1200s -cover github.com/tokenize-titan/titan/testutil -v
+	go test -timeout 1200s -cover github.com/titantkx/titan/testutil -v
 
 test-unit:
-	go test -v -timeout 1200s -cover github.com/tokenize-titan/titan/x/...
+	go test -v -timeout 1200s -cover github.com/titantkx/titan/x/...
 
 test-app:
-	go test -timeout 1200s -cover github.com/tokenize-titan/titan/app -v
+	go test -timeout 1200s -cover github.com/titantkx/titan/app -v
 
 test-integration:	
-	go test -timeout 1200s -cover github.com/tokenize-titan/titan/tests/integration/... -v
+	go test -timeout 1200s -cover github.com/titantkx/titan/tests/integration/... -v
 
 test-e2e-cmd: 
-	TEST_TYPE=basic go test -timeout 1200s -count=1 github.com/tokenize-titan/titan/tests/e2e/cmd -v
+	TEST_TYPE=basic go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
 
 test-all: test-testutil test-unit test-app test-integration test-e2e-cmd
 
@@ -268,7 +268,7 @@ test-all: test-testutil test-unit test-app test-integration test-e2e-cmd
 ###                                Releasing                                ###
 ###############################################################################
 
-PACKAGE_NAME:=github.com/tokenize-titan/titan
+PACKAGE_NAME:=github.com/titantkx/titan
 GOLANG_CROSS_VERSION  = v1.20
 GOPATH ?= '$(HOME)/go'
 release-dry-run:

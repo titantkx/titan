@@ -1,8 +1,8 @@
 # Titan
 
 <div align="center">
-  <a href="https://github.com/tokenize-titan/titan/blob/develop/LICENSE">
-    <img alt="License: CC BY-NC-SA 4.0" src="https://img.shields.io/github/license/tokenize-titan/titan.svg" />
+  <a href="https://github.com/titantkx/titan/blob/develop/LICENSE">
+    <img alt="License: CC BY-NC-SA 4.0" src="https://img.shields.io/github/license/titantkx/titan.svg" />
   </a>
 </div>
 

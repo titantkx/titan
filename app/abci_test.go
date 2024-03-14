@@ -14,9 +14,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/tokenize-titan/ethermint/crypto/ethsecp256k1"
+	"github.com/titantkx/ethermint/crypto/ethsecp256k1"
 
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/utils"
 )
 
 func TestABCI_ApplySnapshotChunk(t *testing.T) {

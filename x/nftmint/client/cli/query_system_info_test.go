@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/status"
 
-	"github.com/tokenize-titan/titan/testutil/network"
-	"github.com/tokenize-titan/titan/testutil/nullify"
-	"github.com/tokenize-titan/titan/x/nftmint/client/cli"
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	"github.com/titantkx/titan/testutil/network"
+	"github.com/titantkx/titan/testutil/nullify"
+	"github.com/titantkx/titan/x/nftmint/client/cli"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 func networkWithSystemInfoObjects(t *testing.T) (*network.Network, types.SystemInfo) {

@@ -12,9 +12,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking/testutil"
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/tokenize-titan/titan/app"
-	simtestutil "github.com/tokenize-titan/titan/testutil/sims"
-	"github.com/tokenize-titan/titan/x/staking/keeper"
+	"github.com/titantkx/titan/app"
+	simtestutil "github.com/titantkx/titan/testutil/sims"
+	"github.com/titantkx/titan/x/staking/keeper"
 )
 
 var PKs = sdksimtestutil.CreateTestPubKeys(500)

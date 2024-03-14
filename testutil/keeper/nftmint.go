@@ -12,9 +12,9 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/x/nftmint/keeper"
-	nftmintutil "github.com/tokenize-titan/titan/x/nftmint/testutil"
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	"github.com/titantkx/titan/x/nftmint/keeper"
+	nftmintutil "github.com/titantkx/titan/x/nftmint/testutil"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 func NftmintKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {

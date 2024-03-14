@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/tokenize-titan/titan/tests/e2e/cmd/setup"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd"
+	"github.com/titantkx/titan/tests/e2e/cmd/setup"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd"
 )
 
 func Setup(m *testing.M, rootDir string, logger io.Writer) {

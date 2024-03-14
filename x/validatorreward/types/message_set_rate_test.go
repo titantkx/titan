@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/tokenize-titan/titan/testutil/sample"
+	"github.com/titantkx/titan/testutil/sample"
 )
 
 func TestMsgSetRate_ValidateBasic(t *testing.T) {

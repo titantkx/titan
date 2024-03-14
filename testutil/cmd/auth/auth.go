@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd"
 )
 
 type AccountsResponse struct {

@@ -3,7 +3,7 @@ package keeper
 import (
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 // SetMintingInfo set a specific mintingInfo in the store from its index
@@ -19,7 +19,6 @@ func (k Keeper) SetMintingInfo(ctx sdk.Context, mintingInfo types.MintingInfo) {
 func (k Keeper) GetMintingInfo(
 	ctx sdk.Context,
 	classId string,
-
 ) (val types.MintingInfo, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.MintingInfoKeyPrefix))
 
@@ -38,7 +37,6 @@ func (k Keeper) GetMintingInfo(
 func (k Keeper) RemoveMintingInfo(
 	ctx sdk.Context,
 	classId string,
-
 ) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.MintingInfoKeyPrefix))
 	store.Delete(types.MintingInfoKey(

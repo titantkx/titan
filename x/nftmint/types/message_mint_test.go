@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil/sample"
+	"github.com/titantkx/titan/testutil/sample"
 )
 
 func TestMsgMint_ValidateBasic(t *testing.T) {

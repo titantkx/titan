@@ -13,8 +13,8 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 
-	etherminttypes "github.com/tokenize-titan/ethermint/types"
-	"github.com/tokenize-titan/titan/utils"
+	etherminttypes "github.com/titantkx/ethermint/types"
+	"github.com/titantkx/titan/utils"
 )
 
 const (

@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	cmdcfg "github.com/tokenize-titan/ethermint/cmd/config"
+	cmdcfg "github.com/titantkx/ethermint/cmd/config"
 )
 
 const (

@@ -8,7 +8,7 @@ import (
 	sdkgovmodule "github.com/cosmos/cosmos-sdk/x/gov"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/tokenize-titan/titan/x/gov/keeper"
+	"github.com/titantkx/titan/x/gov/keeper"
 )
 
 type AppModule struct {

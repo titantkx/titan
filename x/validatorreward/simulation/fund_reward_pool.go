@@ -6,8 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	"github.com/tokenize-titan/titan/x/validatorreward/keeper"
-	"github.com/tokenize-titan/titan/x/validatorreward/types"
+	"github.com/titantkx/titan/x/validatorreward/keeper"
+	"github.com/titantkx/titan/x/validatorreward/types"
 )
 
 func SimulateMsgFundRewardPool(

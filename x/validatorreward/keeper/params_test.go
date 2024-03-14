@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	testkeeper "github.com/tokenize-titan/titan/testutil/keeper"
-	"github.com/tokenize-titan/titan/utils"
-	"github.com/tokenize-titan/titan/x/validatorreward/types"
+	testkeeper "github.com/titantkx/titan/testutil/keeper"
+	"github.com/titantkx/titan/utils"
+	"github.com/titantkx/titan/x/validatorreward/types"
 )
 
 func TestGetParams(t *testing.T) {

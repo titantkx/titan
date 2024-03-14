@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/utils"
 )
 
 func TestMustParseAmount(t *testing.T) {

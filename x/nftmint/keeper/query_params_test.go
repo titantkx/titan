@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-	testkeeper "github.com/tokenize-titan/titan/testutil/keeper"
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	testkeeper "github.com/titantkx/titan/testutil/keeper"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 func TestParamsQuery(t *testing.T) {

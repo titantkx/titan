@@ -41,19 +41,19 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	ethermintclient "github.com/tokenize-titan/ethermint/client"
-	etherminthd "github.com/tokenize-titan/ethermint/crypto/hd"
-	ethermintserver "github.com/tokenize-titan/ethermint/server"
-	ethermintserverconfig "github.com/tokenize-titan/ethermint/server/config"
-	etherminttypes "github.com/tokenize-titan/ethermint/types"
+	ethermintclient "github.com/titantkx/ethermint/client"
+	etherminthd "github.com/titantkx/ethermint/crypto/hd"
+	ethermintserver "github.com/titantkx/ethermint/server"
+	ethermintserverconfig "github.com/titantkx/ethermint/server/config"
+	etherminttypes "github.com/titantkx/ethermint/types"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
 	// this line is used by starport scaffolding # root/moduleImport
 
-	"github.com/tokenize-titan/titan/app"
-	appparams "github.com/tokenize-titan/titan/app/params"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/app"
+	appparams "github.com/titantkx/titan/app/params"
+	"github.com/titantkx/titan/utils"
 )
 
 const (

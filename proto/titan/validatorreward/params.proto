@@ -4,7 +4,7 @@ package titan.validatorreward;
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 
-option go_package = "github.com/tokenize-titan/titan/x/validatorreward/types";
+option go_package = "github.com/titantkx/titan/x/validatorreward/types";
 
 // Params defines the parameters for the module.
 message Params {

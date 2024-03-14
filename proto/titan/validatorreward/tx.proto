@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package titan.validatorreward;
 
-option go_package = "github.com/tokenize-titan/titan/x/validatorreward/types";
+option go_package = "github.com/titantkx/titan/x/validatorreward/types";
 
 import "cosmos/msg/v1/msg.proto";
 import "cosmos/base/v1beta1/coin.proto";

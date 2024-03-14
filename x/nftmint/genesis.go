@@ -2,8 +2,8 @@ package nftmint
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tokenize-titan/titan/x/nftmint/keeper"
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	"github.com/titantkx/titan/x/nftmint/keeper"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.

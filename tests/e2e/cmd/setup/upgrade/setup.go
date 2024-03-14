@@ -6,10 +6,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/tokenize-titan/titan/tests/e2e/cmd/setup"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd"
-	"github.com/tokenize-titan/titan/testutil/cmd/keys"
+	"github.com/titantkx/titan/tests/e2e/cmd/setup"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd"
+	"github.com/titantkx/titan/testutil/cmd/keys"
 )
 
 const UpgradeName = "v2_0_0"

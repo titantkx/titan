@@ -5,12 +5,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/utils"
 
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd"
-	"github.com/tokenize-titan/titan/testutil/cmd/tx"
-	txcmd "github.com/tokenize-titan/titan/testutil/cmd/tx"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd"
+	"github.com/titantkx/titan/testutil/cmd/tx"
+	txcmd "github.com/titantkx/titan/testutil/cmd/tx"
 )
 
 func MustSend(t testutil.TestingT, from string, to string, amount string) txcmd.TxResponse {

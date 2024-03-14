@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd"
-	"github.com/tokenize-titan/titan/testutil/cmd/feemarket"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd"
+	"github.com/titantkx/titan/testutil/cmd/feemarket"
+	"github.com/titantkx/titan/utils"
 )
 
 var rpcErrPattern = regexp.MustCompile(`RPC\serror\s(-?[\d]+)`)

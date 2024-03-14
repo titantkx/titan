@@ -34,10 +34,10 @@ import (
 	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/tokenize-titan/ethermint/crypto/ethsecp256k1"
+	"github.com/titantkx/ethermint/crypto/ethsecp256k1"
 
-	"github.com/tokenize-titan/titan/app/params"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/app/params"
+	"github.com/titantkx/titan/utils"
 )
 
 // SetupOptions defines arguments that are passed into `Simapp` constructor.

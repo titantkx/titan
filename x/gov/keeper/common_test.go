@@ -23,9 +23,9 @@ import (
 	v1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	v1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/tokenize-titan/titan/utils"
-	"github.com/tokenize-titan/titan/x/gov/keeper"
-	govtestutil "github.com/tokenize-titan/titan/x/gov/testutil"
+	"github.com/titantkx/titan/utils"
+	"github.com/titantkx/titan/x/gov/keeper"
+	govtestutil "github.com/titantkx/titan/x/gov/testutil"
 )
 
 var (

@@ -10,20 +10,20 @@ import "cosmos/base/v1beta1/coin.proto";
 
 import "titan/validatorreward/params.proto";
 
-option go_package = "github.com/tokenize-titan/titan/x/validatorreward/types";
+option go_package = "github.com/titantkx/titan/x/validatorreward/types";
 
 // Query defines the gRPC querier service.
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get =
-        "/tokenize-titan/titan/validatorreward/params";
+        "/titantkx/titan/validatorreward/params";
   }
 
   // Queries a list of RewardPool items.
   rpc RewardPool(QueryRewardPoolRequest) returns (QueryRewardPoolResponse) {
     option (google.api.http).get =
-        "/tokenize-titan/titan/validatorreward/reward_pool";
+        "/titantkx/titan/validatorreward/reward_pool";
   }
 }
 // QueryParamsRequest is request type for the Query/Params RPC method.

@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 
 import "titan/validatorreward/params.proto";
 
-option go_package = "github.com/tokenize-titan/titan/x/validatorreward/types";
+option go_package = "github.com/titantkx/titan/x/validatorreward/types";
 
 // GenesisState defines the validatorreward module's genesis state.
 message GenesisState {

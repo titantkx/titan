@@ -6,7 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
-	"github.com/tokenize-titan/titan/x/validatorreward/types"
+	"github.com/titantkx/titan/x/validatorreward/types"
 )
 
 var _ = strconv.Itoa(0)
@@ -17,7 +17,6 @@ func CmdRewardPool() *cobra.Command {
 		Short: "Query reward-pool",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
