@@ -13,11 +13,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: technote-space/get-diff-action@v6.1.2
+        with:
+          PATTERNS: |
+            **/**.proto
+            **/buf.yaml
+            buf.work.yaml
+            buf.gen.yaml
       - run: make proto-gen
+        if: env.GIT_DIFF
 
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: technote-space/get-diff-action@v6.1.2
+        with:
+          PATTERNS: |
+            **/**.proto
+            **/buf.yaml
+            buf.work.yaml
+            buf.gen.yaml
       - run: |
           make proto-lint
+        if: env.GIT_DIFF
