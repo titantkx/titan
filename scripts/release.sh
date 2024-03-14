@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 PACKAGE_NAME=github.com/tokenize-titan/titan
 GOLANG_CROSS_VERSION=v1.20
 GITHUB_REPO=tokenize-titan/titan

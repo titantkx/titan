@@ -205,8 +205,11 @@ func GenerateTx(args ...string) ([]byte, error) {
 		return nil, err
 	}
 	s := bufio.NewScanner(bytes.NewBuffer(output))
-	if s.Scan() && s.Scan() {
-		return s.Bytes(), nil
+	for s.Scan() {
+		b := s.Bytes()
+		if (b[0] == '[' && b[len(b)-1] == ']') || (b[0] == '{' && b[len(b)-1] == '}') {
+			return b, nil
+		}
 	}
 	return nil, fmt.Errorf("invalid output: %s", string(output))
 }

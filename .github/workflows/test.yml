@@ -1,0 +1,74 @@
+name: Test
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+      - release/**
+    paths:
+      - "**/**.go"
+      - go.mod
+      - go.sum
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-testutil:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          check-latest: true
+      - run: make test-testutil        
+
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          check-latest: true      
+      - run: make test-unit
+
+  test-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          check-latest: true      
+      - run: make test-app
+
+  test-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          check-latest: true
+      - run: make test-integration
+
+  test-e2e-cmd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          check-latest: true
+      - run: echo "$GITHUB_WORKSPACE/build" >> $GITHUB_PATH
+      - run: sudo -E make test-e2e-cmd
