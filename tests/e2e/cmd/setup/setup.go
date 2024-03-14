@@ -13,7 +13,7 @@ import (
 	"github.com/titantkx/titan/testutil/cmd/status"
 )
 
-const ImageName = "titanlab/titand"
+const ImageName = "titantkx/titand"
 
 func Install(t testutil.TestingT, w io.Writer, rootDir string) {
 	cwd := testutil.Getwd(t)

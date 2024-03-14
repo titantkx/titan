@@ -12,6 +12,7 @@ PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 COSMOS_VERSION = $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
 IGNITE_VERSION = v0.27.1
 MOCKS_DIR = $(CURDIR)/tests/mocks
+DOCKER_IMAGE := titantkx/titan
 
 # $(info GOOS: $(GOOS), GOARCH: $(GOARCH), CC: $(CC), CXX: $(CXX))
 
@@ -154,6 +155,14 @@ mocks: $(MOCKS_DIR)
 
 $(MOCKS_DIR):
 	mkdir -p $(MOCKS_DIR)
+
+###############################################################################
+###                                Docker                                   ###
+###############################################################################
+
+docker-build:
+	@echo "Building Docker image"
+	@docker build -t $(DOCKER_IMAGE):v$(VERSION) .
 
 ###############################################################################
 ###                                Protobuf                                 ###
