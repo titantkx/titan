@@ -1,9 +1,12 @@
 import { ChainInfo, Window as KeplrWindow } from "@keplr-wallet/types";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { TitanSigningStargateClient } from "../titan_signingstargateclient";
+import CreateValidator from "./CreateValidator";
+import CreateValidatorForOther from "./CreateValidatorForOther";
 import Send from "./Send";
 import Stake from "./Stake";
+import StakeForOther from "./StakeForOther";
 import Unstake from "./Unstake";
 import WithdrawRewards from "./WithdrawRewards";
 
@@ -38,7 +41,7 @@ const chainInfo: ChainInfo = {
     {
       coinDenom: "TKX",
       coinMinimalDenom: "atkx",
-      coinDecimals: 18,      
+      coinDecimals: 18,
       gasPriceStep: {
         low: 10 * 1e10,
         average: 11 * 1e10,
@@ -82,22 +85,35 @@ const KeplrView = () => {
   }, []);
 
   return (
-    <Container fluid className="p-5">
+    <Container fluid className="p-4">
       {client && (
-        <Row>
-          <Col>
-            <Send client={client} />
-          </Col>
-          <Col>
-            <Stake client={client} />
-          </Col>
-          <Col>
-            <Unstake client={client} />
-          </Col>
-          <Col>
-            <WithdrawRewards client={client} />
-          </Col>
-        </Row>
+        <React.Fragment>
+          <Row>
+            <Col>
+              <Send client={client} />
+            </Col>
+            <Col>
+              <Stake client={client} />
+            </Col>
+            <Col>
+              <StakeForOther client={client} />
+            </Col>
+            <Col>
+              <Unstake client={client} />
+            </Col>
+            <Col>
+              <WithdrawRewards client={client} />
+            </Col>
+          </Row>
+          <Row className="mt-4">
+            <Col>
+              <CreateValidator client={client} />
+            </Col>
+            <Col>
+              <CreateValidatorForOther client={client} />
+            </Col>
+          </Row>
+        </React.Fragment>
       )}
     </Container>
   );
