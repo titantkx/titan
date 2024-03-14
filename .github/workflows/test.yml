@@ -18,6 +18,7 @@ concurrency:
 jobs:
   test-testutil:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -29,6 +30,7 @@ jobs:
 
   test-unit:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -40,6 +42,7 @@ jobs:
 
   test-app:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -51,6 +54,7 @@ jobs:
 
   test-integration:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
