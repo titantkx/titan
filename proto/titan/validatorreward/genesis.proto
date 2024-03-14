@@ -14,8 +14,7 @@ message GenesisState {
 
   // last_distribute_time is the last block time when the validator reward is
   // distributed.
-  google.protobuf.Timestamp last_distribute_time = 2
-      [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_distribute_time = 2 [(gogoproto.stdtime) = true];
 }
 
 // TimestampProto is a wrapper around google.protobuf.Timestamp.

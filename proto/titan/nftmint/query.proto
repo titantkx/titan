@@ -25,13 +25,11 @@ service Query {
 
   // MintingInfo queries the minting info of a given class.
   rpc MintingInfo(QueryMintingInfoRequest) returns (QueryMintingInfoResponse) {
-    option (google.api.http).get =
-        "/titantkx/titan/nftmint/minting_info/{class_id}";
+    option (google.api.http).get = "/titantkx/titan/nftmint/minting_info/{class_id}";
   }
 
   // MintingInfos queries a list of minting info.
-  rpc MintingInfos(QueryMintingInfosRequest)
-      returns (QueryMintingInfosResponse) {
+  rpc MintingInfos(QueryMintingInfosRequest) returns (QueryMintingInfosResponse) {
     option (google.api.http).get = "/titantkx/titan/nftmint/minting_info";
   }
 }
@@ -76,6 +74,6 @@ message QueryMintingInfosRequest {
 // QueryMintingInfosResponse is response type for the Query/QueryMintingInfos
 // RPC method.
 message QueryMintingInfosResponse {
-  repeated MintingInfo minting_info = 1 [(gogoproto.nullable) = false];
-  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  repeated MintingInfo                   minting_info = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination   = 2;
 }

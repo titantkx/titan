@@ -206,9 +206,9 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"tokenize-titan", "titan", "validatorreward", "params"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"titantkx", "titan", "validatorreward", "params"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_RewardPool_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"tokenize-titan", "titan", "validatorreward", "reward_pool"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_RewardPool_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"titantkx", "titan", "validatorreward", "reward_pool"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

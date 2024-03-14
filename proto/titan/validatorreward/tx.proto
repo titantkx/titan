@@ -57,10 +57,8 @@ message MsgFundRewardPool {
 
   string depositor = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   // repeated cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false]
-  repeated cosmos.base.v1beta1.Coin amount = 2 [
-    (gogoproto.nullable)     = false,
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
-  ];
+  repeated cosmos.base.v1beta1.Coin amount = 2
+      [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
 }
 
 // MsgFundRewardPoolResponse defines the Msg/FundRewardPool response type.
