@@ -1,6 +1,7 @@
-import { ChainInfo, Window as KeplrWindow } from "@keplr-wallet/types";
-import React, { useEffect, useState } from "react";
+import { ChainInfo, Keplr, Window as KeplrWindow } from "@keplr-wallet/types";
+import React, { useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
+import Dropdown from "react-bootstrap/Dropdown";
 import { TitanSigningStargateClient } from "../titan_signingstargateclient";
 import CreateValidator from "./CreateValidator";
 import CreateValidatorForOther from "./CreateValidatorForOther";
@@ -11,7 +12,9 @@ import Unstake from "./Unstake";
 import WithdrawRewards from "./WithdrawRewards";
 
 declare global {
-  interface Window extends KeplrWindow {}
+  interface Window extends KeplrWindow {
+    leap: any;
+  }
 }
 
 const chainInfo: ChainInfo = {
@@ -57,38 +60,56 @@ const chainInfo: ChainInfo = {
   features: ["cosmwasm", "eth-address-gen", "eth-key-sign"],
 };
 
-const KeplrView = () => {
+const Home = () => {
+  const [walletName, setWalletName] = useState<string>();
   const [client, setClient] = useState<TitanSigningStargateClient>();
 
-  useEffect(() => {
-    const addTitanToKeplr = async () => {
-      const { keplr } = window;
-      if (!keplr) {
-        alert("You need to install Keplr");
-        throw new Error("You need to install Keplr");
-      }
-      keplr.defaultOptions = {
-        sign: {
-          preferNoSetFee: true,
-        },
-      };
-      await keplr.experimentalSuggestChain(chainInfo);
-      await keplr.enable(process.env.REACT_APP_CHAIN_ID!);
-      const client = await TitanSigningStargateClient.connectWithSigner(
-        process.env.REACT_APP_RPC_URL!,
-        keplr.getOfflineSigner(process.env.REACT_APP_CHAIN_ID!),
-        { isEthermint: true }
-      );
-      setClient(client);
+  const addTitanToWallet = async (wallet: Keplr | undefined) => {
+    if (!wallet) {
+      alert("You need to install " + walletName);
+      throw new Error("You need to install " + walletName);
+    }
+    wallet.defaultOptions = {
+      sign: {
+        preferNoSetFee: true,
+      },
     };
-    addTitanToKeplr();
-  }, []);
+    await wallet.experimentalSuggestChain(chainInfo);
+    await wallet.enable(process.env.REACT_APP_CHAIN_ID!);
+    const client = await TitanSigningStargateClient.connectWithSigner(
+      process.env.REACT_APP_RPC_URL!,
+      wallet.getOfflineSigner(process.env.REACT_APP_CHAIN_ID!),
+      { isEthermint: true }
+    );
+    setClient(client);
+  };
+
+  const handleSelectWallet = (evtKey: any) => {
+    if (evtKey === "keplr") {
+      setWalletName("Keplr");
+      addTitanToWallet(window.keplr);
+    } else if (evtKey === "leap") {
+      setWalletName("Leap");
+      addTitanToWallet(window.leap);
+    }
+  };
 
   return (
     <Container fluid className="p-4">
+      <Row>
+        <Dropdown onSelect={handleSelectWallet}>
+          <Dropdown.Toggle id="dropdown-wallet">
+            {walletName || "Select Wallet"}
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item eventKey="keplr">Keplr</Dropdown.Item>
+            <Dropdown.Item eventKey="leap">Leap</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </Row>
       {client && (
         <React.Fragment>
-          <Row>
+          <Row className="mt-4">
             <Col>
               <Send client={client} />
             </Col>
@@ -119,4 +140,4 @@ const KeplrView = () => {
   );
 };
 
-export default KeplrView;
+export default Home;
