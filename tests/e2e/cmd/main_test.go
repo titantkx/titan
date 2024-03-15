@@ -30,13 +30,14 @@ func TestMain(m *testing.M) {
 	}
 
 	utils.InitSDKConfig()
+	utils.RegisterDenoms()
 
 	rootDir, err := filepath.Abs("../../..")
 	if err != nil {
 		panic(err)
 	}
 
-	// alway log to file except when LOG_OUTPUT_TYPE is set to "std"
+	// Always log to file except when LOG_OUTPUT_TYPE is set to "std"
 	logOutputType := os.Getenv("LOG_OUTPUT_TYPE")
 	logger := os.Stdout
 	if logOutputType != "std" {
