@@ -134,6 +134,7 @@ import (
 	"github.com/titantkx/titan/app/posthandler"
 	v1 "github.com/titantkx/titan/app/upgrades/v1"
 	v2 "github.com/titantkx/titan/app/upgrades/v2"
+	"github.com/titantkx/titan/app/upgrades/v2_0_1"
 	"github.com/titantkx/titan/docs"
 	"github.com/titantkx/titan/utils"
 	nftutil "github.com/titantkx/titan/utils/nft"
@@ -1230,6 +1231,11 @@ func (app *App) setupUpgradeHandlers() {
 		v2.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v2_0_1.UpgradeName,
+		v2_0_1.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1254,6 +1260,7 @@ func (app *App) setupUpgradeHandlers() {
 				nfttransfertypes.StoreKey,
 			},
 		}
+	case v2_0_1.UpgradeName:
 	}
 
 	if storeUpgrades != nil {
