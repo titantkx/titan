@@ -1,5 +1,12 @@
 name: Test-Upgrade
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "**/**.go"
+      - go.mod
+      - go.sum
   push:
     branches:
       - release/**
