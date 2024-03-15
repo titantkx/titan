@@ -19,9 +19,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.20'
-          check-latest: true
-      - name: release dry run
-        run: make release-dry-run
+          check-latest: true      
       - name: setup release environment
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
