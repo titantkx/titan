@@ -5,6 +5,8 @@ on:
       - develop
     paths:
       - "**/**.go"
+      - "**/init.sh"
+      - "**/docker-compose.yml"
       - go.mod
       - go.sum
 
@@ -103,6 +105,8 @@ jobs:
         with:
           PATTERNS: |
             **/**.go
+            **/init.sh
+            **/docker-compose.yml
             go.mod
             go.sum
       - run: echo "$GITHUB_WORKSPACE/build" >> $GITHUB_PATH
