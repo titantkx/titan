@@ -39,5 +39,5 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64, linux/arm64
-          tags: titantkx/titan:latest, titantkx/titan:${{ steps.meta.outputs.tag }}
+          platforms: linux/amd64
+          tags: titantkx/titand:latest, titantkx/titand:${{ steps.meta.outputs.tag }}
