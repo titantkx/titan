@@ -1,3 +1,13 @@
+set -e
+
+# Detect platform
+platform=$(uname)
+if [ "$platform" = "Darwin" ]; then
+    SED_INPLACE="sed -i ''"
+else
+    SED_INPLACE="sed -i"
+fi
+
 # Delele old volumns
 rm -rf tmp/val1/.titand/*
 rm -rf tmp/val2/.titand/*
@@ -5,13 +15,13 @@ rm -rf tmp/val2/.titand/*
 # Init val1
 docker compose -f docker-compose-genesis.yml run --rm -i val1 init val1 --chain-id=titan_18887-1 --overwrite
 docker compose -f docker-compose-genesis.yml run --rm -i val1 config keyring-backend test
-sed -i '' 's/^indexer = ".*"/indexer = "kv"/' tmp/val1/.titand/config/config.toml
-sed -i '' 's/^timeout_commit = ".*"/timeout_commit = "0.5s"/' tmp/val1/.titand/config/config.toml
+$SED_INPLACE 's/^indexer = ".*"/indexer = "kv"/' tmp/val1/.titand/config/config.toml
+$SED_INPLACE 's/^timeout_commit = ".*"/timeout_commit = "0.5s"/' tmp/val1/.titand/config/config.toml
 # Init val2
 docker compose -f docker-compose-genesis.yml run --rm -i val2 init val2 --chain-id=titan_18887-1 --overwrite
 docker compose -f docker-compose-genesis.yml run --rm -i val2 config keyring-backend test
-sed -i '' 's/^indexer = ".*"/indexer = "kv"/' tmp/val2/.titand/config/config.toml
-sed -i '' 's/^timeout_commit = ".*"/timeout_commit = "0.5s"/' tmp/val2/.titand/config/config.toml
+$SED_INPLACE 's/^indexer = ".*"/indexer = "kv"/' tmp/val2/.titand/config/config.toml
+$SED_INPLACE 's/^timeout_commit = ".*"/timeout_commit = "0.5s"/' tmp/val2/.titand/config/config.toml
 
 ### On val1 machine
 
@@ -108,13 +118,13 @@ cp tmp/val1/.titand/config/genesis.json tmp/val2/.titand/config/genesis.json
 
 # Add val2 node to seed peers
 val2id=$(docker compose -f docker-compose-genesis.yml run --rm -i val2 tendermint show-node-id)
-sed -i '' "s/^seeds = \"\"/seeds = \"$val2id@val2:26656\"/" tmp/val1/.titand/config/config.toml
+$SED_INPLACE "s/^seeds = \"\"/seeds = \"$val2id@val2:26656\"/" tmp/val1/.titand/config/config.toml
 
 # Expose rpc endpoint
-sed -i '' 's/^laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/' tmp/val1/.titand/config/config.toml
+$SED_INPLACE 's/^laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/' tmp/val1/.titand/config/config.toml
 
 ### On val2 machine
 
 # Add val1 node to seed peers
 val1id=$(docker compose -f docker-compose-genesis.yml run --rm -i val1 tendermint show-node-id)
-sed -i '' "s/^seeds = \"\"/seeds = \"$val1id@val1:26656\"/" tmp/val2/.titand/config/config.toml
+$SED_INPLACE "s/^seeds = \"\"/seeds = \"$val1id@val1:26656\"/" tmp/val2/.titand/config/config.toml

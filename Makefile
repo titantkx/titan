@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-export VERSION := $(shell echo $(shell git describe --always --match "v*") | sed 's/^v//')
+export VERSION := $(shell echo $(shell git describe --tag --always --match "v*") | sed 's/^v//')
 export TMVERSION := $(shell go list -m github.com/cometbft/cometbft | sed 's:.* ::')
 export COMMIT := $(shell git log -1 --format='%H')
 export MAKE_PROJECT_ROOT := $(CURDIR)
@@ -270,6 +270,12 @@ test-integration:
 
 test-e2e-cmd: 
 	TEST_TYPE=basic go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
+
+test-e2e-upgrade:
+	TEST_TYPE=upgrade go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
+
+test-e2e-upgrade-from-genesis:
+	TEST_TYPE=upgrade-from-genesis go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
 
 test-all: test-testutil test-unit test-app test-integration test-e2e-cmd
 
