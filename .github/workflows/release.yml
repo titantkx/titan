@@ -22,8 +22,8 @@ jobs:
           check-latest: true      
       - name: setup release environment
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.INNERPEACE080_GITHUB_TOKEN }}
         run: |-
-          echo 'GITHUB_TOKEN=${{secrets.GITHUB_TOKEN}}' > .release-env
+          echo 'GITHUB_TOKEN=${{secrets.INNERPEACE080_GITHUB_TOKEN}}' > .release-env
       - name: release publish
         run: make release
