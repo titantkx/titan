@@ -3,13 +3,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - "**/**.go"
-      - "**/init.sh"
-      - "**/docker-compose-genesis.yml"
-      - "**/docker-compose-latest.yml"
-      - go.mod
-      - go.sum
   push:
     branches:
       - release/**
