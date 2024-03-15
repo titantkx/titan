@@ -5,13 +5,13 @@ name: e2e-test-titan
 services:
   val1:
     command: start
-    image: titanlab/titand:v1.0.0
+    image: titantkx/titand:v2.0.0
     volumes:
       - ./tmp/val1/.titand:/root/.titand
     ports:
       - "26657:26657"
   val2:
     command: start
-    image: titanlab/titand:v1.0.0
+    image: titantkx/titand:v2.0.0
     volumes:
       - ./tmp/val2/.titand:/root/.titand

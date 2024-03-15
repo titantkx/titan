@@ -3,31 +3,36 @@ import { Field, Form, Formik } from "formik";
 import { Button, FormGroup } from "react-bootstrap";
 import * as Yup from "yup";
 import { TitanSigningStargateClient } from "../titan_signingstargateclient";
-import { validateGasPrice } from "../utils/helper";
+import { parseCoin, validateCoin, validateGasPrice } from "../utils/helper";
 
-interface WithdrawRewardsProps {
+interface UnstakeProps {
   client: TitanSigningStargateClient;
 }
 
-const WithdrawRewards = ({ client }: WithdrawRewardsProps) => {
-  interface WithdrawRewardsInputs {
+const Unstake = ({ client }: UnstakeProps) => {
+  interface UnstakeInputs {
     delegator: string;
     validator: string;
+    amount: string;
     gas: string;
     gasPrice: string;
     memo?: string;
   }
 
-  const initialValues: WithdrawRewardsInputs = {
+  const initialValues: UnstakeInputs = {
     delegator: "titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr",
     validator: "titanvaloper1cxjpv02d4cg7jp9qvh2her2lz5ljut0ulc3dua",
+    amount: "10tkx",
     gas: "auto",
-    gasPrice:  `${10 * 1e10}atkx`,
+    gasPrice: `${10 * 1e10}atkx`,
   };
 
-  const withdrawRewardsSchema = Yup.object().shape({
+  const unstakeSchema = Yup.object().shape({
     delegator: Yup.string().required(),
     validator: Yup.string().required(),
+    amount: Yup.string()
+      .required()
+      .test("validate-amount", "Invalid amount", validateCoin),
     gas: Yup.string()
       .required()
       .matches(/^(auto|\d+)$/, "Gas must be auto or number"),
@@ -37,26 +42,29 @@ const WithdrawRewards = ({ client }: WithdrawRewardsProps) => {
     memo: Yup.string(),
   });
 
-  const withdrawRewards = async ({
+  const unstake = async ({
     delegator,
     validator,
+    amount,
     gas,
     gasPrice,
     memo,
-  }: WithdrawRewardsInputs) => {
+  }: UnstakeInputs) => {
     try {
-      console.log("stake");
-      const resp = await client.withdrawRewards(
+      const resp = await client.undelegateTokens(
         delegator,
         validator,
+        parseCoin(amount),
         {
           gas: gas === "auto" ? "auto" : Number(gas),
           gasPrice: GasPrice.fromString(gasPrice),
         },
         memo
       );
-      if (resp.code === 0) window.alert("Withdrew rewards successfully");
-      else window.alert(JSON.stringify(resp));
+      if (resp.code === 0) {
+        window.alert("Unstaked successfully");
+        console.log(resp.transactionHash);
+      } else window.alert(JSON.stringify(resp));
     } catch (e) {
       window.alert(e);
     }
@@ -65,8 +73,8 @@ const WithdrawRewards = ({ client }: WithdrawRewardsProps) => {
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={withdrawRewardsSchema}
-      onSubmit={withdrawRewards}
+      validationSchema={unstakeSchema}
+      onSubmit={unstake}
     >
       {({ errors, touched, isValid }) => (
         <Form>
@@ -80,6 +88,12 @@ const WithdrawRewards = ({ client }: WithdrawRewardsProps) => {
             <Field name="validator" placeholder="Validator" />
             {errors.validator && touched.validator ? (
               <div>{errors.validator}</div>
+            ) : null}
+          </FormGroup>
+          <FormGroup>
+            <Field name="amount" placeholder="Amount" />
+            {errors.amount && touched.amount ? (
+              <div>{errors.amount}</div>
             ) : null}
           </FormGroup>
           <FormGroup>
@@ -97,7 +111,7 @@ const WithdrawRewards = ({ client }: WithdrawRewardsProps) => {
             {errors.memo && touched.memo ? <div>{errors.memo}</div> : null}
           </FormGroup>
           <Button type="submit" disabled={!isValid}>
-            Withdraw Rewards
+            Unstake
           </Button>
         </Form>
       )}
@@ -105,4 +119,4 @@ const WithdrawRewards = ({ client }: WithdrawRewardsProps) => {
   );
 };
 
-export default WithdrawRewards;
+export default Unstake;

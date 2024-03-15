@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	keepertest "github.com/tokenize-titan/titan/testutil/keeper"
-	"github.com/tokenize-titan/titan/utils"
+	keepertest "github.com/titantkx/titan/testutil/keeper"
+	"github.com/titantkx/titan/utils"
 )
 
 func TestKeeper_LastDistributeTime(t *testing.T) {

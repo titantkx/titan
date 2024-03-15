@@ -1,4 +1,4 @@
-module github.com/tokenize-titan/titan
+module github.com/titantkx/titan
 
 go 1.19
 
@@ -28,7 +28,7 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.4
-	github.com/tokenize-titan/ethermint v0.23.0-rc.5
+	github.com/titantkx/ethermint v0.23.2
 	google.golang.org/genproto/googleapis/api v0.0.0-20231002182017-d307bd883b97
 	google.golang.org/grpc v1.58.3
 	google.golang.org/protobuf v1.31.0
@@ -219,4 +219,4 @@ require (
 
 replace github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
-replace github.com/cosmos/cosmos-sdk => github.com/tokenize-titan/cosmos-sdk v0.47.6-titan.3
+replace github.com/cosmos/cosmos-sdk => github.com/titantkx/cosmos-sdk v0.47.6-titan.4

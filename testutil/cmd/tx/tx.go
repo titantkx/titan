@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd"
-	"github.com/tokenize-titan/titan/testutil/cmd/feemarket"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd"
+	"github.com/titantkx/titan/testutil/cmd/feemarket"
+	"github.com/titantkx/titan/utils"
 )
 
 var rpcErrPattern = regexp.MustCompile(`RPC\serror\s(-?[\d]+)`)
@@ -205,8 +205,11 @@ func GenerateTx(args ...string) ([]byte, error) {
 		return nil, err
 	}
 	s := bufio.NewScanner(bytes.NewBuffer(output))
-	if s.Scan() && s.Scan() {
-		return s.Bytes(), nil
+	for s.Scan() {
+		b := s.Bytes()
+		if (b[0] == '[' && b[len(b)-1] == ']') || (b[0] == '{' && b[len(b)-1] == '}') {
+			return b, nil
+		}
 	}
 	return nil, fmt.Errorf("invalid output: %s", string(output))
 }

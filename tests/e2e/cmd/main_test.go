@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"github.com/tokenize-titan/titan/tests/e2e/cmd/setup/basic"
-	"github.com/tokenize-titan/titan/tests/e2e/cmd/setup/upgrade"
-	upgradefromgenesis "github.com/tokenize-titan/titan/tests/e2e/cmd/setup/upgrade-from-genesis"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/tests/e2e/cmd/setup/basic"
+	"github.com/titantkx/titan/tests/e2e/cmd/setup/upgrade"
+	upgradefromgenesis "github.com/titantkx/titan/tests/e2e/cmd/setup/upgrade-from-genesis"
+	"github.com/titantkx/titan/utils"
 )
 
 const (
@@ -20,6 +20,9 @@ const (
 )
 
 func TestMain(m *testing.M) {
+	// defer os.Exit here to avoid hang when test fail in Setup step
+	defer os.Exit(1)
+
 	if err := godotenv.Load(); err != nil {
 		if !os.IsNotExist(err) {
 			panic(err)
@@ -33,10 +36,16 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	logger, err := os.Create("titand.log")
-	if err != nil {
-		panic(err)
+	// alway log to file except when LOG_OUTPUT_TYPE is set to "std"
+	logOutputType := os.Getenv("LOG_OUTPUT_TYPE")
+	logger := os.Stdout
+	if logOutputType != "std" {
+		logger, err = os.Create("titand.log")
+		if err != nil {
+			panic(err)
+		}
 	}
+
 	defer logger.Close()
 
 	testType := os.Getenv("TEST_TYPE")

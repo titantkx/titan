@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/utils"
 )
 
 var coinPattern = regexp.MustCompile(`((?:[\d]+\.)?[\d]+)([\w]+)`)

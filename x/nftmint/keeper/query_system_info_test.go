@@ -8,9 +8,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	keepertest "github.com/tokenize-titan/titan/testutil/keeper"
-	"github.com/tokenize-titan/titan/testutil/nullify"
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	keepertest "github.com/titantkx/titan/testutil/keeper"
+	"github.com/titantkx/titan/testutil/nullify"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 func TestSystemInfoQuery(t *testing.T) {

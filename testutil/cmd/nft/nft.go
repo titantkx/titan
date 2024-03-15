@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd"
-	txcmd "github.com/tokenize-titan/titan/testutil/cmd/tx"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd"
+	txcmd "github.com/titantkx/titan/testutil/cmd/tx"
 )
 
 type MintingInfo struct {

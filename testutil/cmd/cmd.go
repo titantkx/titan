@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
+	"github.com/titantkx/titan/testutil"
 )
 
 var HomeDir string

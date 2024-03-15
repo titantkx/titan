@@ -1,5 +1,5 @@
 {
-  "name": "keplr",
+  "name": "cosmos-wallet",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
@@ -23,9 +23,12 @@
   },
   "devDependencies": {
     "@keplr-wallet/types": "^0.12.48",
-    "@titan-cosmjs/proto-signing": "^0.32.1",
-    "@titan-cosmjs/stargate": "^0.32.1",
-    "@titan-cosmjs/tendermint-rpc": "^0.32.1",
+    "@titan-cosmjs/math": "^0.32.2",
+    "@titan-cosmjs/amino": "^0.32.2",
+    "@titan-cosmjs/proto-signing": "^0.32.2",
+    "@titan-cosmjs/stargate": "^0.32.2",
+    "@titan-cosmjs/tendermint-rpc": "^0.32.2",
+    "titan-cosmjs-types": "^0.9.0",
     "react-app-rewired": "^2.2.1"
   },
   "scripts": {

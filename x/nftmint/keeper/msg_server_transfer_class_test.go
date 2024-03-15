@@ -6,8 +6,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/utils"
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	"github.com/titantkx/titan/utils"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 func mustTransferClass(t testing.TB, ms types.MsgServer, ctx context.Context, sender, receiver, classId string) {

@@ -117,39 +117,40 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
-	ethermintante "github.com/tokenize-titan/ethermint/app/ante"
-	ethermintappparams "github.com/tokenize-titan/ethermint/app/params"
-	"github.com/tokenize-titan/ethermint/ethereum/eip712"
-	srvflags "github.com/tokenize-titan/ethermint/server/flags"
-	ethermint "github.com/tokenize-titan/ethermint/types"
-	"github.com/tokenize-titan/ethermint/x/evm"
-	evmkeeper "github.com/tokenize-titan/ethermint/x/evm/keeper"
-	evmtypes "github.com/tokenize-titan/ethermint/x/evm/types"
-	"github.com/tokenize-titan/ethermint/x/evm/vm/geth"
-	"github.com/tokenize-titan/ethermint/x/feemarket"
-	feemarketkeeper "github.com/tokenize-titan/ethermint/x/feemarket/keeper"
-	feemarkettypes "github.com/tokenize-titan/ethermint/x/feemarket/types"
+	ethermintante "github.com/titantkx/ethermint/app/ante"
+	ethermintappparams "github.com/titantkx/ethermint/app/params"
+	"github.com/titantkx/ethermint/ethereum/eip712"
+	srvflags "github.com/titantkx/ethermint/server/flags"
+	ethermint "github.com/titantkx/ethermint/types"
+	"github.com/titantkx/ethermint/x/evm"
+	evmkeeper "github.com/titantkx/ethermint/x/evm/keeper"
+	evmtypes "github.com/titantkx/ethermint/x/evm/types"
+	"github.com/titantkx/ethermint/x/evm/vm/geth"
+	"github.com/titantkx/ethermint/x/feemarket"
+	feemarketkeeper "github.com/titantkx/ethermint/x/feemarket/keeper"
+	feemarkettypes "github.com/titantkx/ethermint/x/feemarket/types"
 
-	"github.com/tokenize-titan/titan/app/ante"
-	"github.com/tokenize-titan/titan/app/posthandler"
-	v1 "github.com/tokenize-titan/titan/app/upgrades/v1"
-	v2 "github.com/tokenize-titan/titan/app/upgrades/v2"
-	"github.com/tokenize-titan/titan/docs"
-	"github.com/tokenize-titan/titan/utils"
-	nftutil "github.com/tokenize-titan/titan/utils/nft"
-	distr "github.com/tokenize-titan/titan/x/distribution"
-	distrkeeper "github.com/tokenize-titan/titan/x/distribution/keeper"
-	gov "github.com/tokenize-titan/titan/x/gov"
-	govkeeper "github.com/tokenize-titan/titan/x/gov/keeper"
-	stakingkeeper "github.com/tokenize-titan/titan/x/staking/keeper"
+	"github.com/titantkx/titan/app/ante"
+	"github.com/titantkx/titan/app/posthandler"
+	v1 "github.com/titantkx/titan/app/upgrades/v1"
+	v2 "github.com/titantkx/titan/app/upgrades/v2"
+	"github.com/titantkx/titan/app/upgrades/v2_0_1"
+	"github.com/titantkx/titan/docs"
+	"github.com/titantkx/titan/utils"
+	nftutil "github.com/titantkx/titan/utils/nft"
+	distr "github.com/titantkx/titan/x/distribution"
+	distrkeeper "github.com/titantkx/titan/x/distribution/keeper"
+	gov "github.com/titantkx/titan/x/gov"
+	govkeeper "github.com/titantkx/titan/x/gov/keeper"
+	stakingkeeper "github.com/titantkx/titan/x/staking/keeper"
 
-	"github.com/tokenize-titan/titan/x/validatorreward"
-	validatorrewardkeeper "github.com/tokenize-titan/titan/x/validatorreward/keeper"
-	validatorrewardtypes "github.com/tokenize-titan/titan/x/validatorreward/types"
+	"github.com/titantkx/titan/x/validatorreward"
+	validatorrewardkeeper "github.com/titantkx/titan/x/validatorreward/keeper"
+	validatorrewardtypes "github.com/titantkx/titan/x/validatorreward/types"
 
-	nftmintmodule "github.com/tokenize-titan/titan/x/nftmint"
-	nftmintmodulekeeper "github.com/tokenize-titan/titan/x/nftmint/keeper"
-	nftmintmoduletypes "github.com/tokenize-titan/titan/x/nftmint/types"
+	nftmintmodule "github.com/titantkx/titan/x/nftmint"
+	nftmintmodulekeeper "github.com/titantkx/titan/x/nftmint/keeper"
+	nftmintmoduletypes "github.com/titantkx/titan/x/nftmint/types"
 
 	nfttransfer "github.com/bianjieai/nft-transfer"
 	nfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
@@ -157,7 +158,7 @@ import (
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
-	appparams "github.com/tokenize-titan/titan/app/params"
+	appparams "github.com/titantkx/titan/app/params"
 )
 
 const (
@@ -1230,6 +1231,11 @@ func (app *App) setupUpgradeHandlers() {
 		v2.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v2_0_1.UpgradeName,
+		v2_0_1.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1254,6 +1260,7 @@ func (app *App) setupUpgradeHandlers() {
 				nfttransfertypes.StoreKey,
 			},
 		}
+	case v2_0_1.UpgradeName:
 	}
 
 	if storeUpgrades != nil {

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/tokenize-titan/titan/testutil"
+	"github.com/titantkx/titan/testutil"
 )
 
 func TestFloat_String(t *testing.T) {

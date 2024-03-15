@@ -4,10 +4,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd/keys"
-	"github.com/tokenize-titan/titan/testutil/cmd/staking"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd/keys"
+	"github.com/titantkx/titan/testutil/cmd/staking"
+	"github.com/titantkx/titan/utils"
 )
 
 func MustGetValidator(t testing.TB) string {

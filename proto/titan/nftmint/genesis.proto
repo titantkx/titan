@@ -7,7 +7,7 @@ import "titan/nftmint/params.proto";
 import "titan/nftmint/system_info.proto";
 import "titan/nftmint/minting_info.proto";
 
-option go_package = "github.com/tokenize-titan/titan/x/nftmint/types";
+option go_package = "github.com/titantkx/titan/x/nftmint/types";
 
 // GenesisState defines the nftmint module's genesis state.
 message GenesisState {

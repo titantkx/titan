@@ -12,6 +12,7 @@ PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 COSMOS_VERSION = $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
 IGNITE_VERSION = v0.27.1
 MOCKS_DIR = $(CURDIR)/tests/mocks
+DOCKER_IMAGE := titantkx/titand
 
 # $(info GOOS: $(GOOS), GOARCH: $(GOARCH), CC: $(CC), CXX: $(CXX))
 
@@ -156,28 +157,36 @@ $(MOCKS_DIR):
 	mkdir -p $(MOCKS_DIR)
 
 ###############################################################################
+###                                Docker                                   ###
+###############################################################################
+
+docker-build:
+	@echo "Building Docker image"
+	@docker build -t $(DOCKER_IMAGE):v$(VERSION) .
+
+###############################################################################
 ###                                Protobuf                                 ###
 ###############################################################################
 
 protoVer=0.11.2
 protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
 protoContainerName=protobuilder-titan-$(subst /,_,$(subst \,_,$(CURDIR)))
-protoImage=$(DOCKER) run -v $(CURDIR):/workspace --workdir /workspace --name $(protoContainerName) $(protoImageName)
-protoFormatImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(protoImageName)
+protoImage=$(DOCKER) run -v $(CURDIR):/workspace --workdir /workspace --user 0 --name $(protoContainerName) $(protoImageName)
+protoFormatImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace --user 0 $(protoImageName)
 
 proto-all: proto-format proto-lint proto-gen
 
 proto-gen:
-	@echo "Generating Protobuf files"
+	@echo "Generating Protobuf files"	
 	@if [ ! "$(shell docker ps -aq -f name=$(protoContainerName))" ]; then \
-    $(protoImage) sh ./scripts/protocgen.sh ; \
+		$(protoImage) sh ./scripts/protocgen.sh ; \
 	else \
 		$(DOCKER) start -a $(protoContainerName) ; \
 	fi
 	
 
 proto-format:
-	@$(protoFormatImage) find ./ -name "*.proto" -exec clang-format --style="{ IndentWidth: 2, BasedOnStyle: google, AlignConsecutiveAssignments: true, AlignConsecutiveDeclarations: Consecutive }" -i {} \;
+	@$(protoFormatImage) find ./ -name "*.proto" -exec clang-format --style="{ IndentWidth: 2, BasedOnStyle: google, AlignConsecutiveAssignments: true, AlignConsecutiveDeclarations: Consecutive, ColumnLimit: 120 }" -i {} \;
 
 proto-lint:
 	@$(protoFormatImage) buf lint --error-format=json
@@ -238,12 +247,43 @@ test-solidity:
 	@echo "Beginning solidity tests..."
 	./scripts/run-solidity-tests.sh
 
+vulncheck: $(BUILDDIR)/
+	GOBIN=$(BUILDDIR) go install golang.org/x/vuln/cmd/govulncheck@latest
+	$(BUILDDIR)/govulncheck ./...
+
+go.sum: go.mod
+	@echo "Ensure dependencies have not been modified ..." >&2
+	go mod verify
+	go mod tidy
+
+test-testutil:
+	go test -timeout 1200s -cover github.com/titantkx/titan/testutil -v
+
+test-unit:
+	go test -v -timeout 1200s -cover github.com/titantkx/titan/x/...
+
+test-app:
+	go test -timeout 1200s -cover github.com/titantkx/titan/app -v
+
+test-integration:	
+	go test -timeout 1200s -cover github.com/titantkx/titan/tests/integration/... -v
+
+test-e2e-cmd: 
+	TEST_TYPE=basic go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
+
+test-e2e-upgrade:
+	TEST_TYPE=upgrade go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
+
+test-e2e-upgrade-from-genesis:
+	TEST_TYPE=upgrade-from-genesis go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
+
+test-all: test-testutil test-unit test-app test-integration test-e2e-cmd
 
 ###############################################################################
 ###                                Releasing                                ###
 ###############################################################################
 
-PACKAGE_NAME:=github.com/tokenize-titan/titan
+PACKAGE_NAME:=github.com/titantkx/titan
 GOLANG_CROSS_VERSION  = v1.20
 GOPATH ?= '$(HOME)/go'
 release-dry-run:

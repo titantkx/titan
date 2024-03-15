@@ -7,7 +7,7 @@ import (
 	sdkgovkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	sdkgovtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/tokenize-titan/titan/x/gov/types"
+	"github.com/titantkx/titan/x/gov/types"
 )
 
 type Keeper struct {

@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-PACKAGE_NAME=github.com/tokenize-titan/titan
+set -e
+
+PACKAGE_NAME=github.com/titantkx/titan
 GOLANG_CROSS_VERSION=v1.20
-GITHUB_REPO=tokenize-titan/titan
+GITHUB_REPO=titantkx/titan
 
 # verify if `MAKE_PROJECT_ROOT` and `MAKE_BUILD_TAGS` is set
 if [ -z "$MAKE_PROJECT_ROOT" ] || [ -z "$MAKE_BUILD_TAGS" ]; then

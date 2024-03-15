@@ -6,7 +6,7 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	sdkstakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/tokenize-titan/titan/x/staking/types"
+	"github.com/titantkx/titan/x/staking/types"
 )
 
 type Keeper struct {

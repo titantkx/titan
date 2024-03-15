@@ -6,10 +6,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
-	keepertest "github.com/tokenize-titan/titan/testutil/keeper"
-	"github.com/tokenize-titan/titan/testutil/nullify"
-	"github.com/tokenize-titan/titan/x/nftmint/keeper"
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	keepertest "github.com/titantkx/titan/testutil/keeper"
+	"github.com/titantkx/titan/testutil/nullify"
+	"github.com/titantkx/titan/x/nftmint/keeper"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 func createTestSystemInfo(keeper *keeper.Keeper, ctx sdk.Context) types.SystemInfo {

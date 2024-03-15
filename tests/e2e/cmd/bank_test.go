@@ -7,14 +7,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/utils"
 
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd"
-	"github.com/tokenize-titan/titan/testutil/cmd/bank"
-	"github.com/tokenize-titan/titan/testutil/cmd/keys"
-	"github.com/tokenize-titan/titan/testutil/cmd/status"
-	txcmd "github.com/tokenize-titan/titan/testutil/cmd/tx"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd"
+	"github.com/titantkx/titan/testutil/cmd/bank"
+	"github.com/titantkx/titan/testutil/cmd/keys"
+	"github.com/titantkx/titan/testutil/cmd/status"
+	txcmd "github.com/titantkx/titan/testutil/cmd/tx"
 )
 
 var faucetMtx sync.Mutex

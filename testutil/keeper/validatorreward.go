@@ -15,9 +15,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/x/validatorreward/keeper"
-	validatorrewardtestutil "github.com/tokenize-titan/titan/x/validatorreward/testutil"
-	"github.com/tokenize-titan/titan/x/validatorreward/types"
+	"github.com/titantkx/titan/x/validatorreward/keeper"
+	validatorrewardtestutil "github.com/titantkx/titan/x/validatorreward/testutil"
+	"github.com/titantkx/titan/x/validatorreward/types"
 )
 
 func ValidatorrewardKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {

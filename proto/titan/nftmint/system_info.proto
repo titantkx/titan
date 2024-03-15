@@ -1,7 +1,7 @@
 syntax = "proto3";
 package titan.nftmint;
 
-option go_package = "github.com/tokenize-titan/titan/x/nftmint/types";
+option go_package = "github.com/titantkx/titan/x/nftmint/types";
 
 // SystemInfo defines the system info of this module.
 message SystemInfo {

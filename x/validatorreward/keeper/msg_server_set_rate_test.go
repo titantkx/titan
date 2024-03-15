@@ -7,10 +7,10 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/tokenize-titan/titan/testutil/sample"
-	"github.com/tokenize-titan/titan/utils"
-	"github.com/tokenize-titan/titan/x/validatorreward/keeper"
-	"github.com/tokenize-titan/titan/x/validatorreward/types"
+	"github.com/titantkx/titan/testutil/sample"
+	"github.com/titantkx/titan/utils"
+	"github.com/titantkx/titan/x/validatorreward/keeper"
+	"github.com/titantkx/titan/x/validatorreward/types"
 )
 
 func TestMsgServer_SetRate(t *testing.T) {

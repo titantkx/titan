@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/tokenize-titan/titan/x/validatorreward/keeper"
+	"github.com/titantkx/titan/x/validatorreward/keeper"
 )
 
 // BeginBlocker add validator reward to `feeCollector`

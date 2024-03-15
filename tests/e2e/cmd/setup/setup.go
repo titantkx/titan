@@ -7,13 +7,13 @@ import (
 	"strings"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd"
-	"github.com/tokenize-titan/titan/testutil/cmd/gov"
-	"github.com/tokenize-titan/titan/testutil/cmd/status"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd"
+	"github.com/titantkx/titan/testutil/cmd/gov"
+	"github.com/titantkx/titan/testutil/cmd/status"
 )
 
-const ImageName = "titanlab/titand"
+const ImageName = "titantkx/titand"
 
 func Install(t testutil.TestingT, w io.Writer, rootDir string) {
 	cwd := testutil.Getwd(t)
@@ -42,6 +42,7 @@ func StartChain(t testutil.TestingT, w io.Writer, dcFile string) (ready chan str
 	go func() {
 		isRunning := false
 		r := bufio.NewReader(s)
+		numberExecutedBlocksNeeded := 6
 		for {
 			line, isPrefix, err := r.ReadLine()
 			if err == io.EOF {
@@ -53,8 +54,12 @@ func StartChain(t testutil.TestingT, w io.Writer, dcFile string) (ready chan str
 				fmt.Fprintln(w)
 			}
 			if !isRunning && strings.Contains(string(line), "executed block") {
-				isRunning = true
-				readyCh <- struct{}{}
+				fmt.Printf("Executed block %d\n", numberExecutedBlocksNeeded)
+				numberExecutedBlocksNeeded--
+				if numberExecutedBlocksNeeded == 0 {
+					isRunning = true
+					readyCh <- struct{}{}
+				}
 			}
 		}
 	}()

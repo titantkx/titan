@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
+	"github.com/titantkx/titan/testutil"
 )
 
 func TestMockTest_Errorf(t *testing.T) {

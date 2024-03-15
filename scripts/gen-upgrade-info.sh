@@ -15,7 +15,7 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-GITHUB_REPO=tokenize-titan/titan
+GITHUB_REPO=titantkx/titan
 UPGRADE_INFO_FILE_NAME="upgrade-info.json"
 # verify release version exists on github
 

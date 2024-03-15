@@ -1,16 +1,21 @@
-import { GasPrice } from "@titan-cosmjs/stargate";
+import {
+  GasPrice,
+  MsgDelegateForOtherEncodeObject,
+} from "@titan-cosmjs/stargate";
 import { Field, Form, Formik } from "formik";
 import { Button, FormGroup } from "react-bootstrap";
+import { MsgDelegateForOther } from "titan-cosmjs-types/cosmos/staking/v1beta1/tx";
 import * as Yup from "yup";
 import { TitanSigningStargateClient } from "../titan_signingstargateclient";
 import { parseCoin, validateCoin, validateGasPrice } from "../utils/helper";
 
-interface UnstakeProps {
+interface StakeForOtherProps {
   client: TitanSigningStargateClient;
 }
 
-const Unstake = ({ client }: UnstakeProps) => {
-  interface UnstakeInputs {
+const StakeForOther = ({ client }: StakeForOtherProps) => {
+  interface StakeInputs {
+    payer: string;
     delegator: string;
     validator: string;
     amount: string;
@@ -19,15 +24,17 @@ const Unstake = ({ client }: UnstakeProps) => {
     memo?: string;
   }
 
-  const initialValues: UnstakeInputs = {
-    delegator: "titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr",
+  const initialValues: StakeInputs = {
+    payer: "titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr",
+    delegator: "titan153fhvld277g4mr56kyt6389g6jv4ktn3d8e7r0",
     validator: "titanvaloper1cxjpv02d4cg7jp9qvh2her2lz5ljut0ulc3dua",
     amount: "10tkx",
     gas: "auto",
-    gasPrice:  `${10 * 1e10}atkx`,
+    gasPrice: `${10 * 1e10}atkx`,
   };
 
-  const unstakeSchema = Yup.object().shape({
+  const stakeSchema = Yup.object().shape({
+    payer: Yup.string().required(),
     delegator: Yup.string().required(),
     validator: Yup.string().required(),
     amount: Yup.string()
@@ -42,28 +49,38 @@ const Unstake = ({ client }: UnstakeProps) => {
     memo: Yup.string(),
   });
 
-  const unstake = async ({
+  const stake = async ({
+    payer,
     delegator,
     validator,
     amount,
     gas,
     gasPrice,
     memo,
-  }: UnstakeInputs) => {
+  }: StakeInputs) => {
     try {
-      console.log("stake");
-      const resp = await client.undelegateTokens(
-        delegator,
-        validator,
-        parseCoin(amount),
+      const msg: MsgDelegateForOtherEncodeObject = {
+        typeUrl: "/cosmos.staking.v1beta1.MsgDelegateForOther",
+        value: MsgDelegateForOther.fromPartial({
+          payerAddress: payer,
+          delegatorAddress: delegator,
+          validatorAddress: validator,
+          amount: parseCoin(amount),
+        }),
+      };
+      const resp = await client.signAndBroadcast(
+        payer,
+        [msg],
         {
           gas: gas === "auto" ? "auto" : Number(gas),
           gasPrice: GasPrice.fromString(gasPrice),
         },
         memo
       );
-      if (resp.code === 0) window.alert("Unstaked successfully");
-      else window.alert(JSON.stringify(resp));
+      if (resp.code === 0) {
+        window.alert("Staked successfully");
+        console.log(resp.transactionHash);
+      } else window.alert(JSON.stringify(resp));
     } catch (e) {
       window.alert(e);
     }
@@ -72,11 +89,15 @@ const Unstake = ({ client }: UnstakeProps) => {
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={unstakeSchema}
-      onSubmit={unstake}
+      validationSchema={stakeSchema}
+      onSubmit={stake}
     >
       {({ errors, touched, isValid }) => (
         <Form>
+          <FormGroup>
+            <Field name="payer" placeholder="Payer" />
+            {errors.payer && touched.payer ? <div>{errors.payer}</div> : null}
+          </FormGroup>
           <FormGroup>
             <Field name="delegator" placeholder="Delegator" />
             {errors.delegator && touched.delegator ? (
@@ -110,7 +131,7 @@ const Unstake = ({ client }: UnstakeProps) => {
             {errors.memo && touched.memo ? <div>{errors.memo}</div> : null}
           </FormGroup>
           <Button type="submit" disabled={!isValid}>
-            Unstake
+            Stake for Other
           </Button>
         </Form>
       )}
@@ -118,4 +139,4 @@ const Unstake = ({ client }: UnstakeProps) => {
   );
 };
 
-export default Unstake;
+export default StakeForOther;

@@ -4,11 +4,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	keepertest "github.com/tokenize-titan/titan/testutil/keeper"
-	"github.com/tokenize-titan/titan/testutil/nullify"
-	"github.com/tokenize-titan/titan/utils"
-	"github.com/tokenize-titan/titan/x/validatorreward"
-	"github.com/tokenize-titan/titan/x/validatorreward/types"
+	keepertest "github.com/titantkx/titan/testutil/keeper"
+	"github.com/titantkx/titan/testutil/nullify"
+	"github.com/titantkx/titan/utils"
+	"github.com/titantkx/titan/x/validatorreward"
+	"github.com/titantkx/titan/x/validatorreward/types"
 )
 
 func TestGenesis(t *testing.T) {

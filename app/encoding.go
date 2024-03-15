@@ -7,10 +7,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 
-	ethermintcryptocodec "github.com/tokenize-titan/ethermint/crypto/codec"
-	ethermint "github.com/tokenize-titan/ethermint/types"
+	ethermintcryptocodec "github.com/titantkx/ethermint/crypto/codec"
+	ethermint "github.com/titantkx/ethermint/types"
 
-	"github.com/tokenize-titan/titan/app/params"
+	"github.com/titantkx/titan/app/params"
 )
 
 // makeEncodingConfig creates an EncodingConfig for an amino based test configuration.

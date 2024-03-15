@@ -7,10 +7,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
-	keepertest "github.com/tokenize-titan/titan/testutil/keeper"
-	"github.com/tokenize-titan/titan/x/nftmint/keeper"
-	"github.com/tokenize-titan/titan/x/nftmint/testutil"
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	keepertest "github.com/titantkx/titan/testutil/keeper"
+	"github.com/titantkx/titan/x/nftmint/keeper"
+	"github.com/titantkx/titan/x/nftmint/testutil"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 func setupMsgServer(t testing.TB) (types.MsgServer, context.Context) {

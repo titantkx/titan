@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking/testutil"
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/tokenize-titan/titan/app"
+	"github.com/titantkx/titan/app"
 )
 
 // bootstrapSlashTest creates 3 validators and bootstrap the app.

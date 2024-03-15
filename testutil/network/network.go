@@ -19,7 +19,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/tokenize-titan/titan/app"
+	"github.com/titantkx/titan/app"
 )
 
 type (

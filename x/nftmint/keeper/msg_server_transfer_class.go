@@ -4,7 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tokenize-titan/titan/x/nftmint/types"
+	"github.com/titantkx/titan/x/nftmint/types"
 )
 
 func (k msgServer) TransferClass(goCtx context.Context, msg *types.MsgTransferClass) (*types.MsgTransferClassResponse, error) {

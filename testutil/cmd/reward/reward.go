@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tokenize-titan/titan/testutil"
-	"github.com/tokenize-titan/titan/testutil/cmd"
-	"github.com/tokenize-titan/titan/testutil/cmd/bank"
-	txcmd "github.com/tokenize-titan/titan/testutil/cmd/tx"
-	"github.com/tokenize-titan/titan/utils"
+	"github.com/titantkx/titan/testutil"
+	"github.com/titantkx/titan/testutil/cmd"
+	"github.com/titantkx/titan/testutil/cmd/bank"
+	txcmd "github.com/titantkx/titan/testutil/cmd/tx"
+	"github.com/titantkx/titan/utils"
 )
 
 type Params struct {
