@@ -1,6 +1,8 @@
-name: Test
+name: Test-Upgrade
 on:
-  pull_request:
+  push:
+    branches:
+      - release/**
     paths:
       - "**/**.go"
       - go.mod
@@ -87,7 +89,7 @@ jobs:
       - run: make test-integration
         if: env.GIT_DIFF
 
-  test-e2e-cmd:
+  test-e2e-upgrade:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -105,5 +107,5 @@ jobs:
             go.sum
       - run: echo "$GITHUB_WORKSPACE/build" >> $GITHUB_PATH
         if: env.GIT_DIFF
-      - run: sudo -E make test-e2e-cmd
+      - run: sudo -E make test-e2e-upgrade
         if: env.GIT_DIFF

@@ -271,6 +271,12 @@ test-integration:
 test-e2e-cmd: 
 	TEST_TYPE=basic go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
 
+test-e2e-upgrade:
+	TEST_TYPE=upgrade go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
+
+test-e2e-upgrade-from-genesis:
+	TEST_TYPE=upgrade-from-genesis go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
+
 test-all: test-testutil test-unit test-app test-integration test-e2e-cmd
 
 ###############################################################################

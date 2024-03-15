@@ -1,3 +1,5 @@
+set -e
+
 # Delele old volumns
 rm -rf tmp/val1/.titand/*
 rm -rf tmp/val2/.titand/*
@@ -24,7 +26,8 @@ config="
 .chain_id = \"titan_18887-1\" |
 .validators = [] |
 .app_state.bank.supply = [] |
-del(.app_state.bank.balances[] | select(.address == \"titan1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3ljrm26\")) |
+.app_state.bank.balances |= map(if .address == \"titan1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3ljrm26\" then .coins = [] else . end) |
+.app_state.bank.balances |= map(if .address == \"titan1tygms3xhhs3yv487phx3dw4a95jn7t7ltjl2uw\" then .coins = [] else . end) |
 del(.app_state.ibc.connection_genesis.connections[] | select(.client_id == \"09-localhost\")) |
 .app_state.staking.params.global_min_self_delegation = \"5000000000000000000\" |
 .app_state.staking.last_total_power = \"0\" |
@@ -59,6 +62,8 @@ docker compose -f docker-compose-genesis.yml run --rm -i val1 keys add val1
 val1=$(docker compose -f docker-compose-genesis.yml run --rm -i val1 keys show val1 --address)
 # Add balance to val1
 docker compose -f docker-compose-genesis.yml run --rm -i val1 add-genesis-account $val1 1000000tkx
+# re delete bank supply
+echo $(jq ".app_state.bank.supply = []" tmp/val1/.titand/config/genesis.json) > tmp/val1/.titand/config/genesis.json
 # val1 stakes tkx
 docker compose -f docker-compose-genesis.yml run --rm -i val1 gentx val1 100000tkx --min-self-delegation 5000000000000000000
 
@@ -72,6 +77,8 @@ docker compose -f docker-compose-genesis.yml run --rm -i val2 keys add val2
 val2=$(docker compose -f docker-compose-genesis.yml run --rm -i val2 keys show val2 --address)
 # Add balance to val2
 docker compose -f docker-compose-genesis.yml run --rm -i val2 add-genesis-account $val2 1000000tkx
+# re delete bank supply
+echo $(jq ".app_state.bank.supply = []" tmp/val2/.titand/config/genesis.json) > tmp/val2/.titand/config/genesis.json
 # val2 stakes tkx
 docker compose -f docker-compose-genesis.yml run --rm -i val2 gentx val2 100000tkx --min-self-delegation 5000000000000000000
 
@@ -92,5 +99,15 @@ docker compose -f docker-compose-genesis.yml run --rm -i val1 validate-genesis
 # Copy final genesis file from val1 machine to val2 machine
 cp tmp/val1/.titand/config/genesis.json tmp/val2/.titand/config/genesis.json
 
+# Add val2 node to seed peers
+val2id=$(docker compose -f docker-compose-genesis.yml run --rm -i val2 tendermint show-node-id)
+sed -i '' "s/^seeds = \"\"/seeds = \"$val2id@val2:26656\"/" tmp/val1/.titand/config/config.toml
+
 # Expose rpc endpoint
 sed -i '' 's/^laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/' tmp/val1/.titand/config/config.toml
+
+### On val2 machine
+
+# Add val1 node to seed peers
+val1id=$(docker compose -f docker-compose-genesis.yml run --rm -i val1 tendermint show-node-id)
+sed -i '' "s/^seeds = \"\"/seeds = \"$val1id@val1:26656\"/" tmp/val2/.titand/config/config.toml

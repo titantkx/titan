@@ -1,3 +1,5 @@
+set -e
+
 # Delele old volumns
 rm -rf tmp/val1/.titand/*
 rm -rf tmp/val2/.titand/*
