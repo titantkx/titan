@@ -1,0 +1,16 @@
+name: Changelog Checks
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - release/**
+
+jobs:
+  check_diff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Changelog for changes
+        uses: tarides/changelog-check-action@v2
+        with:
+          changelog: CHANGELOG.md

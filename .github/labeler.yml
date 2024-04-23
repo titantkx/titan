@@ -22,10 +22,7 @@ license:
   - changed-files: 
       - any-glob-to-any-file: 
         - "LICENSE"
-        - "NOTICE"
-        - "AUTHORS"
-        - "CONTRIBUTORS"
-        - "PATENTS"
+        - "CODE_OF_CONDUCT.md"
 
 build:
   - changed-files:
