@@ -8,17 +8,20 @@ Increasingly difficult tests are provided:
 - [Proxy](./suites/proxy): depositable delegate proxy contract and tests from [aragonOS](https://github.com/aragon/aragonOS)
 - [Staking](./suites/staking): Staking contracts and full test suite from [aragon/staking](http://github.com/aragon/staking)
 
-### Quick start
+## Quick start
 
 **Prerequisite**: in the repo's root, run `make install` to install the `titand` and `titand` binaries. When done, come back to this directory.
 
 **Prerequisite**: install the individual solidity packages. They're set up as individual reops in a yarn monorepo workspace. Install them all via `yarn install`.
 
-To run the tests, you can use the `test-helper.js` utility to test all suites under `ganache` or `titan` network. The `test-helper.js` will help you spawn an `titand` process before running the tests.
+To run the tests, you can use the `test-helper.js` utility to test all suites under `ganache` or `titan` network.
+The `test-helper.js` will help you spawn an `titand` process before running the tests.
 
-You can simply run `yarn test --network titan` to run all tests with ethermint network, or you can run `yarn test --network ganache` to use ganache shipped with truffle. In most cases, there two networks should produce identical test results.
+You can simply run `yarn test --network titan` to run all tests with ethermint network, or you can run `yarn test --network ganache` to use ganache shipped with truffle.
+In most cases, there two networks should produce identical test results.
 
-If you only want to run a few test cases, append the name of tests following by the command line. For example, use `yarn test --network titan --allowTests=basic` to run the `basic` test under `titan` network.
+If you only want to run a few test cases, append the name of tests following by the command line.
+For example, use `yarn test --network titan --allowTests=basic` to run the `basic` test under `titan` network.
 
 If you need to take more control, you can also run `titand` using:
 
@@ -26,7 +29,8 @@ If you need to take more control, you can also run `titand` using:
 ./init-test-node.sh
 ```
 
-Keep the terminal window open, go into any of the tests and run `yarn test-titan`. You should see `titand` accepting transactions and producing blocks. You should be able to query for any transaction via:
+Keep the terminal window open, go into any of the tests and run `yarn test-titan`.
+You should see `titand` accepting transactions and producing blocks. You should be able to query for any transaction via:
 
 - `titand query tx <cosmos-sdk tx>`
 - `curl localhost:8545 -H "Content-Type:application/json" -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionByHash","params":["<titan tx>"],"id":1}'`
