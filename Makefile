@@ -7,6 +7,7 @@ export MAKE_PROJECT_ROOT := $(CURDIR)
 LEDGER_ENABLED ?= true
 BINDIR ?= $(GOPATH)/bin
 BUILDDIR ?= $(CURDIR)/build
+HTTPS_GIT := https://github.com/titantkx/titan.git
 DOCKER := $(shell which docker)
 PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 COSMOS_VERSION = $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
@@ -174,7 +175,7 @@ protoContainerName=protobuilder-titan-$(subst /,_,$(subst \,_,$(CURDIR)))
 protoImage=$(DOCKER) run -v $(CURDIR):/workspace --workdir /workspace --user 0 --name $(protoContainerName) $(protoImageName)
 protoFormatImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace --user 0 $(protoImageName)
 
-proto-all: proto-format proto-lint proto-gen
+proto-all: proto-format proto-lint proto-check-breaking proto-gen
 
 proto-gen:
 	@echo "Generating Protobuf files"	
@@ -191,6 +192,9 @@ proto-format:
 proto-lint:
 	@$(protoFormatImage) buf lint --error-format=json
 
+proto-check-breaking:
+	@echo "Checking Protobuf files for breaking changes"
+	$(protoFormatImage) buf breaking --against $(HTTPS_GIT)#branch=main
 
 ###############################################################################
 ###                              Documentation                              ###
