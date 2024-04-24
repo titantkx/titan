@@ -169,7 +169,7 @@ docker-build:
 ###                                Protobuf                                 ###
 ###############################################################################
 
-protoVer=0.11.2
+protoVer=0.13.0
 protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
 protoContainerName=protobuilder-titan-$(subst /,_,$(subst \,_,$(CURDIR)))
 protoImage=$(DOCKER) run -v $(CURDIR):/workspace --workdir /workspace --user 0 --name $(protoContainerName) $(protoImageName)
@@ -288,7 +288,7 @@ test-all: test-testutil test-unit test-app test-integration test-e2e-cmd
 ###############################################################################
 
 PACKAGE_NAME:=github.com/titantkx/titan
-GOLANG_CROSS_VERSION  = v1.20
+GOLANG_CROSS_VERSION  = v1.22
 GOPATH ?= '$(HOME)/go'
 release-dry-run:
 	./scripts/release.sh --dry-run
