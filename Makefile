@@ -113,10 +113,10 @@ all: build-with-regen
 
 lint:	golangci-lint
 	go mod verify	
-	golangci-lint run --out-format=tab --timeout 2m0s
+	golangci-lint run --out-format=tab
 
 lint-fix:	golangci-lint	
-	golangci-lint run --fix --out-format=tab --issues-exit-code=0 --timeout 2m0s
+	golangci-lint run --fix --out-format=tab --issues-exit-code=0
 
 .PHONY: lint lint-fix
 
