@@ -45,11 +45,7 @@ func (p Params) Validate() error {
 		return err
 	}
 
-	if err := validateAuthority(p.Authority); err != nil {
-		return err
-	}
-
-	return nil
+	return validateAuthority(p.Authority)
 }
 
 // String implements the Stringer interface.

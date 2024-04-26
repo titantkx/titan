@@ -83,6 +83,7 @@ func MustList(t testutil.TestingT) []Key {
 }
 
 func MustExport(t testutil.TestingT, name string, password string) []byte {
+	//nolint:gosec // this for testing purpose only
 	command := exec.Command("titand", "keys", "export", name, "--home="+cmd.HomeDir, "--keyring-backend=test")
 	stdin, err := command.StdinPipe()
 	if err != nil {
@@ -90,6 +91,7 @@ func MustExport(t testutil.TestingT, name string, password string) []byte {
 	}
 	go func() {
 		defer stdin.Close()
+		//nolint:errcheck
 		io.WriteString(stdin, password)
 	}()
 	fmt.Println("[CMD]", command)
@@ -103,6 +105,7 @@ func MustExport(t testutil.TestingT, name string, password string) []byte {
 }
 
 func MustImport(t testutil.TestingT, name string, fileName string, password string) {
+	//nolint:gosec // this for testing purpose only
 	command := exec.Command("titand", "keys", "import", name, fileName, "--home="+cmd.HomeDir, "--keyring-backend=test")
 	stdin, err := command.StdinPipe()
 	if err != nil {
@@ -110,6 +113,7 @@ func MustImport(t testutil.TestingT, name string, fileName string, password stri
 	}
 	go func() {
 		defer stdin.Close()
+		//nolint:errcheck
 		io.WriteString(stdin, password)
 	}()
 	fmt.Println("[CMD]", command)

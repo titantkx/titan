@@ -134,7 +134,7 @@ func addDefaultKeyInfoKeyring(clientCtx client.Context) (client.Context, error) 
 		records, _ = kr.List()
 
 		if len(records) == 0 {
-			return clientCtx, errors.New("Can not add default key info")
+			return clientCtx, errors.New("can not add default key info")
 		}
 	}
 
@@ -224,7 +224,7 @@ func initRootCmd(
 	rootCmd.AddCommand(rosettaCmd.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Marshaler))
 
 	// update flags description
-	rootCmd, err := UpdateFlags(rootCmd)
+	_, err := UpdateFlags(rootCmd)
 	if err != nil {
 		panic(err)
 	}

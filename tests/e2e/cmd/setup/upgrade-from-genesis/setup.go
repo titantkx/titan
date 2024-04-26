@@ -14,7 +14,7 @@ import (
 
 const UpgradeName = "v2_0_1"
 
-func Setup(m *testing.M, rootDir string, logger io.Writer) {
+func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 	t := testutil.NewMockTest(os.Stderr)
 	defer t.Finish()
 
@@ -72,5 +72,6 @@ func Setup(m *testing.M, rootDir string, logger io.Writer) {
 
 	setup.StopChain(t, logger, "docker-compose-latest.yml")
 
+	//nolint:gocritic // Using os.Exit(0) here is necessary to terminate the test
 	os.Exit(0)
 }

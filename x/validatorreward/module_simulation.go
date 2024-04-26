@@ -23,14 +23,17 @@ var (
 )
 
 const (
+	//nolint:gosec // this is not credentials
 	opWeightMsgSetRate = "op_weight_msg_set_rate"
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgSetRate int = 100
 
+	//nolint:gosec // this is not credentials
 	opWeightMsgSetAuthority = "op_weight_msg_set_authority"
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgSetAuthority int = 100
 
+	//nolint:gosec // this is not credentials
 	opWeightMsgFundRewardPool = "op_weight_msg_fund_reward_pool"
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgFundRewardPool int = 100
@@ -55,7 +58,7 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
 
 // ProposalContents doesn't return any content functions for governance proposals.
-func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent {
+func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent { //nolint:staticcheck
 	return nil
 }
 
@@ -102,7 +105,7 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 }
 
 // ProposalMsgs returns msgs used for governance proposals for simulations.
-func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+func (am AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedProposalMsg {
 	return []simtypes.WeightedProposalMsg{
 		simulation.NewWeightedProposalMsg(
 			opWeightMsgSetRate,

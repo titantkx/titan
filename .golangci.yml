@@ -32,11 +32,27 @@ linters:
     - gofumpt
     - gomodguard   
 
+issues:
+  exclude-rules:
+    - text: "Use of weak random number generator"
+      linters:
+        - gosec
+    - text: "var-naming:.*Id|var-naming:.*Uri|ST1003:.*Id|ST1003:.*Uri"
+      linters:
+        - stylecheck
+        - revive    
+    - text: "don't use an underscore in package name|ST1003:"
+      linters:
+        - revive
+        - stylecheck
+        
+
+
 linters-settings:
   dogsled:
     max-blank-identifiers: 4
   golint:
-    min-confidence: 0
+    min-confidence: 0.8
   maligned:
     suggest-new: true
   misspell:

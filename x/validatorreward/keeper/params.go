@@ -41,10 +41,10 @@ func (k Keeper) GetRate(ctx sdk.Context) sdk.Dec {
 }
 
 // SetRate sets the Rate param
-func (k Keeper) SetRate(ctx sdk.Context, rate sdk.Dec) {
+func (k Keeper) SetRate(ctx sdk.Context, rate sdk.Dec) error {
 	params := k.GetParams(ctx)
 	params.Rate = rate
-	k.SetParams(ctx, params)
+	return k.SetParams(ctx, params)
 }
 
 // Authority returns the Authority param
@@ -55,8 +55,8 @@ func (k Keeper) GetAuthority(ctx sdk.Context) sdk.AccAddress {
 }
 
 // SetAuthority sets the Authority param
-func (k Keeper) SetAuthority(ctx sdk.Context, authority sdk.AccAddress) {
+func (k Keeper) SetAuthority(ctx sdk.Context, authority sdk.AccAddress) error {
 	params := k.GetParams(ctx)
 	params.Authority = authority.String()
-	k.SetParams(ctx, params)
+	return k.SetParams(ctx, params)
 }

@@ -135,6 +135,7 @@ func ExecWrite(w io.Writer, name string, args ...string) (*os.ProcessState, erro
 			if err != nil {
 				panic(err)
 			}
+			//nolint:errcheck	// accept some lost output
 			w.Write(line)
 			if !isPrefix {
 				fmt.Fprintln(w)
@@ -151,6 +152,7 @@ func ExecWrite(w io.Writer, name string, args ...string) (*os.ProcessState, erro
 			if err != nil {
 				panic(err)
 			}
+			//nolint:errcheck // accept some lost output
 			w.Write(line)
 			if !isPrefix {
 				fmt.Fprintln(w)

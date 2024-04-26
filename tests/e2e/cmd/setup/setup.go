@@ -49,6 +49,7 @@ func StartChain(t testutil.TestingT, w io.Writer, dcFile string) (ready chan str
 				break
 			}
 			require.NoError(t, err)
+			//nolint:errcheck	// accept the error
 			w.Write(line)
 			if !isPrefix {
 				fmt.Fprintln(w)
@@ -83,6 +84,7 @@ func StartChainAndListenForUpgrade(t testutil.TestingT, w io.Writer, dcFile stri
 				break
 			}
 			require.NoError(t, err)
+			//nolint:errcheck	// accept the error
 			w.Write(line)
 			if !isPrefix {
 				fmt.Fprintln(w)

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"cosmossdk.io/math"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtime "github.com/cometbft/cometbft/types/time"
@@ -106,7 +108,8 @@ func setupGovKeeper(t *testing.T) (
 	govKeeper.SetLegacyRouter(govRouter)
 	govParams := v1.DefaultParams()
 	govParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(MinDepositByConcensusPower).Mul(sdk.NewInt(1e18))))
-	govKeeper.SetParams(ctx, govParams)
+	err := govKeeper.SetParams(ctx, govParams)
+	require.NoError(t, err)
 
 	// Register all handlers for the MegServiceRouter.
 	msr.SetInterfaceRegistry(encCfg.InterfaceRegistry)
@@ -116,14 +119,14 @@ func setupGovKeeper(t *testing.T) (
 	return govKeeper, accKeeper, bankKeeper, stakingKeeper, distrKeeper, genAddr, encCfg, ctx
 }
 
-func trackMockAccount(ctx sdk.Context, accKeeper *sdkgovtestutil.MockAccountKeeper) {
+func trackMockAccount(_ sdk.Context, accKeeper *sdkgovtestutil.MockAccountKeeper) {
 	accKeeper.EXPECT().GetModuleAddress(govtypes.ModuleName).Return(govAcct).AnyTimes()
 	accKeeper.EXPECT().GetModuleAccount(gomock.Any(), govtypes.ModuleName).Return(authtypes.NewEmptyModuleAccount(govtypes.ModuleName)).AnyTimes()
 }
 
 // trackMockBalances sets up expected calls on the Mock BankKeeper, and also
 // locally tracks accounts balances (not modules balances).
-func trackMockBank(ctx sdk.Context, bankKeeper *sdkgovtestutil.MockBankKeeper) {
+func trackMockBank(_ sdk.Context, bankKeeper *sdkgovtestutil.MockBankKeeper) {
 	balances := make(map[string]sdk.Coins)
 	balances[genAddr.String()] = sdk.NewCoins(sdk.NewCoin(utils.BaseDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18))))
 
@@ -191,9 +194,6 @@ func trackMockStaking(ctx sdk.Context, stakingKeeper *sdkgovtestutil.MockStaking
 
 func trackMockDistribution(ctx sdk.Context, distrKeeper *govtestutil.MockDistributionKeeper, bankKeeper *sdkgovtestutil.MockBankKeeper) {
 	distrKeeper.EXPECT().FundCommunityPoolFromModule(gomock.Any(), gomock.Any(), govtypes.ModuleName).DoAndReturn(func(_ sdk.Context, amount sdk.Coins, _ string) error {
-		if err := bankKeeper.SendCoinsFromModuleToModule(ctx, govtypes.ModuleName, distrtypes.ModuleName, amount); err != nil {
-			return err
-		}
-		return nil
+		return bankKeeper.SendCoinsFromModuleToModule(ctx, govtypes.ModuleName, distrtypes.ModuleName, amount)
 	}).AnyTimes()
 }

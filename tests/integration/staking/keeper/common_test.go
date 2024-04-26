@@ -56,10 +56,14 @@ func createValidators(t *testing.T, ctx sdk.Context, appIn *app.App, genAddr sdk
 	vals := []types.Validator{val1, val2}
 
 	appIn.StakingKeeper.SetValidator(ctx, val1)
-	appIn.StakingKeeper.SetValidatorByConsAddr(ctx, val1)
+	if err := appIn.StakingKeeper.SetValidatorByConsAddr(ctx, val1); err != nil {
+		require.NoError(t, err)
+	}
 	appIn.StakingKeeper.SetNewValidatorByPowerIndex(ctx, val1)
 	appIn.StakingKeeper.SetValidator(ctx, val2)
-	appIn.StakingKeeper.SetValidatorByConsAddr(ctx, val2)
+	if err := appIn.StakingKeeper.SetValidatorByConsAddr(ctx, val2); err != nil {
+		require.NoError(t, err)
+	}
 	appIn.StakingKeeper.SetNewValidatorByPowerIndex(ctx, val2)
 
 	// call the after-creation hook

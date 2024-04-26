@@ -10,6 +10,7 @@ import (
 	"github.com/titantkx/titan/x/nftmint/types"
 )
 
+//nolint:revive	// ctx at third position .
 func mustTransferClass(t testing.TB, ms types.MsgServer, ctx context.Context, sender, receiver, classId string) {
 	resp, err := ms.TransferClass(ctx, &types.MsgTransferClass{
 		Creator:  sender,

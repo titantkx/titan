@@ -58,25 +58,25 @@ func InitSDKConfig() {
 
 // RegisterDenoms registers the base and display denominations to the SDK.
 func RegisterDenoms() {
-	if _, registed := sdk.GetDenomUnit(DisplayDenom); !registed {
+	if _, registered := sdk.GetDenomUnit(DisplayDenom); !registered {
 		if err := sdk.RegisterDenom(DisplayDenom, sdk.OneDec()); err != nil {
 			panic(err)
 		}
 	}
 
-	if _, registed := sdk.GetDenomUnit(BaseDenom); !registed {
+	if _, registered := sdk.GetDenomUnit(BaseDenom); !registered {
 		if err := sdk.RegisterDenom(BaseDenom, sdk.NewDecWithPrec(1, 18)); err != nil {
 			panic(err)
 		}
 	}
 
-	if _, registed := sdk.GetDenomUnit(MicroDenom); !registed {
+	if _, registered := sdk.GetDenomUnit(MicroDenom); !registered {
 		if err := sdk.RegisterDenom(MicroDenom, sdk.NewDecWithPrec(1, 6)); err != nil {
 			panic(err)
 		}
 	}
 
-	if _, registed := sdk.GetDenomUnit(MilliDenom); !registed {
+	if _, registered := sdk.GetDenomUnit(MilliDenom); !registered {
 		if err := sdk.RegisterDenom(MilliDenom, sdk.NewDecWithPrec(1, 3)); err != nil {
 			panic(err)
 		}
