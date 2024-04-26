@@ -224,7 +224,7 @@ cosmovisor:
 	cp cosmovisor_tmp/tools/cosmovisor/cosmovisor build/cosmovisor
 	rm -rf cosmovisor_tmp
 
-GOLANGCI_VERSION=v1.52.2
+GOLANGCI_VERSION=latest
 
 golangci-lint:
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_VERSION)

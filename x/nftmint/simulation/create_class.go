@@ -15,7 +15,8 @@ func SimulateMsgCreateClass(
 	_ types.BankKeeper,
 	_ keeper.Keeper,
 ) simtypes.Operation {
-	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
+	//nolint:revive	// keep `chainID` for clear meaning
+	return func(r *rand.Rand, _ *baseapp.BaseApp, _ sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgCreateClass{

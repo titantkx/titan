@@ -110,7 +110,7 @@ func (am AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedPr
 		simulation.NewWeightedProposalMsg(
 			opWeightMsgSetRate,
 			defaultWeightMsgSetRate,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+			func(_ *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
 				validatorrewardsimulation.SimulateMsgSetRate(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
@@ -118,7 +118,7 @@ func (am AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedPr
 		simulation.NewWeightedProposalMsg(
 			opWeightMsgSetAuthority,
 			defaultWeightMsgSetAuthority,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+			func(_ *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
 				validatorrewardsimulation.SimulateMsgSetAuthority(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
@@ -126,7 +126,7 @@ func (am AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedPr
 		simulation.NewWeightedProposalMsg(
 			opWeightMsgFundRewardPool,
 			defaultWeightMsgFundRewardPool,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+			func(_ *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
 				validatorrewardsimulation.SimulateMsgFundRewardPool(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},

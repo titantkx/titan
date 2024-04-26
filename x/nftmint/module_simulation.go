@@ -126,7 +126,7 @@ func (am AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedPr
 		simulation.NewWeightedProposalMsg(
 			opWeightMsgCreateClass,
 			defaultWeightMsgCreateClass,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+			func(_ *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
 				nftmintsimulation.SimulateMsgCreateClass(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
@@ -134,7 +134,7 @@ func (am AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedPr
 		simulation.NewWeightedProposalMsg(
 			opWeightMsgMint,
 			defaultWeightMsgMint,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+			func(_ *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
 				nftmintsimulation.SimulateMsgMint(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
@@ -142,7 +142,7 @@ func (am AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedPr
 		simulation.NewWeightedProposalMsg(
 			opWeightMsgUpdateClass,
 			defaultWeightMsgUpdateClass,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+			func(_ *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
 				nftmintsimulation.SimulateMsgUpdateClass(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
@@ -150,7 +150,7 @@ func (am AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedPr
 		simulation.NewWeightedProposalMsg(
 			opWeightMsgTransferClass,
 			defaultWeightMsgTransferClass,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+			func(_ *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
 				nftmintsimulation.SimulateMsgTransferClass(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},

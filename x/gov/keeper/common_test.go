@@ -183,7 +183,7 @@ func trackMockBank(_ sdk.Context, bankKeeper *sdkgovtestutil.MockBankKeeper) {
 }
 
 func trackMockStaking(ctx sdk.Context, stakingKeeper *sdkgovtestutil.MockStakingKeeper) {
-	stakingKeeper.EXPECT().TokensFromConsensusPower(ctx, gomock.Any()).DoAndReturn(func(ctx sdk.Context, power int64) math.Int {
+	stakingKeeper.EXPECT().TokensFromConsensusPower(ctx, gomock.Any()).DoAndReturn(func(_ sdk.Context, power int64) math.Int {
 		return sdk.TokensFromConsensusPower(power, sdk.DefaultPowerReduction)
 	}).AnyTimes()
 	stakingKeeper.EXPECT().BondDenom(ctx).Return(utils.BaseDenom).AnyTimes()

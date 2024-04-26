@@ -75,7 +75,7 @@ func TestMsgServer_SetRate(t *testing.T) {
 	for _, tc := range testCases {
 		ms, ctx, k := setupMsgServer(t)
 
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.name, func(_ *testing.T) {
 			tc.expect(ms, ctx, k, tc.authority, tc.rate)
 		})
 	}
