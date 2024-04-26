@@ -21,3 +21,16 @@ I have...
 - [ ] tackled an existing issue or discussed with a team member
 - [ ] left instructions on how to review the changes
 - [ ] targeted the correct branch (see [PR Targeting](https://github.com/titantkx/titan/blob/develop/CONTRIBUTING.md#pr-targeting))
+
+## Reviewers Checklist
+
+**All** items are required.
+Please add a note if the item is not applicable
+and please add your handle next to the items reviewed
+if you only reviewed selected items.
+
+I have...
+
+- [ ] confirmed all author checklist items have been addressed
+- [ ] reviewed content
+- [ ] confirmed all CI checks have passed
