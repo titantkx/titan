@@ -11,9 +11,18 @@ HTTPS_GIT := https://github.com/titantkx/titan.git
 DOCKER := $(shell which docker)
 PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 COSMOS_VERSION = $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
-IGNITE_VERSION = v0.27.1
+IGNITE_VERSION = v0.27.2
 MOCKS_DIR = $(CURDIR)/tests/mocks
 DOCKER_IMAGE := titantkx/titand
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+		SED_INPLACE = sed -i ''
+else ifeq ($(UNAME_S),Linux)
+		SED_INPLACE = sed -i
+else
+		$(error platform is not supported)
+endif
 
 # $(info GOOS: $(GOOS), GOARCH: $(GOARCH), CC: $(CC), CXX: $(CXX))
 
@@ -213,7 +222,7 @@ ignite:
 	@echo "Installing ignite (tag ${IGNITE_VERSION}) ..."
 	rm -rf ignite_tmp	
 	git clone --depth 1 --branch ${IGNITE_VERSION} https://github.com/ignite/cli.git ignite_tmp	
-	cd ignite_tmp && make install
+	cd ignite_tmp && go get golang.org/x/mod@v0.12.0 && go mod tidy && make install
 	rm -rf ignite_tmp
 
 cosmovisor:
