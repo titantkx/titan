@@ -28,9 +28,9 @@ go test github.com/titantkx/titan/tests/e2e/cmd -v
 
 ### Upgrade test
 
-1. Update `UpgradeName` with new upgrade name in `tests/e2e/cmd/setup/upgrade/setup.go`.
+1. Set `UpgradeName` in `tests/e2e/cmd/setup/upgrade/setup.go` to the latest upgrade name.
 
-2. Update `image` in `tests/e2e/cmd/setup/upgrade/docker-compose-genesis.yml` is old titand version.
+2. Set `image` in `tests/e2e/cmd/setup/upgrade/docker-compose-genesis.yml` to the titand version you want to upgrade from.
 
 3. Run test
 
@@ -40,9 +40,9 @@ go test github.com/titantkx/titan/tests/e2e/cmd -v
 
 ### Upgrade test from an exported genesis file
 
-1. Update `UpgradeName` with new upgrade name in `tests/e2e/cmd/setup/upgrade-from-genesis/setup.go`.
+1. Set `UpgradeName` in `tests/e2e/cmd/setup/upgrade-from-genesis/setup.go` to the latest upgrade name.
 
-2. Update `image` in `tests/e2e/cmd/setup/upgrade-from-genesis/docker-compose-genesis.yml` is old titand version.
+2. Set `image` in `tests/e2e/cmd/setup/upgrade-from-genesis/docker-compose-genesis.yml` to the titand version you want to upgrade from.
 
 3. To run the upgrade test from an exported genesis file, you need to export the genesis file from the current chain state first.
 
