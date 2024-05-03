@@ -16,4 +16,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: orijtech/consensuswarn@main
         with:
-          roots: "github.com/titantkx/titan/app.App.DeliverTx,github.com/titantkx/titan/app.App.BeginBlocker,github.com/titantkx/titan/app.App.EndBlocker"
+          roots: "github.com/titantkx/titan/app.App.BaseApp.DeliverTx,github.com/titantkx/titan/app.App.BeginBlocker,github.com/titantkx/titan/app.App.EndBlocker"
