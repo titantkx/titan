@@ -134,7 +134,7 @@ func addDefaultKeyInfoKeyring(clientCtx client.Context) (client.Context, error) 
 		records, _ = kr.List()
 
 		if len(records) == 0 {
-			return clientCtx, errors.New("can not add default key info")
+			return clientCtx, errors.New("cannot add default key info")
 		}
 	}
 
