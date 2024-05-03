@@ -25,7 +25,7 @@ type Keeper struct {
 func NewKeeper(
 	cdc codec.BinaryCodec, key storetypes.StoreKey,
 	ak types.AccountKeeper, bk types.BankKeeper, sk types.StakingKeeper,
-	feeCollectorName string, ValidatorRewardCollectorName string, authority string,
+	feeCollectorName string, validatorRewardCollectorName string, authority string,
 ) Keeper {
 	return Keeper{
 		Keeper:        sdkdistributionkeeper.NewKeeper(cdc, key, ak, bk, sk, feeCollectorName, authority),
@@ -34,7 +34,7 @@ func NewKeeper(
 		stakingKeeper: sk,
 
 		feeCollectorName:             feeCollectorName,
-		validatorRewardCollectorName: ValidatorRewardCollectorName,
+		validatorRewardCollectorName: validatorRewardCollectorName,
 	}
 }
 

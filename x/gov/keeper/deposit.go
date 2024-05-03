@@ -7,11 +7,11 @@ import (
 )
 
 // DeleteAndContributeDeposits deletes and contribute all the deposits on a specific proposal.
-func (keeper Keeper) DeleteAndContributeDeposits(ctx sdk.Context, proposalID uint64) {
-	store := ctx.KVStore(keeper.storeKey)
+func (k Keeper) DeleteAndContributeDeposits(ctx sdk.Context, proposalID uint64) {
+	store := ctx.KVStore(k.storeKey)
 
-	keeper.IterateDeposits(ctx, proposalID, func(deposit v1.Deposit) bool {
-		err := keeper.distKeeper.FundCommunityPoolFromModule(ctx, deposit.Amount, types.ModuleName)
+	k.IterateDeposits(ctx, proposalID, func(deposit v1.Deposit) bool {
+		err := k.distKeeper.FundCommunityPoolFromModule(ctx, deposit.Amount, types.ModuleName)
 		if err != nil {
 			panic(err)
 		}

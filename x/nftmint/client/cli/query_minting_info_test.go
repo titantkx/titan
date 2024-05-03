@@ -84,8 +84,11 @@ func TestShowMintingInfo(t *testing.T) {
 				var resp types.QueryMintingInfoResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 				require.NotNil(t, resp.MintingInfo)
+
+				// Fix for G601: Implicit memory aliasing in for loop
+				obj := tc.obj
 				require.Equal(t,
-					nullify.Fill(&tc.obj),
+					nullify.Fill(&obj),
 					nullify.Fill(&resp.MintingInfo),
 				)
 			}

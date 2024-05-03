@@ -38,11 +38,10 @@ func MustGetRewards(t testutil.TestingT, del string, val string, height int64) t
 		}
 		cmd.MustQuery(t, &v, args...)
 		return v.Total
-	} else {
-		var v struct {
-			Rewards testutil.Coins `json:"rewards"`
-		}
-		cmd.MustQuery(t, &v, args...)
-		return v.Rewards
 	}
+	var v struct {
+		Rewards testutil.Coins `json:"rewards"`
+	}
+	cmd.MustQuery(t, &v, args...)
+	return v.Rewards
 }

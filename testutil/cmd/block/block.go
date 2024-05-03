@@ -13,6 +13,7 @@ type Block struct {
 	Header BlockHeader `json:"header"`
 }
 
+//nolint:revive
 type BlockHeader struct {
 	Time time.Time `json:"time"`
 }

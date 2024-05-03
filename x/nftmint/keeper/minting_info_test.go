@@ -28,10 +28,9 @@ func createNMintingInfo(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.M
 func TestMintingInfoGet(t *testing.T) {
 	keeper, ctx := keepertest.NftmintKeeper(t)
 	items := createNMintingInfo(keeper, ctx, 10)
-	for _, item := range items {
-		rst, found := keeper.GetMintingInfo(ctx,
-			item.ClassId,
-		)
+	for i := range items {
+		item := items[i]
+		rst, found := keeper.GetMintingInfo(ctx, item.ClassId)
 		require.True(t, found)
 		require.Equal(t,
 			nullify.Fill(&item),

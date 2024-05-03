@@ -16,7 +16,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -133,6 +132,8 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 }
 
 // Setup initializes a new SimApp. A Nop logger is set in SimApp. Return app and genesis address.
+//
+//nolint:revive // keep `isCheckTx` for future usage
 func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	t.Helper()
 
@@ -161,6 +162,7 @@ func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	return app, genAcc.GetAddress()
 }
 
+//nolint:unused
 func setTxSignature(t *testing.T, builder client.TxBuilder, nonce uint64) {
 	privKey := secp256k1.GenPrivKeyFromSecret([]byte("test"))
 	pubKey := privKey.PubKey()
@@ -227,29 +229,29 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 			NextValidatorsHash: valSet.Hash(),
 		}})
 
-		for txNum := 0; txNum < cfg.blockTxs; txNum++ {
-			// msgs := []sdk.Msg{}
-			// for msgNum := 0; msgNum < 100; msgNum++ {
-			// 	key := []byte(fmt.Sprintf("%v", keyCounter))
-			// 	value := make([]byte, 10000)
+		// for txNum := 0; txNum < cfg.blockTxs; txNum++ {
+		// msgs := []sdk.Msg{}
+		// for msgNum := 0; msgNum < 100; msgNum++ {
+		// 	key := []byte(fmt.Sprintf("%v", keyCounter))
+		// 	value := make([]byte, 10000)
 
-			// 	_, err := r.Read(value)
-			// 	require.NoError(t, err)
+		// 	_, err := r.Read(value)
+		// 	require.NoError(t, err)
 
-			// 	msgs = append(msgs, &baseapptestutil.MsgKeyValue{Key: key, Value: value})
-			// 	keyCounter++
-			// }
+		// 	msgs = append(msgs, &baseapptestutil.MsgKeyValue{Key: key, Value: value})
+		// 	keyCounter++
+		// }
 
-			// builder := encodingConfig.TxConfig.NewTxBuilder()
-			// builder.SetMsgs(msgs...)
-			// setTxSignature(t, builder, 0)
+		// builder := encodingConfig.TxConfig.NewTxBuilder()
+		// builder.SetMsgs(msgs...)
+		// setTxSignature(t, builder, 0)
 
-			// txBytes, err := encodingConfig.TxConfig.TxEncoder()(builder.GetTx())
-			// require.NoError(t, err)
+		// txBytes, err := encodingConfig.TxConfig.TxEncoder()(builder.GetTx())
+		// require.NoError(t, err)
 
-			// resp := app.DeliverTx(abci.RequestDeliverTx{Tx: txBytes})
-			// require.True(t, resp.IsOK(), "%v", resp.String())
-		}
+		// resp := app.DeliverTx(abci.RequestDeliverTx{Tx: txBytes})
+		// require.True(t, resp.IsOK(), "%v", resp.String())
+		// }
 
 		app.EndBlock(abci.RequestEndBlock{Height: currentBlockHeight})
 
@@ -372,9 +374,9 @@ func NewTestNetworkFixture() network.TestFixture {
 			0,
 			MakeEncodingConfig(),
 			sdksimtestutil.NewAppOptionsWithFlagHome(val.GetCtx().Config.RootDir),
-			bam.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
-			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
-			bam.SetChainID(val.GetCtx().Viper.GetString(flags.FlagChainID)),
+			baseapp.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
+			baseapp.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
+			baseapp.SetChainID(val.GetCtx().Viper.GetString(flags.FlagChainID)),
 		)
 	}
 

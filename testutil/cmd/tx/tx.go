@@ -18,6 +18,7 @@ import (
 
 var rpcErrPattern = regexp.MustCompile(`RPC\serror\s(-?[\d]+)`)
 
+//nolint:revive
 type TxResponse struct {
 	Height    testutil.Int `json:"height"`
 	Code      int          `json:"code"`
@@ -135,6 +136,7 @@ func ExecTx(ctx context.Context, args ...string) (*TxResponse, error) {
 	return QueryTx(ctx, tx.Hash)
 }
 
+//nolint:revive // ctx at second position, legacy
 func MustExecTx(t testutil.TestingT, ctx context.Context, args ...string) TxResponse {
 	tx, err := ExecTx(ctx, args...)
 	require.NoError(t, err)
@@ -142,6 +144,7 @@ func MustExecTx(t testutil.TestingT, ctx context.Context, args ...string) TxResp
 	return *tx
 }
 
+//nolint:revive // ctx at second position, legacy
 func MustErrExecTx(t testutil.TestingT, ctx context.Context, expErr string, args ...string) {
 	tx, err := ExecTx(ctx, args...)
 	require.Nil(t, tx)
@@ -236,6 +239,7 @@ func BroadcastTx(ctx context.Context, filePath string) (*TxResponse, error) {
 	return QueryTx(ctx, tx.Hash)
 }
 
+//nolint:revive // ctx at second position, legacy
 func MustBroadcastTx(t testutil.TestingT, ctx context.Context, filePath string) TxResponse {
 	tx, err := BroadcastTx(ctx, filePath)
 	require.NoError(t, err)

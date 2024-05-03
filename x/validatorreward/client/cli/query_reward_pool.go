@@ -16,7 +16,7 @@ func CmdRewardPool() *cobra.Command {
 		Use:   "reward-pool",
 		Short: "Query reward-pool",
 		Args:  cobra.ExactArgs(0),
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
+		RunE: func(cmd *cobra.Command, args []string) (err error) { //nolint:revive	// keep args for clear meaning
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err

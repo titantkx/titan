@@ -13,7 +13,7 @@ func CmdShowSystemInfo() *cobra.Command {
 		Use:   "show-system-info",
 		Short: "Show system info",
 		Args:  cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) error { //nolint:revive	// keep args for clear meaning
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err

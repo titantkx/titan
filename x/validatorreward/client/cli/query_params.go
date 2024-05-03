@@ -13,6 +13,7 @@ func CmdQueryParams() *cobra.Command {
 		Use:   "params",
 		Short: "shows the parameters of the module",
 		Args:  cobra.NoArgs,
+		//nolint:revive	// keep `args` for clear meaning
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {

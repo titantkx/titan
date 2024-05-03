@@ -48,5 +48,8 @@ func (k Keeper) DistributeTokens(ctx sdk.Context, totalPreviousPower int64) {
 
 	k.SetLastDistributeTime(ctx, ctx.BlockHeader().Time)
 
-	k.bankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, types.ValidatorRewardCollectorName, rewardAmount)
+	err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, types.ValidatorRewardCollectorName, rewardAmount)
+	if err != nil {
+		panic(err)
+	}
 }

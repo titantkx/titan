@@ -40,7 +40,9 @@ func (s *IntegrationTestSuite) bootstrapSlashTest(power int64) (*app.App, sdk.Co
 		validator := testutil.NewValidator(s.T(), addrVals[i], PKs[i])
 		validator, _ = validator.AddTokensFromDel(amt)
 		validator = sdkstakingkeeper.TestingUpdateValidator(s.app.StakingKeeper.Keeper, s.ctx, validator, true)
-		s.app.StakingKeeper.SetValidatorByConsAddr(s.ctx, validator)
+		if err := s.app.StakingKeeper.SetValidatorByConsAddr(s.ctx, validator); err != nil {
+			require.NoError(err)
+		}
 		if err := s.app.StakingKeeper.Hooks().AfterValidatorCreated(s.ctx, validator.GetOperator()); err != nil {
 			require.NoError(err)
 		}

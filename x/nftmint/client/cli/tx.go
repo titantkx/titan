@@ -14,8 +14,10 @@ import (
 var DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
 
 const (
+	//nolint:unused
 	flagPacketTimeoutTimestamp = "packet-timeout-timestamp"
-	listSeparator              = ","
+	//nolint:unused
+	listSeparator = ","
 )
 
 // GetTxCmd returns the transaction commands for this module

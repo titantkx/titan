@@ -19,7 +19,7 @@ func MustGetGlobalMinSelfDelegation(t testing.TB) testutil.Int {
 	return staking.MustGetParams(t).GlobalMinSelfDelegation
 }
 
-func MustGetMinStakeAmount(t testing.TB, minSelfDelegation testutil.Int) testutil.Int {
+func MustGetMinStakeAmount(_ testing.TB, minSelfDelegation testutil.Int) testutil.Int {
 	stakePower := testutil.TokensToConsensusPower(minSelfDelegation)
 	stakeAmount := testutil.TokensFromConsensusPower(stakePower)
 	return testutil.MakeIntFromString(stakeAmount.String())
