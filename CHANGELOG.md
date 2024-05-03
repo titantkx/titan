@@ -29,6 +29,7 @@ Types of changes (Stanzas):
 "Client Breaking" for breaking CLI commands and REST routes used by end-users.
 "API Breaking" for breaking exported APIs used by developers building on SDK.
 "State Machine Breaking" for any changes that result in a different AppState given same genesisState and txList.
+"Miscellaneous" for anything else.
 
 Ref: https://keepachangelog.com/en/1.1.0/
 -->
@@ -36,5 +37,9 @@ Ref: https://keepachangelog.com/en/1.1.0/
 # Changelog
 
 ## Unreleased
+
+### Miscellaneous
+
+- (Makefile) Update to use fork version of ignite cli.
 
 ## [v2.0.1](https://github.com/titantkx/titan/releases/tag/v2.0.1)

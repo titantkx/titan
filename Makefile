@@ -11,7 +11,7 @@ HTTPS_GIT := https://github.com/titantkx/titan.git
 DOCKER := $(shell which docker)
 PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 COSMOS_VERSION = $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
-IGNITE_VERSION = v0.27.2
+IGNITE_VERSION = v0.27.2-titan.1
 MOCKS_DIR = $(CURDIR)/tests/mocks
 DOCKER_IMAGE := titantkx/titand
 
@@ -221,8 +221,8 @@ update-swagger-docs-by-ignite:
 ignite:
 	@echo "Installing ignite (tag ${IGNITE_VERSION}) ..."
 	rm -rf ignite_tmp	
-	git clone --depth 1 --branch ${IGNITE_VERSION} https://github.com/ignite/cli.git ignite_tmp	
-	cd ignite_tmp && go get golang.org/x/mod@v0.12.0 && go mod tidy && make install
+	git clone --depth 1 --branch ${IGNITE_VERSION} https://github.com/titantkx/ignite-cli.git ignite_tmp
+	cd ignite_tmp && make install
 	rm -rf ignite_tmp
 
 cosmovisor:
