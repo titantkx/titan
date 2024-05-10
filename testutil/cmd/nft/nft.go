@@ -57,6 +57,15 @@ func MustGetClass(t testutil.TestingT, classId string) Class {
 	return v.Class
 }
 
+func MustGetLatestClass(t testutil.TestingT) Class {
+	var v struct {
+		Classes []Class `json:"classes"`
+	}
+	cmd.MustQuery(t, &v, "nft", "classes", "--reverse")
+	require.NotEmpty(t, v.Classes)
+	return v.Classes[0]
+}
+
 func MustGetNFT(t testutil.TestingT, classId string, tokenId string) NFT {
 	var v struct {
 		NFT NFT `json:"nft"`
