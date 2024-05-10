@@ -38,6 +38,10 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 ## Unreleased
 
+### Features
+
+- (amino) [#73](https://github.com/titantkx/titan/issues/73) Add regis amino codec of `nftmint` and `validatorreward` module for `gov`,`authz`,`group`.
+
 ### Miscellaneous
 
 - (Makefile) Update to use fork version of ignite cli.

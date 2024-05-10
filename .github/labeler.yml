@@ -10,7 +10,7 @@ types:
       - any-glob-to-any-file: 
         - "types/**/*"
 
-docs:
+documentation:
   - changed-files:
       - any-glob-to-any-file: 
         - "docs/**/*"

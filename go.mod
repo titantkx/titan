@@ -1,6 +1,6 @@
 module github.com/titantkx/titan
 
-go 1.22.2
+go 1.22.3
 
 require (
 	cosmossdk.io/api v0.3.1
@@ -219,6 +219,6 @@ require (
 
 replace github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
-replace github.com/cosmos/cosmos-sdk => github.com/titantkx/cosmos-sdk v0.47.6-titan.4
+replace github.com/cosmos/cosmos-sdk => github.com/titantkx/cosmos-sdk v0.47.6-titan.5
 
 replace github.com/ethereum/go-ethereum => github.com/titantkx/go-ethereum v1.10.26-titan.1

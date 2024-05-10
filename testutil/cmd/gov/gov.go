@@ -17,6 +17,8 @@ const (
 	//nolint:revive
 	PROPOSAL_STATUS_REJECTED = "PROPOSAL_STATUS_REJECTED"
 	//nolint:revive
+	PROPOSAL_STATUS_FAILED = "PROPOSAL_STATUS_FAILED"
+	//nolint:revive
 	PROPOSAL_STATUS_DEPOSIT_PERIOD = "PROPOSAL_STATUS_DEPOSIT_PERIOD"
 	//nolint:revive
 	PROPOSAL_STATUS_DEPOSIT_FAILED = "PROPOSAL_STATUS_DEPOSIT_FAILED"
@@ -163,6 +165,23 @@ type SoftwareUpgradePlan struct {
 	Name   string       `json:"name"`
 	Height testutil.Int `json:"height"`
 	Info   string       `json:"info"`
+}
+
+type MsgNftCreateClass struct {
+	Type        string `json:"@type"`
+	Creator     string `json:"creator,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Symbol      string `json:"symbol,omitempty"`
+	Description string `json:"description,omitempty"`
+	Uri         string `json:"uri,omitempty"`
+	UriHash     string `json:"uri_hash,omitempty"`
+	Data        string `json:"data,omitempty"`
+}
+
+type MsgValidatorRewardSetRate struct {
+	Type      string `json:"@type"`
+	Authority string `json:"authority,omitempty"`
+	Rate      string `json:"rate"`
 }
 
 func MustSubmitProposal(t testutil.TestingT, from string, proposal ProposalMsg) string {

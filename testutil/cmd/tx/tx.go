@@ -114,13 +114,37 @@ func QueryTx(ctx context.Context, txHash string) (*TxResponse, error) {
 	}
 }
 
+func SearchTxByEvent(ctx context.Context, eventFilter string) (*TxResponse, error) {
+	for {
+		output, err := cmd.Exec("titand", "query", "txs", "--output=json", "--events", eventFilter)
+		if err != nil {
+			matches := rpcErrPattern.FindStringSubmatch(string(output))
+			if len(matches) == 2 && matches[1] == "-32603" {
+				// Transaction not found, wait until it is delivered or timeout
+				select {
+				case <-time.After(1 * time.Second):
+					continue
+				case <-ctx.Done():
+					return nil, err
+				}
+			}
+			return nil, err
+		}
+		var tx TxResponse
+		if err := cmd.UnmarshalJSON(output, &tx); err != nil {
+			return nil, err
+		}
+		return &tx, nil
+	}
+}
+
 func ExecTx(ctx context.Context, args ...string) (*TxResponse, error) {
 	gasPrice, err := feemarket.GetBaseFee(0)
 	if err != nil {
 		return nil, err
 	}
 	args = append([]string{"tx"}, args...)
-	args = append(args, "--gas=auto", "--gas-adjustment=1.3", "--gas-prices="+gasPrice.String()+utils.BaseDenom, "--output=json", "-y")
+	args = append(args, "--gas=auto", "--gas-adjustment=1.3", "--gas-prices="+gasPrice.String()+utils.BaseDenom, "--output=json", "-y", "--sign-mode=amino-json")
 	args = append(args, "--keyring-backend=test")
 	output, err := cmd.Exec("titand", args...)
 	if err != nil {

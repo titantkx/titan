@@ -54,7 +54,7 @@ func TestMsgSetRate_ValidateBasic(t *testing.T) {
 			name: "valid rate",
 			msg: MsgSetRate{
 				Authority: sample.AccAddress(),
-				Rate:      sdk.NewDec(0),
+				Rate:      sdk.NewDecWithPrec(1, 1),
 			},
 		},
 	}
