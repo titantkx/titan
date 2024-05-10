@@ -1,6 +1,6 @@
 module github.com/titantkx/titan
 
-go 1.22.2
+go 1.22.3
 
 require (
 	cosmossdk.io/api v0.3.1
