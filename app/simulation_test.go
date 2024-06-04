@@ -10,34 +10,60 @@ import (
 	"testing"
 	"time"
 
+	"cosmossdk.io/math"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simulationtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	vestingypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 	simcli "github.com/cosmos/cosmos-sdk/x/simulation/client/cli"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
-
+	"github.com/titantkx/ethermint/x/feemarket"
+	feemarkettypes "github.com/titantkx/ethermint/x/feemarket/types"
 	"github.com/titantkx/titan/app"
+	nftminttypes "github.com/titantkx/titan/x/nftmint/types"
+	validatorrewardtypes "github.com/titantkx/titan/x/validatorreward/types"
 )
+
+var ModuleBasics = app.ModuleBasics
+
+// Override feemarket.AppModuleBasic
+type FeeMarketAppModuleBasic struct {
+	feemarket.AppModuleBasic
+}
+
+func (FeeMarketAppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
+	params := feemarkettypes.DefaultParams()
+	params.NoBaseFee = true
+	params.BaseFee = math.NewInt(0)
+	params.MinGasPrice = math.LegacyNewDec(0)
+
+	genState := &feemarkettypes.GenesisState{
+		Params:   params,
+		BlockGas: 0,
+	}
+
+	return cdc.MustMarshalJSON(genState)
+}
 
 type storeKeysPrefixes struct {
 	A        storetypes.StoreKey
@@ -48,6 +74,8 @@ type storeKeysPrefixes struct {
 // Get flags every time the simulator is run
 func init() {
 	simcli.GetSimulatorFlags()
+
+	ModuleBasics[FeeMarketAppModuleBasic{}.Name()] = FeeMarketAppModuleBasic{}
 }
 
 // fauxMerkleModeOpt returns a BaseApp option to use a dbStoreAdapter instead of
@@ -60,7 +88,7 @@ func fauxMerkleModeOpt(bapp *baseapp.BaseApp) {
 // Running using starport command:
 // `starport chain simulate -v --numBlocks 200 --blockSize 50`
 // Running as go benchmark test:
-// `go test -benchmem -run=^$ -bench ^BenchmarkSimulation ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true`
+// `go test -benchmem -run=^$ -bench=^BenchmarkSimulation$ ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true`
 func BenchmarkSimulation(b *testing.B) {
 	simcli.FlagSeedValue = time.Now().Unix()
 	simcli.FlagVerboseValue = true
@@ -68,7 +96,7 @@ func BenchmarkSimulation(b *testing.B) {
 	simcli.FlagEnabledValue = true
 
 	config := simcli.NewConfigFromFlags()
-	config.ChainID = "mars-simapp"
+	config.ChainID = "titanben_1-1"
 	db, dir, logger, _, err := simtestutil.SetupSimulation(
 		config,
 		"leveldb-bApp-sim",
@@ -101,6 +129,9 @@ func BenchmarkSimulation(b *testing.B) {
 	)
 	require.Equal(b, app.Name, bApp.Name())
 
+	vestingypes.RegisterLegacyAminoCodec(bApp.LegacyAmino())
+	vestingypes.RegisterInterfaces(bApp.InterfaceRegistry())
+
 	// run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(
 		b,
@@ -109,7 +140,7 @@ func BenchmarkSimulation(b *testing.B) {
 		simtestutil.AppStateFn(
 			bApp.AppCodec(),
 			bApp.SimulationManager(),
-			app.NewDefaultGenesisState(bApp.AppCodec()),
+			ModuleBasics.DefaultGenesis(bApp.AppCodec()),
 		),
 		simulationtypes.RandomAccounts,
 		simtestutil.SimulationOperations(bApp, bApp.AppCodec(), config),
@@ -128,6 +159,7 @@ func BenchmarkSimulation(b *testing.B) {
 	}
 }
 
+// `go test -benchmem -run=^TestAppStateDeterminism$ -bench ^$ ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true`
 func TestAppStateDeterminism(t *testing.T) {
 	if !simcli.FlagEnabledValue {
 		t.Skip("skipping application simulation")
@@ -159,7 +191,7 @@ func TestAppStateDeterminism(t *testing.T) {
 			} else {
 				logger = log.NewNopLogger()
 			}
-			chainID := fmt.Sprintf("chain-id-%d-%d", i, j)
+			chainID := fmt.Sprintf("titan_%d-%d", i+1, j+1)
 			config.ChainID = chainID
 
 			db := dbm.NewMemDB()
@@ -177,6 +209,9 @@ func TestAppStateDeterminism(t *testing.T) {
 				baseapp.SetChainID(chainID),
 			)
 
+			vestingypes.RegisterLegacyAminoCodec(bApp.LegacyAmino())
+			vestingypes.RegisterInterfaces(bApp.InterfaceRegistry())
+
 			fmt.Printf(
 				"running non-determinism simulation; seed %d: %d/%d, attempt: %d/%d\n",
 				config.Seed, i+1, numSeeds, j+1, numTimesToRunPerSeed,
@@ -189,7 +224,7 @@ func TestAppStateDeterminism(t *testing.T) {
 				simtestutil.AppStateFn(
 					bApp.AppCodec(),
 					bApp.SimulationManager(),
-					app.NewDefaultGenesisState(bApp.AppCodec()),
+					ModuleBasics.DefaultGenesis(bApp.AppCodec()),
 				),
 				simulationtypes.RandomAccounts,
 				simtestutil.SimulationOperations(bApp, bApp.AppCodec(), config),
@@ -216,9 +251,10 @@ func TestAppStateDeterminism(t *testing.T) {
 	}
 }
 
+// `go test -benchmem -run=^TestAppImportExport$ -bench ^$ ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true`
 func TestAppImportExport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
-	config.ChainID = "mars-simapp-import"
+	config.ChainID = "titanimport_1-1"
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(
 		config,
@@ -255,6 +291,9 @@ func TestAppImportExport(t *testing.T) {
 	)
 	require.Equal(t, app.Name, bApp.Name())
 
+	vestingypes.RegisterLegacyAminoCodec(bApp.LegacyAmino())
+	vestingypes.RegisterInterfaces(bApp.InterfaceRegistry())
+
 	// run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(
 		t,
@@ -263,7 +302,7 @@ func TestAppImportExport(t *testing.T) {
 		simtestutil.AppStateFn(
 			bApp.AppCodec(),
 			bApp.SimulationManager(),
-			app.NewDefaultGenesisState(bApp.AppCodec()),
+			ModuleBasics.DefaultGenesis(bApp.AppCodec()),
 		),
 		simulationtypes.RandomAccounts,
 		simtestutil.SimulationOperations(bApp, bApp.AppCodec(), config),
@@ -314,7 +353,10 @@ func TestAppImportExport(t *testing.T) {
 		appOptions,
 		baseapp.SetChainID(config.ChainID),
 	)
-	require.Equal(t, app.Name, bApp.Name())
+	require.Equal(t, app.Name, newApp.Name())
+
+	vestingypes.RegisterLegacyAminoCodec(newApp.LegacyAmino())
+	vestingypes.RegisterInterfaces(newApp.InterfaceRegistry())
 
 	var genesisState app.GenesisState
 	err = json.Unmarshal(exported.AppState, &genesisState)
@@ -331,8 +373,9 @@ func TestAppImportExport(t *testing.T) {
 		}
 	}()
 
-	ctxA := bApp.NewContext(true, tmproto.Header{Height: bApp.LastBlockHeight()})
-	ctxB := newApp.NewContext(true, tmproto.Header{Height: bApp.LastBlockHeight()})
+	ctxA := bApp.NewContext(true, tmproto.Header{ChainID: config.ChainID, Height: bApp.LastBlockHeight()})
+	ctxB := newApp.NewContext(true, tmproto.Header{ChainID: config.ChainID, Height: bApp.LastBlockHeight()})
+
 	newApp.ModuleManager().InitGenesis(ctxB, bApp.AppCodec(), genesisState)
 	newApp.StoreConsensusParams(ctxB, exported.ConsensusParams)
 
@@ -348,7 +391,6 @@ func TestAppImportExport(t *testing.T) {
 			},
 		}, // ordering may change but it doesn't matter
 		{bApp.GetKey(slashingtypes.StoreKey), newApp.GetKey(slashingtypes.StoreKey), [][]byte{}},
-		{bApp.GetKey(minttypes.StoreKey), newApp.GetKey(minttypes.StoreKey), [][]byte{}},
 		{bApp.GetKey(distrtypes.StoreKey), newApp.GetKey(distrtypes.StoreKey), [][]byte{}},
 		{bApp.GetKey(banktypes.StoreKey), newApp.GetKey(banktypes.StoreKey), [][]byte{banktypes.BalancesPrefix}},
 		{bApp.GetKey(paramstypes.StoreKey), newApp.GetKey(paramstypes.StoreKey), [][]byte{}},
@@ -356,6 +398,8 @@ func TestAppImportExport(t *testing.T) {
 		{bApp.GetKey(evidencetypes.StoreKey), newApp.GetKey(evidencetypes.StoreKey), [][]byte{}},
 		{bApp.GetKey(capabilitytypes.StoreKey), newApp.GetKey(capabilitytypes.StoreKey), [][]byte{}},
 		{bApp.GetKey(authzkeeper.StoreKey), newApp.GetKey(authzkeeper.StoreKey), [][]byte{authzkeeper.GrantKey, authzkeeper.GrantQueuePrefix}},
+		{bApp.GetKey(validatorrewardtypes.StoreKey), newApp.GetKey(validatorrewardtypes.StoreKey), [][]byte{}},
+		{bApp.GetKey(nftminttypes.StoreKey), newApp.GetKey(nftminttypes.StoreKey), [][]byte{}},
 	}
 
 	for _, skp := range storeKeysPrefixes {
@@ -370,9 +414,10 @@ func TestAppImportExport(t *testing.T) {
 	}
 }
 
+// `go test -benchmem -run=^TestAppSimulationAfterImport$ -bench ^$ ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true`
 func TestAppSimulationAfterImport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
-	config.ChainID = "mars-simapp-after-import"
+	config.ChainID = "titanafterimport_1-1"
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(
 		config,
@@ -410,6 +455,9 @@ func TestAppSimulationAfterImport(t *testing.T) {
 	)
 	require.Equal(t, app.Name, bApp.Name())
 
+	vestingypes.RegisterLegacyAminoCodec(bApp.LegacyAmino())
+	vestingypes.RegisterInterfaces(bApp.InterfaceRegistry())
+
 	// run randomized simulation
 	stopEarly, simParams, simErr := simulation.SimulateFromSeed(
 		t,
@@ -418,7 +466,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		simtestutil.AppStateFn(
 			bApp.AppCodec(),
 			bApp.SimulationManager(),
-			app.NewDefaultGenesisState(bApp.AppCodec()),
+			ModuleBasics.DefaultGenesis(bApp.AppCodec()),
 		),
 		simulationtypes.RandomAccounts,
 		simtestutil.SimulationOperations(bApp, bApp.AppCodec(), config),
@@ -475,7 +523,10 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		fauxMerkleModeOpt,
 		baseapp.SetChainID(config.ChainID),
 	)
-	require.Equal(t, app.Name, bApp.Name())
+	require.Equal(t, app.Name, newApp.Name())
+
+	vestingypes.RegisterLegacyAminoCodec(newApp.LegacyAmino())
+	vestingypes.RegisterInterfaces(newApp.InterfaceRegistry())
 
 	newApp.InitChain(abci.RequestInitChain{
 		ChainId:       config.ChainID,
@@ -489,7 +540,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		simtestutil.AppStateFn(
 			bApp.AppCodec(),
 			bApp.SimulationManager(),
-			app.NewDefaultGenesisState(bApp.AppCodec()),
+			ModuleBasics.DefaultGenesis(newApp.AppCodec()),
 		),
 		simulationtypes.RandomAccounts,
 		simtestutil.SimulationOperations(newApp, newApp.AppCodec(), config),
