@@ -46,4 +46,8 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 - (Makefile) Update to use fork version of ignite cli.
 
+- Fix simulation tests.
+
+- Add simulation tests for module `validatorreward`.
+
 ## [v2.0.1](https://github.com/titantkx/titan/releases/tag/v2.0.1)
