@@ -1,6 +1,8 @@
 package validatorreward
 
 import (
+	"encoding/json"
+	"fmt"
 	"math/rand"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -43,14 +45,19 @@ const (
 
 // GenerateGenesisState creates a randomized GenState of the module.
 func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
-	accs := make([]string, len(simState.Accounts))
-	for i, acc := range simState.Accounts {
-		accs[i] = acc.Address.String()
-	}
+	rate := simtypes.RandomDecAmount(simState.Rand, types.MaxRate)
+	authority, _ := simtypes.RandomAcc(simState.Rand, simState.Accounts)
+
 	validatorrewardGenesis := types.GenesisState{
-		Params: types.DefaultParams(),
+		Params: types.NewParams(rate, authority.Address.String()),
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
+
+	bz, err := json.MarshalIndent(&validatorrewardGenesis.Params, "", " ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Selected randomly generated validatorreward parameters:\n%s\n", bz)
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&validatorrewardGenesis)
 }
 

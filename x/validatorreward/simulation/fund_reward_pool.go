@@ -5,26 +5,50 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	"github.com/cosmos/cosmos-sdk/x/simulation"
 	"github.com/titantkx/titan/x/validatorreward/keeper"
 	"github.com/titantkx/titan/x/validatorreward/types"
 )
 
 func SimulateMsgFundRewardPool(
-	_ types.AccountKeeper,
-	_ types.BankKeeper,
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
 	_ keeper.Keeper,
 ) simtypes.Operation {
 	//nolint:revive	// keep `chainID` for clear meaning
-	return func(r *rand.Rand, _ *baseapp.BaseApp, _ sdk.Context, accs []simtypes.Account, chainID string,
+	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgFundRewardPool{
-			Depositor: simAccount.Address.String(),
+		depositor, _ := simtypes.RandomAcc(r, accs)
+		spendable := bk.SpendableCoins(ctx, depositor.Address)
+		depositAmount := simtypes.RandSubsetCoins(r, spendable)
+
+		// if coins slice is empty, we cannot create valid types.MsgFundRewardPool
+		if len(depositAmount) == 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgFundRewardPool, "empty coins slice"), nil, nil
 		}
 
-		// TODO: Handling the FundRewardPool simulation
+		msg := &types.MsgFundRewardPool{
+			Depositor: depositor.Address.String(),
+			Amount:    depositAmount,
+		}
 
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "FundRewardPool simulation not implemented"), nil, nil
+		txCtx := simulation.OperationInput{
+			R:               r,
+			App:             app,
+			TxGen:           moduletestutil.MakeTestEncodingConfig().TxConfig,
+			Cdc:             nil,
+			Msg:             msg,
+			MsgType:         msg.Type(),
+			Context:         ctx,
+			SimAccount:      depositor,
+			AccountKeeper:   ak,
+			Bankkeeper:      bk,
+			ModuleName:      types.ModuleName,
+			CoinsSpentInMsg: depositAmount,
+		}
+
+		return simulation.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }

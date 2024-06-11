@@ -15,6 +15,8 @@ const (
 
 var DefaultRate = sdk.NewDecWithPrec(6, 2) // 6%
 
+var MaxRate = sdk.NewDecWithPrec(100, 2) // 100%
+
 // NewParams creates a new Params instance
 func NewParams(
 	rate sdkmath.LegacyDec,
