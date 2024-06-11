@@ -292,6 +292,18 @@ test-e2e-upgrade-from-genesis:
 
 test-all: test-testutil test-unit test-app test-integration test-e2e-cmd
 
+test-benchmark: 
+	go test -benchmem -run=^$$ -bench=^BenchmarkSimulation$$ ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true
+
+test-determinism:
+	go test -benchmem -run=^TestAppStateDeterminism$$ -bench ^$$ ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true
+
+test-import-export:
+	go test -benchmem -run=^TestAppImportExport$$ -bench ^$$ ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true
+
+test-after-import:
+	go test -benchmem -run=^TestAppSimulationAfterImport$$ -bench ^$$ ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true
+
 ###############################################################################
 ###                                Releasing                                ###
 ###############################################################################
