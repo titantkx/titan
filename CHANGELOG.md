@@ -36,7 +36,11 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 # Changelog
 
-## Unreleased
+## [Unreleased]
+
+### State Machine Breaking
+
+- (deps) upgrade cometbft to 0.37.6, ibc-go to 7.4.0, gogoproto to 1.4.12
 
 ### Features
 
