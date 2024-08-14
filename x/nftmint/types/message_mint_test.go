@@ -18,8 +18,8 @@ func TestMsgMint_ValidateBasic(t *testing.T) {
 		{
 			name: "valid msg",
 			msg: MsgMint{
-				Creator:  sample.AccAddress(),
-				Receiver: sample.AccAddress(),
+				Creator:  sample.AccAddress().String(),
+				Receiver: sample.AccAddress().String(),
 				ClassId:  sample.ClassId(),
 			},
 		},
@@ -27,7 +27,7 @@ func TestMsgMint_ValidateBasic(t *testing.T) {
 			name: "invalid creator address",
 			msg: MsgMint{
 				Creator:  "invalid_address",
-				Receiver: sample.AccAddress(),
+				Receiver: sample.AccAddress().String(),
 				ClassId:  strconv.FormatUint(rand.Uint64(), 10),
 			},
 			err: ErrInvalidAddress,
@@ -35,7 +35,7 @@ func TestMsgMint_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid receiver address",
 			msg: MsgMint{
-				Creator:  sample.AccAddress(),
+				Creator:  sample.AccAddress().String(),
 				Receiver: "invalid_address",
 				ClassId:  sample.ClassId(),
 			},
@@ -44,8 +44,8 @@ func TestMsgMint_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid class id",
 			msg: MsgMint{
-				Creator:  sample.AccAddress(),
-				Receiver: sample.AccAddress(),
+				Creator:  sample.AccAddress().String(),
+				Receiver: sample.AccAddress().String(),
 				ClassId:  "invalid_class_id",
 			},
 			err: ErrInvalidClassId,

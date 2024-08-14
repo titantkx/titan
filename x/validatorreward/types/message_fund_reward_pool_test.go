@@ -23,7 +23,7 @@ func TestMsgFundRewardPool_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid address",
 			msg: MsgFundRewardPool{
-				Depositor: sample.AccAddress(),
+				Depositor: sample.AccAddress().String(),
 			},
 		},
 	}

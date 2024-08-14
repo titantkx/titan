@@ -57,7 +57,7 @@ func TestMsgServer_SetRate(t *testing.T) {
 		},
 		{
 			name:      "Invalid authority address",
-			authority: sample.AccAddress(),
+			authority: sample.AccAddress().String(),
 			rate:      sdk.NewDecWithPrec(5, 1),
 			expect: func(ms types.MsgServer, ctx sdk.Context, k *keeper.Keeper, authority string, rate sdk.Dec) {
 				oldRate := k.GetRate(ctx)
