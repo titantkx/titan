@@ -41,11 +41,11 @@ Ref: https://keepachangelog.com/en/1.1.0/
 ### State Machine Breaking
 
 - (deps) upgrade cometbft to 0.37.6, ibc-go to 7.4.0, gogoproto to 1.4.12
+- (ibc) [#81](https://github.com/titantkx/titan/issues/81) Integrate `packetForward` middleware for ibc transfer.
 
 ### Features
 
 - (amino) [#73](https://github.com/titantkx/titan/issues/73) Add regis amino codec of `nftmint` and `validatorreward` module for `gov`,`authz`,`group`.
-- (ibc) [#81](https://github.com/titantkx/titan/issues/81) Integrate `packetForward` middleware for ibc transfer.
 
 ### Miscellaneous
 
