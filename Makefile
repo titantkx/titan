@@ -290,6 +290,9 @@ test-e2e-upgrade:
 test-e2e-upgrade-from-genesis:
 	TEST_TYPE=upgrade-from-genesis go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
 
+test-interchain:
+	$(MAKE) -C tests/interchain test-interchain
+
 test-all: test-testutil test-unit test-app test-integration test-e2e-cmd
 
 test-benchmark: 
