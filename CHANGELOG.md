@@ -48,6 +48,9 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 - (amino) [#73](https://github.com/titantkx/titan/issues/73) Add regis amino codec of `nftmint` and `validatorreward` module for `gov`,`authz`,`group`.
 
+- (tokenfactory) [#88](https://github.com/titantkx/titan/pull/88) Add tokenfactory module.
+
+
 ### Miscellaneous
 
 - (Makefile) Update to use fork version of ignite cli.
@@ -55,5 +58,9 @@ Ref: https://keepachangelog.com/en/1.1.0/
 - Fix simulation tests.
 
 - Add simulation tests for module `validatorreward`.
+
+- (testutil) [#88](https://github.com/titantkx/titan/pull/88) Change function `sample.AccAddress` return type.
+
+- (.golangci.yml) [#88](https://github.com/titantkx/titan/pull/88) Remove rule `allow-leading-space`.
 
 ## [v2.0.1](https://github.com/titantkx/titan/releases/tag/v2.0.1)
