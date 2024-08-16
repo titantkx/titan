@@ -45,6 +45,7 @@ Ref: https://keepachangelog.com/en/1.1.0/
 ### Features
 
 - (amino) [#73](https://github.com/titantkx/titan/issues/73) Add regis amino codec of `nftmint` and `validatorreward` module for `gov`,`authz`,`group`.
+- (ibc) [#81](https://github.com/titantkx/titan/issues/81) Integrate `packetForward` middleware for ibc transfer.
 
 ### Miscellaneous
 
