@@ -27,7 +27,7 @@ func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	setup.Install(t, logger, rootDir)
 
 	fmt.Println("Building image...")
-	setup.BuildImage(t, logger, rootDir, "latest")
+	setup.BuildImage(t, logger, rootDir, "local")
 
 	setup.StopChain(t, logger, "docker-compose-genesis.yml") // Stop any running instance
 
@@ -57,7 +57,7 @@ func Setup(m *testing.M, rootDir string, logger io.Writer) {
 
 	fmt.Println("Restarting blockchain...")
 	setup.StopChain(t, logger, "docker-compose-genesis.yml")
-	ready, done = setup.StartChain(t, logger, "docker-compose-latest.yml")
+	ready, done = setup.StartChain(t, logger, "docker-compose-local.yml")
 
 	select {
 	case <-ready:
@@ -68,7 +68,7 @@ func Setup(m *testing.M, rootDir string, logger io.Writer) {
 
 	code := m.Run()
 
-	setup.StopChain(t, logger, "docker-compose-latest.yml")
+	setup.StopChain(t, logger, "docker-compose-local.yml")
 
 	<-done
 	fmt.Println("Stopped blockchain")

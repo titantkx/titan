@@ -34,7 +34,7 @@ func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 	setup.Install(t, logger, rootDir)
 
 	fmt.Println("Building image...")
-	setup.BuildImage(t, logger, rootDir, "latest")
+	setup.BuildImage(t, logger, rootDir, "local")
 
 	setup.StopChain(t, logger, "docker-compose-genesis.yml") // Stop any running instance
 
@@ -61,7 +61,7 @@ func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 
 	fmt.Println("Restarting blockchain...")
 	setup.StopChain(t, logger, "docker-compose-genesis.yml")
-	ready, done = setup.StartChain(t, logger, "docker-compose-latest.yml")
+	ready, done = setup.StartChain(t, logger, "docker-compose-local.yml")
 
 	select {
 	case <-ready:
@@ -70,7 +70,7 @@ func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 		panic("Blockchain is stopped before ready")
 	}
 
-	setup.StopChain(t, logger, "docker-compose-latest.yml")
+	setup.StopChain(t, logger, "docker-compose-local.yml")
 
 	//nolint:gocritic // Using os.Exit(0) here is necessary to terminate the test
 	os.Exit(0)
