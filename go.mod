@@ -4,10 +4,12 @@ go 1.22.3
 
 require (
 	cosmossdk.io/api v0.3.1
+	cosmossdk.io/core v0.6.1
 	cosmossdk.io/errors v1.0.1
 	cosmossdk.io/math v1.2.0
 	cosmossdk.io/tools/rosetta v0.2.1
 	github.com/CosmWasm/wasmd v0.45.0
+	github.com/CosmWasm/wasmvm v1.5.0
 	github.com/bianjieai/nft-transfer v1.1.3-ibc-v7.3.0
 	github.com/cometbft/cometbft v0.37.6
 	github.com/cometbft/cometbft-db v0.8.0
@@ -43,14 +45,12 @@ require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v1.1.5 // indirect
 	cloud.google.com/go/storage v1.35.1 // indirect
-	cosmossdk.io/core v0.6.1 // indirect
 	cosmossdk.io/depinject v1.0.0-alpha.4 // indirect
 	cosmossdk.io/log v1.3.0 // indirect
 	filippo.io/edwards25519 v1.0.0 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
 	github.com/99designs/keyring v1.2.2 // indirect
 	github.com/ChainSafe/go-schnorrkel v1.0.0 // indirect
-	github.com/CosmWasm/wasmvm v1.5.0 // indirect
 	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
 	github.com/VictoriaMetrics/fastcache v1.6.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
@@ -231,6 +231,6 @@ require (
 
 replace github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
-replace github.com/cosmos/cosmos-sdk => github.com/titantkx/cosmos-sdk v0.47.6-titan.6
+replace github.com/cosmos/cosmos-sdk => github.com/titantkx/cosmos-sdk v0.47.6-titan.7
 
 replace github.com/ethereum/go-ethereum => github.com/titantkx/go-ethereum v1.10.26-titan.1

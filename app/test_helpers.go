@@ -13,8 +13,6 @@ import (
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
-	"github.com/stretchr/testify/require"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -33,8 +31,9 @@ import (
 	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 	"github.com/titantkx/ethermint/crypto/ethsecp256k1"
-
 	"github.com/titantkx/titan/app/params"
 	"github.com/titantkx/titan/utils"
 )
@@ -132,8 +131,6 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 }
 
 // Setup initializes a new SimApp. A Nop logger is set in SimApp. Return app and genesis address.
-//
-//nolint:revive // keep `isCheckTx` for future usage
 func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	t.Helper()
 
@@ -155,9 +152,12 @@ func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	genAcc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
 		Address: genAcc.GetAddress().String(),
-		Coins:   sdk.NewCoins(sdk.NewCoin(utils.BaseDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18)))),
+		Coins: sdk.NewCoins(
+			sdk.NewCoin(utils.BaseDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18))),
+			sdk.NewCoin(utils.SecondaryDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18))),
+		),
 	}
-	app := SetupWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{genAcc}, balance)
+	app := SetupWithGenesisValSet(t, isCheckTx, valSet, []authtypes.GenesisAccount{genAcc}, balance)
 
 	return app, genAcc.GetAddress()
 }
@@ -288,7 +288,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 // that also act as delegators. For simplicity, each validator is bonded with a delegation
 // of one consensus engine unit in the default token of the simapp from first genesis
 // account. A Nop logger is set in SimApp.
-func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) *App {
+func SetupWithGenesisValSet(t *testing.T, isCheckTx bool, valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) *App {
 	t.Helper()
 
 	app, genesisState, _ := setup(true, 5, baseapp.SetChainID(DefaultChainID))
@@ -298,25 +298,27 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 	require.NoError(t, err)
 
-	// init chain will set the validator set and initialize the genesis accounts
-	app.InitChain(
-		abci.RequestInitChain{
-			ChainId:         DefaultChainID,
-			Validators:      []abci.ValidatorUpdate{},
-			ConsensusParams: sdksimtestutil.DefaultConsensusParams,
-			AppStateBytes:   stateBytes,
-		},
-	)
+	if !isCheckTx {
+		// init chain will set the validator set and initialize the genesis accounts
+		app.InitChain(
+			abci.RequestInitChain{
+				ChainId:         DefaultChainID,
+				Validators:      []abci.ValidatorUpdate{},
+				ConsensusParams: sdksimtestutil.DefaultConsensusParams,
+				AppStateBytes:   stateBytes,
+			},
+		)
 
-	// commit genesis changes
-	app.Commit()
-	app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
-		ChainID:            DefaultChainID,
-		Height:             app.LastBlockHeight() + 1,
-		AppHash:            app.LastCommitID().Hash,
-		ValidatorsHash:     valSet.Hash(),
-		NextValidatorsHash: valSet.Hash(),
-	}})
+		// commit genesis changes
+		app.Commit()
+		app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
+			ChainID:            DefaultChainID,
+			Height:             app.LastBlockHeight() + 1,
+			AppHash:            app.LastCommitID().Hash,
+			ValidatorsHash:     valSet.Hash(),
+			NextValidatorsHash: valSet.Hash(),
+		}})
+	}
 
 	return app
 }
@@ -422,4 +424,38 @@ func PrintExported(exportedApp servertypes.ExportedApp) {
 	}
 	genDocBytes, _ := tmjson.MarshalIndent(exportedGenDoc, "", "  ")
 	fmt.Println("exportedGenDoc", string(genDocBytes))
+}
+
+type KeeperTestHelper struct {
+	suite.Suite
+}
+
+func (s *KeeperTestHelper) SkipIfWSL() {
+	SkipIfWSL(s.T())
+}
+
+// SkipIfWSL skips tests if running on WSL
+// This is a workaround to enable quickly running full unit test suite locally
+// on WSL without failures. The failures are stemming from trying to upload
+// wasm code. An OS permissioning issue.
+func SkipIfWSL(t *testing.T) {
+	t.Helper()
+	skip := os.Getenv("SKIP_WASM_WSL_TESTS")
+	if skip == "true" {
+		t.Skip("Skipping Wasm tests")
+	}
+}
+
+// AssertEventEmitted asserts that ctx's event manager has emitted the given number of events
+// of the given type.
+func (s *KeeperTestHelper) AssertEventEmitted(ctx sdk.Context, eventTypeExpected string, numEventsExpected int) {
+	allEvents := ctx.EventManager().Events()
+	// filter out other events
+	actualEvents := make([]sdk.Event, 0)
+	for _, event := range allEvents {
+		if event.Type == eventTypeExpected {
+			actualEvents = append(actualEvents, event)
+		}
+	}
+	s.Require().Equal(numEventsExpected, len(actualEvents))
 }
