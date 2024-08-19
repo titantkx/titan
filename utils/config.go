@@ -82,3 +82,11 @@ func RegisterDenoms() {
 		}
 	}
 }
+
+func IsMainnet(chainID string) bool {
+	return chainID == MainnetChainID
+}
+
+func IsTestnet(chainID string) bool {
+	return chainID == TestnetChainID
+}
