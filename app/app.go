@@ -585,7 +585,7 @@ func New(
 	// Create the packet forward middleware keeper
 	app.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
 		appCodec,
-		app.keys[packetforwardtypes.StoreKey],
+		keys[packetforwardtypes.StoreKey],
 		app.TransferKeeper,
 		app.IBCKeeper.ChannelKeeper,
 		app.DistrKeeper,
