@@ -18,8 +18,8 @@ func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	t := testutil.NewMockTest(os.Stderr)
 	defer t.Finish()
 	testutil.HandleOSInterrupt(func() {
-		defer setup.StopChain(t, logger, "docker-compose-genesis.yml")
-		defer setup.StopChain(t, logger, "docker-compose-local.yml")
+		setup.StopChain(t, logger, "docker-compose-genesis.yml")
+		setup.StopChain(t, logger, "docker-compose-local.yml")
 	})
 
 	testutil.Chdir(t, "setup/upgrade")
