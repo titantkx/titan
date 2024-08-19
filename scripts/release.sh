@@ -3,7 +3,7 @@
 set -e
 
 PACKAGE_NAME=github.com/titantkx/titan
-GOLANG_CROSS_VERSION=v1.22
+GOLANG_CROSS_VERSION=v1.22-v1.25.1
 GITHUB_REPO=titantkx/titan
 
 # verify if `MAKE_PROJECT_ROOT` and `MAKE_BUILD_TAGS` is set
