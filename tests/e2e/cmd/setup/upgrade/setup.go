@@ -17,7 +17,7 @@ const UpgradeName = "v3_0_0_rc_0"
 func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	t := testutil.NewMockTest(os.Stderr)
 	defer t.Finish()
-	t.HandleOSInterrupt(func() {
+	testutil.HandleOSInterrupt(func() {
 		defer setup.StopChain(t, logger, "docker-compose-genesis.yml")
 		defer setup.StopChain(t, logger, "docker-compose-local.yml")
 	})

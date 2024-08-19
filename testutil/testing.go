@@ -3,10 +3,7 @@ package testutil
 import (
 	"fmt"
 	"io"
-	"os"
-	"os/signal"
 	"runtime"
-	"syscall"
 )
 
 type TestingT interface {
@@ -50,17 +47,4 @@ func (t *MockTest) doCleanup() {
 		t.cleanupFunc()
 		t.cleanupCalled = true
 	}
-}
-
-func (t *MockTest) HandleOSInterrupt(f func()) {
-	// Set up signal handling for Ctrl+C
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-sigChan
-		t.doCleanup()
-		fmt.Println("Received interrupt signal, cleaning up...")
-		f()
-		os.Exit(1)
-	}()
 }
