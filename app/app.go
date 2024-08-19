@@ -134,9 +134,11 @@ import (
 
 	"github.com/titantkx/titan/app/ante"
 	"github.com/titantkx/titan/app/posthandler"
-	v1 "github.com/titantkx/titan/app/upgrades/v1"
-	v2 "github.com/titantkx/titan/app/upgrades/v2"
+	"github.com/titantkx/titan/app/upgrades/v1"
+	"github.com/titantkx/titan/app/upgrades/v2"
 	"github.com/titantkx/titan/app/upgrades/v2_0_1"
+	"github.com/titantkx/titan/app/upgrades/v3_0_0"
+	v3_0_0_rc_0 "github.com/titantkx/titan/app/upgrades/v3_0_0/rc_0"
 	"github.com/titantkx/titan/docs"
 	"github.com/titantkx/titan/utils"
 	nftutil "github.com/titantkx/titan/utils/nft"
@@ -1265,6 +1267,16 @@ func (app *App) setupUpgradeHandlers() {
 		v2_0_1.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v3_0_0_rc_0.UpgradeName,
+		v3_0_0_rc_0.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v3_0_0.UpgradeName,
+		v3_0_0.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1290,6 +1302,10 @@ func (app *App) setupUpgradeHandlers() {
 			},
 		}
 	case v2_0_1.UpgradeName:
+	case v3_0_0_rc_0.UpgradeName:
+		storeUpgrades = v3_0_0_rc_0.CreateStoreUpgrade()
+	case v3_0_0.UpgradeName:
+		storeUpgrades = v3_0_0.CreateStoreUpgrade()
 	}
 
 	if storeUpgrades != nil {
