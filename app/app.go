@@ -740,6 +740,7 @@ func New(
 		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp, // forward timeout
 		packetforwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,  // refund timeout
 	)
+	// ibcfee must come after PFM since PFM does not understand IncentivizedAcknowlegements (ICS29)
 	transferIBCModule = ibcfee.NewIBCMiddleware(transferIBCModule, app.IBCFeeKeeper)
 
 	// Create wasm ibc Stack
