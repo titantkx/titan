@@ -26,7 +26,7 @@ func HandleOSInterrupt(f func()) {
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-sigChan
-		fmt.Println("Received interrupt signal, cleaning up...")
+		fmt.Println("Received interrupt signal")
 		f()
 		os.Exit(1)
 	}()
