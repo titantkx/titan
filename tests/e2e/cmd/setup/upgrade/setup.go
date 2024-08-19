@@ -12,11 +12,15 @@ import (
 	"github.com/titantkx/titan/testutil/cmd/keys"
 )
 
-const UpgradeName = "v2_0_1"
+const UpgradeName = "v3_0_0_rc_0"
 
 func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	t := testutil.NewMockTest(os.Stderr)
 	defer t.Finish()
+	t.HandleOSInterrupt(func() {
+		defer setup.StopChain(t, logger, "docker-compose-genesis.yml")
+		defer setup.StopChain(t, logger, "docker-compose-local.yml")
+	})
 
 	testutil.Chdir(t, "setup/upgrade")
 	testutil.MkdirAll(t, "tmp", os.ModePerm)
