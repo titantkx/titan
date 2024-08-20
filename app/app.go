@@ -87,6 +87,9 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward"
+	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/keeper"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
 	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
 	icacontroller "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller"
 	icacontrollerkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/keeper"
@@ -131,9 +134,11 @@ import (
 
 	"github.com/titantkx/titan/app/ante"
 	"github.com/titantkx/titan/app/posthandler"
-	v1 "github.com/titantkx/titan/app/upgrades/v1"
-	v2 "github.com/titantkx/titan/app/upgrades/v2"
+	"github.com/titantkx/titan/app/upgrades/v1"
+	"github.com/titantkx/titan/app/upgrades/v2"
 	"github.com/titantkx/titan/app/upgrades/v2_0_1"
+	"github.com/titantkx/titan/app/upgrades/v3_0_0"
+	v3_0_0_rc_0 "github.com/titantkx/titan/app/upgrades/v3_0_0/rc_0"
 	"github.com/titantkx/titan/docs"
 	"github.com/titantkx/titan/utils"
 	nftutil "github.com/titantkx/titan/utils/nft"
@@ -215,6 +220,8 @@ var (
 		ica.AppModuleBasic{},
 		consensus.AppModuleBasic{},
 		nftmodule.AppModuleBasic{},
+		// non standard modules
+		packetforward.AppModuleBasic{},
 
 		// Ethermint modules
 		evm.AppModuleBasic{},
@@ -292,6 +299,7 @@ type App struct {
 	UpgradeKeeper         *upgradekeeper.Keeper
 	ParamsKeeper          paramskeeper.Keeper
 	IBCKeeper             *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	PacketForwardKeeper   *packetforwardkeeper.Keeper
 	IBCFeeKeeper          ibcfeekeeper.Keeper
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
@@ -374,7 +382,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibcexported.StoreKey, upgradetypes.StoreKey,
 		feegrant.StoreKey, evidencetypes.StoreKey, ibctransfertypes.StoreKey, icahosttypes.StoreKey,
 		capabilitytypes.StoreKey, group.StoreKey, icacontrollertypes.StoreKey, consensusparamtypes.StoreKey,
-		ibcfeetypes.StoreKey,
+		ibcfeetypes.StoreKey, packetforwardtypes.StoreKey,
 		nftkeeper.StoreKey,
 		wasmtypes.StoreKey,
 		// ethermint keys
@@ -574,6 +582,18 @@ func New(
 		scopedTransferKeeper,
 	)
 
+	// Create the packet forward middleware keeper
+	app.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
+		appCodec,
+		keys[packetforwardtypes.StoreKey],
+		app.TransferKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		app.DistrKeeper,
+		app.BankKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec, keys[icahosttypes.StoreKey],
 		app.GetSubspace(icahosttypes.SubModuleName),
@@ -713,6 +733,14 @@ func New(
 	// Create transfer ibc Stack
 	var transferIBCModule ibcporttypes.IBCModule
 	transferIBCModule = transfer.NewIBCModule(app.TransferKeeper)
+	transferIBCModule = packetforward.NewIBCMiddleware(
+		transferIBCModule,
+		app.PacketForwardKeeper,
+		0, // retries on timeout
+		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp, // forward timeout
+		packetforwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,  // refund timeout
+	)
+	// ibcfee must come after PFM since PFM does not understand IncentivizedAcknowlegements (ICS29)
 	transferIBCModule = ibcfee.NewIBCMiddleware(transferIBCModule, app.IBCFeeKeeper)
 
 	// Create wasm ibc Stack
@@ -779,6 +807,7 @@ func New(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
 		ibc.NewAppModule(app.IBCKeeper),
+		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
@@ -820,6 +849,7 @@ func New(
 		ibcexported.ModuleName,
 		icatypes.ModuleName,
 		genutiltypes.ModuleName,
+		packetforwardtypes.ModuleName,
 		authz.ModuleName,
 		feegrant.ModuleName,
 		nft.ModuleName,
@@ -842,6 +872,7 @@ func New(
 		ibctransfertypes.ModuleName,
 		ibcexported.ModuleName,
 		icatypes.ModuleName,
+		packetforwardtypes.ModuleName,
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
@@ -879,6 +910,7 @@ func New(
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
 		govtypes.ModuleName,
+		packetforwardtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibcexported.ModuleName,
 		// evm module denomination is used by the feemarket module, in AnteHandle
@@ -1192,6 +1224,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable()) //nolint:staticcheck
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
+	paramsKeeper.Subspace(packetforwardtypes.ModuleName).WithKeyTable(packetforwardtypes.ParamKeyTable())
 	paramsKeeper.Subspace(ibcexported.ModuleName)
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
@@ -1235,6 +1268,16 @@ func (app *App) setupUpgradeHandlers() {
 		v2_0_1.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v3_0_0_rc_0.UpgradeName,
+		v3_0_0_rc_0.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v3_0_0.UpgradeName,
+		v3_0_0.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1260,6 +1303,10 @@ func (app *App) setupUpgradeHandlers() {
 			},
 		}
 	case v2_0_1.UpgradeName:
+	case v3_0_0_rc_0.UpgradeName:
+		storeUpgrades = v3_0_0_rc_0.CreateStoreUpgrade()
+	case v3_0_0.UpgradeName:
+		storeUpgrades = v3_0_0.CreateStoreUpgrade()
 	}
 
 	if storeUpgrades != nil {

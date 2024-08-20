@@ -12,11 +12,15 @@ import (
 	"github.com/titantkx/titan/testutil/cmd/keys"
 )
 
-const UpgradeName = "v2_0_1"
+const UpgradeName = "v3_0_0_rc_0"
 
 func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 	t := testutil.NewMockTest(os.Stderr)
 	defer t.Finish()
+	testutil.HandleOSInterrupt(func() {
+		setup.StopChain(t, logger, "docker-compose-genesis.yml")
+		setup.StopChain(t, logger, "docker-compose-local.yml")
+	})
 
 	testutil.Chdir(t, "setup/upgrade-from-genesis")
 	testutil.MkdirAll(t, "tmp", os.ModePerm)
@@ -34,7 +38,7 @@ func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 	setup.Install(t, logger, rootDir)
 
 	fmt.Println("Building image...")
-	setup.BuildImage(t, logger, rootDir, "latest")
+	setup.BuildImage(t, logger, rootDir, "local")
 
 	setup.StopChain(t, logger, "docker-compose-genesis.yml") // Stop any running instance
 
@@ -61,7 +65,7 @@ func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 
 	fmt.Println("Restarting blockchain...")
 	setup.StopChain(t, logger, "docker-compose-genesis.yml")
-	ready, done = setup.StartChain(t, logger, "docker-compose-latest.yml")
+	ready, done = setup.StartChain(t, logger, "docker-compose-local.yml")
 
 	select {
 	case <-ready:
@@ -70,7 +74,7 @@ func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 		panic("Blockchain is stopped before ready")
 	}
 
-	setup.StopChain(t, logger, "docker-compose-latest.yml")
+	setup.StopChain(t, logger, "docker-compose-local.yml")
 
 	//nolint:gocritic // Using os.Exit(0) here is necessary to terminate the test
 	os.Exit(0)
