@@ -9,6 +9,8 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
 	"github.com/strangelove-ventures/interchaintest/v7/testreporter"
 	"go.uber.org/zap/zaptest"
+
+	"github.com/titantkx/titan/tests/interchain"
 )
 
 func TestConformance(t *testing.T) {
@@ -24,7 +26,7 @@ func TestConformance(t *testing.T) {
 	// Here we define our ChainFactory by instantiating a new instance of the BuiltinChainFactory exposed in interchaintest.
 	// We use the ChainSpec type to fully describe which chains we want to use in our tests.
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
-		titanChainSpec(ctx, chainIDTitan, numValidators, numFullNodes),
+		interchain.TitanChainSpec(ctx, chainIDTitan, numValidators, numFullNodes),
 		{
 			Name:          "gaia",
 			ChainName:     chainIDGaia1,
