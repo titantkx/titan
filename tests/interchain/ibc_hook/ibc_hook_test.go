@@ -191,8 +191,8 @@ func TestIbcHook(t *testing.T) {
 		memo, err := json.Marshal(metadata)
 		require.NoError(t, err)
 
-		timesToSend := int64(2)
-		for i := int64(0); i < timesToSend; i++ {
+		timesToSend := 2
+		for i := 0; i < timesToSend; i++ {
 			height, err := chain1.Height(ctx)
 			require.NoError(t, err)
 			transferTx, err := chain1.SendIBCTransfer(ctx, c1tChan.ChannelID, user1.KeyName(), transfer, ibc.TransferOptions{Memo: string(memo)})
@@ -234,7 +234,7 @@ func TestIbcHook(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, timesToSend-1, len(results.Data.TotalFunds))
 			require.Equal(t, c1tDenomTrace.IBCDenom(), results.Data.TotalFunds[0].Denom)
-			require.Equal(t, amountToSend.MulRaw(timesToSend).String(), results.Data.TotalFunds[0].Amount)
+			require.Equal(t, amountToSend.MulRaw(int64(timesToSend)).String(), results.Data.TotalFunds[0].Amount)
 			t.Logf("stdout: %s", stdout)
 		}
 	})
