@@ -825,6 +825,7 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
+		ibchooks.NewAppModule(app.AccountKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
