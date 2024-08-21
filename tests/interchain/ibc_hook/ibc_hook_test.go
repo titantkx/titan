@@ -17,6 +17,7 @@ import (
 	"go.uber.org/zap/zaptest"
 
 	sdkmath "cosmossdk.io/math"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	ibchookskeeper "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/keeper"
 
 	"github.com/titantkx/titan/tests/interchain"
@@ -58,11 +59,13 @@ type CounterResponseGetTotalFunds struct {
 }
 
 func TestIbcHook(t *testing.T) {
-	// Set an environment variable
-	err := os.Setenv("KEEP_CONTAINERS", "")
-	if err != nil {
-		t.Logf("Error setting environment variable: %s", err)
-		return
+	// Set an environment variable `KEEP_CONTAINERS` if it's not already set
+	if os.Getenv("KEEP_CONTAINERS") == "" {
+		err := os.Setenv("KEEP_CONTAINERS", "")
+		if err != nil {
+			t.Logf("Error setting environment variable: %s", err)
+			return
+		}
 	}
 
 	if testing.Short() {
@@ -149,6 +152,7 @@ func TestIbcHook(t *testing.T) {
 
 	c1tDenom := transfertypes.GetPrefixedDenom(t1Chan.PortID, t1Chan.ChannelID, chain1.Config().Denom)
 	c1tDenomTrace := transfertypes.ParseDenomTrace(c1tDenom)
+	c1tEscrowAccount := sdk.MustBech32ifyAddressBytes(chain1.Config().Bech32Prefix, transfertypes.GetEscrowAddress(c1tChan.PortID, c1tChan.ChannelID))
 
 	//////////////////////////
 
@@ -199,6 +203,8 @@ func TestIbcHook(t *testing.T) {
 			require.NoError(t, err)
 			_, err = testutil.PollForAck(ctx, chain1, height, height+30, transferTx.Packet)
 			require.NoError(t, err)
+			err = testutil.WaitForBlocks(ctx, 1, chain1, chainT)
+			require.NoError(t, err)
 		}
 
 		t.Logf("sender: %s", user1.FormattedAddress())
@@ -237,5 +243,58 @@ func TestIbcHook(t *testing.T) {
 			require.Equal(t, amountToSend.MulRaw(int64(timesToSend)).String(), results.Data.TotalFunds[0].Amount)
 			t.Logf("stdout: %s", stdout)
 		}
+	})
+
+	t.Run("trigger fail contract logic 1->t", func(t *testing.T) {
+		amountToSend := sdkmath.NewInt(10)
+
+		transfer := ibc.WalletAmount{
+			Address: counterContractAddr,
+			Denom:   chain1.Config().Denom,
+			Amount:  amountToSend,
+		}
+
+		metadata := &PacketMetadata{
+			Wasm: &WasmMetadata{
+				Contract: counterContractAddr,
+				Msg: map[string]map[string]interface{}{
+					"increment_not_existed": {},
+				},
+			},
+		}
+		memo, err := json.Marshal(metadata)
+		require.NoError(t, err)
+
+		chain1OldBalance, err := chain1.GetBalance(ctx, user1.FormattedAddress(), chain1.Config().Denom)
+		require.NoError(t, err)
+		c1tEscrowOldBalance, err := chain1.GetBalance(ctx, c1tEscrowAccount, chain1.Config().Denom)
+		require.NoError(t, err)
+		chainTContractOldBalance, err := chainT.GetBalance(ctx, counterContractAddr, c1tDenomTrace.IBCDenom())
+		require.NoError(t, err)
+
+		height, err := chain1.Height(ctx)
+		require.NoError(t, err)
+		transferTx, err := chain1.SendIBCTransfer(ctx, c1tChan.ChannelID, user1.KeyName(), transfer, ibc.TransferOptions{Memo: string(memo)})
+		require.NoError(t, err)
+		pkack, err := testutil.PollForAck(ctx, chain1, height, height+30, transferTx.Packet)
+		require.NoError(t, err)
+		err = testutil.WaitForBlocks(ctx, 1, chain1, chainT)
+		require.NoError(t, err)
+		t.Logf("ack: %s", string(pkack.Acknowledgement))
+		var ack map[string]string // This can't be unmarshalled to Acknowledgement because it's fetched from the events
+		err = json.Unmarshal(pkack.Acknowledgement, &ack)
+		require.NoError(t, err)
+		require.Contains(t, ack, "error")
+
+		chain1Balance, err := chain1.GetBalance(ctx, user1.FormattedAddress(), chain1.Config().Denom)
+		require.NoError(t, err)
+		c1tEscrowBalance, err := chain1.GetBalance(ctx, c1tEscrowAccount, chain1.Config().Denom)
+		require.NoError(t, err)
+		chainTContractBalance, err := chainT.GetBalance(ctx, counterContractAddr, c1tDenomTrace.IBCDenom())
+		require.NoError(t, err)
+
+		require.Equal(t, chain1OldBalance.Sub(transferTx.Fee), chain1Balance)
+		require.Equal(t, c1tEscrowOldBalance, c1tEscrowBalance)
+		require.Equal(t, chainTContractOldBalance, chainTContractBalance)
 	})
 }

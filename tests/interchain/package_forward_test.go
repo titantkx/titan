@@ -40,11 +40,13 @@ type PacketMetadata struct {
 
 // TestPacketForwardMiddlewareRouter ensures the PFM module is set up properly and works as expected.
 func TestPacketForwardMiddlewareRouter(t *testing.T) {
-	// Set an environment variable
-	err := os.Setenv("KEEP_CONTAINERS", "")
-	if err != nil {
-		t.Logf("Error setting environment variable: %s", err)
-		return
+	// Set an environment variable `KEEP_CONTAINERS` if it's not already set
+	if os.Getenv("KEEP_CONTAINERS") == "" {
+		err := os.Setenv("KEEP_CONTAINERS", "")
+		if err != nil {
+			t.Logf("Error setting environment variable: %s", err)
+			return
+		}
 	}
 
 	if testing.Short() {
