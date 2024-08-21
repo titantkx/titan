@@ -227,7 +227,7 @@ func TestIbcHook(t *testing.T) {
 			results := &CounterResponseGetCount{}
 			err = json.Unmarshal(stdout, results)
 			require.NoError(t, err)
-			require.Equal(t, 1, results.Data.Count)
+			require.Equal(t, timesToSend-1, results.Data.Count)
 			t.Logf("stdout: %s", stdout)
 		}
 
@@ -238,7 +238,7 @@ func TestIbcHook(t *testing.T) {
 			results := &CounterResponseGetTotalFunds{}
 			err = json.Unmarshal(stdout, results)
 			require.NoError(t, err)
-			require.Equal(t, timesToSend-1, len(results.Data.TotalFunds))
+			require.Equal(t, 1, len(results.Data.TotalFunds))
 			require.Equal(t, c1tDenomTrace.IBCDenom(), results.Data.TotalFunds[0].Denom)
 			require.Equal(t, amountToSend.MulRaw(int64(timesToSend)).String(), results.Data.TotalFunds[0].Amount)
 			t.Logf("stdout: %s", stdout)
