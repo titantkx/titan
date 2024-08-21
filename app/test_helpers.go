@@ -217,7 +217,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 	// r := rand.New(rand.NewSource(3920758213583))
 	// keyCounter := 0
 
-	for height := int64(1); height <= int64(cfg.blocks); height++ {
+	for height := uint64(1); height <= cfg.blocks; height++ {
 		currentBlockHeight := app.LastBlockHeight() + 1
 		app.Logger().Debug("Creating block", "height", currentBlockHeight)
 
@@ -258,14 +258,14 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 		app.Commit()
 
 		// wait for snapshot to be taken, since it happens asynchronously
-		if cfg.snapshotInterval > 0 && uint64(height)%cfg.snapshotInterval == 0 {
+		if cfg.snapshotInterval > 0 && height%cfg.snapshotInterval == 0 {
 			start := time.Now()
 			for {
 				if time.Since(start) > snapshotTimeout {
 					t.Errorf("timed out waiting for snapshot after %v", snapshotTimeout)
 				}
 
-				snapshot, err := snapshotStore.Get(uint64(height), snapshottypes.CurrentFormat)
+				snapshot, err := snapshotStore.Get(height, snapshottypes.CurrentFormat)
 				require.NoError(t, err)
 
 				if snapshot != nil {

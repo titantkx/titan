@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	sdktestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	transfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	interchaintest "github.com/strangelove-ventures/interchaintest/v7"
 	"github.com/strangelove-ventures/interchaintest/v7/chain/cosmos"
@@ -22,8 +21,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	titanapp "github.com/titantkx/titan/app"
-	titanutils "github.com/titantkx/titan/utils"
+	"github.com/titantkx/titan/tests/interchain"
 )
 
 type ForwardMetadata struct {
@@ -40,82 +38,15 @@ type PacketMetadata struct {
 	Forward *ForwardMetadata `json:"forward"`
 }
 
-var (
-	IBCRelayerImage   = "ghcr.io/cosmos/relayer"
-	IBCRelayerVersion = "main"
-
-	titanImageInfo = []ibc.DockerImage{
-		{
-			Repository: "docker.io/titantkx/titand",
-			Version:    "local",
-			UidGid:     "1025:1025",
-		},
-	}
-
-	overrideGenesisKV = []cosmos.GenesisKV{
-		// {
-		// 	Key:   "app_state.gov.params.min_deposit.0.denom",
-		// 	Value: titanutils.BondDenom,
-		// },
-		// {
-		// 	Key:   "app_state.feepay.params.enable_feepay",
-		// 	Value: false,
-		// },
-		{
-			Key:   "app_state.evm.params.evm_denom",
-			Value: titanutils.BondDenom,
-		},
-	}
-)
-
-func titanEncoding() *sdktestutil.TestEncodingConfig {
-	encodingConfig := titanapp.MakeEncodingConfig()
-
-	return &sdktestutil.TestEncodingConfig{
-		InterfaceRegistry: encodingConfig.InterfaceRegistry,
-		Codec:             encodingConfig.Marshaler,
-		TxConfig:          encodingConfig.TxConfig,
-		Amino:             encodingConfig.Amino,
-	}
-}
-
-func titanChainSpec(
-	_ context.Context,
-	chainID string,
-	nv, nf int,
-) *interchaintest.ChainSpec {
-	decimals := int64(18)
-	return &interchaintest.ChainSpec{
-		NumValidators: &nv,
-		NumFullNodes:  &nf,
-		ChainConfig: ibc.ChainConfig{
-			Type:           "cosmos",
-			Name:           "titan",
-			ChainID:        chainID,
-			Bin:            "titand",
-			Denom:          "atkx",
-			Bech32Prefix:   "titan",
-			CoinType:       "60",
-			GasPrices:      "100000000000atkx",
-			GasAdjustment:  2,
-			TrustingPeriod: "168h0m0s",
-			NoHostMount:    false,
-			Images:         titanImageInfo,
-			EncodingConfig: titanEncoding(),
-			CoinDecimals:   &decimals,
-			ModifyGenesis:  cosmos.ModifyGenesis(overrideGenesisKV),
-			UseGasUsed:     true,
-		},
-	}
-}
-
 // TestPacketForwardMiddlewareRouter ensures the PFM module is set up properly and works as expected.
 func TestPacketForwardMiddlewareRouter(t *testing.T) {
-	// Set an environment variable
-	err := os.Setenv("KEEP_CONTAINERS", "")
-	if err != nil {
-		t.Logf("Error setting environment variable: %s", err)
-		return
+	// Set an environment variable `KEEP_CONTAINERS` if it's not already set
+	if os.Getenv("KEEP_CONTAINERS") == "" {
+		err := os.Setenv("KEEP_CONTAINERS", "")
+		if err != nil {
+			t.Logf("Error setting environment variable: %s", err)
+			return
+		}
 	}
 
 	if testing.Short() {
@@ -134,7 +65,7 @@ func TestPacketForwardMiddlewareRouter(t *testing.T) {
 	)
 
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
-		titanChainSpec(ctx, chainIDT, numValidators, numFullNodes),
+		interchain.TitanChainSpec(ctx, chainIDT, numValidators, numFullNodes),
 		{
 			Name:          "gaia",
 			ChainName:     chainID1,
@@ -166,7 +97,7 @@ func TestPacketForwardMiddlewareRouter(t *testing.T) {
 	r := interchaintest.NewBuiltinRelayerFactory(
 		ibc.CosmosRly,
 		zaptest.NewLogger(t),
-		interchaintestrelayer.CustomDockerImage(IBCRelayerImage, IBCRelayerVersion, "1000:1000"),
+		interchaintestrelayer.CustomDockerImage(interchain.IBCRelayerImage, interchain.IBCRelayerVersion, "1000:1000"),
 		interchaintestrelayer.StartupFlags("--processor", "events", "--block-history", "100", "--log-level", "debug"), // , "--override"
 	).Build(t, client, network)
 

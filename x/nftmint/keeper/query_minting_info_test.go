@@ -114,7 +114,7 @@ func TestMintingInfoQueryPaginated(t *testing.T) {
 	t.Run("Total", func(t *testing.T) {
 		resp, err := keeper.MintingInfos(wctx, request(nil, 0, 0, true))
 		require.NoError(t, err)
-		require.Equal(t, len(msgs), int(resp.Pagination.Total))
+		require.Equal(t, uint64(len(msgs)), resp.Pagination.Total)
 		require.ElementsMatch(t,
 			nullify.Fill(msgs),
 			nullify.Fill(resp.MintingInfo),

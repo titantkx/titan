@@ -90,6 +90,9 @@ import (
 	"github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward"
 	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/keeper"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
+	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7"
+	ibchookskeeper "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/keeper"
+	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/types"
 	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
 	icacontroller "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller"
 	icacontrollerkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/keeper"
@@ -222,6 +225,7 @@ var (
 		nftmodule.AppModuleBasic{},
 		// non standard modules
 		packetforward.AppModuleBasic{},
+		ibchooks.AppModuleBasic{},
 
 		// Ethermint modules
 		evm.AppModuleBasic{},
@@ -309,7 +313,8 @@ type App struct {
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	NFTKeeper             nftkeeper.Keeper
-	WasmKeeper            wasmkeeper.Keeper
+	WasmKeeper            *wasmkeeper.Keeper
+	IBCHooksKeeper        ibchookskeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -382,7 +387,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibcexported.StoreKey, upgradetypes.StoreKey,
 		feegrant.StoreKey, evidencetypes.StoreKey, ibctransfertypes.StoreKey, icahosttypes.StoreKey,
 		capabilitytypes.StoreKey, group.StoreKey, icacontrollertypes.StoreKey, consensusparamtypes.StoreKey,
-		ibcfeetypes.StoreKey, packetforwardtypes.StoreKey,
+		ibcfeetypes.StoreKey, packetforwardtypes.StoreKey, ibchookstypes.StoreKey,
 		nftkeeper.StoreKey,
 		wasmtypes.StoreKey,
 		// ethermint keys
@@ -594,6 +599,10 @@ func New(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
+	app.IBCHooksKeeper = ibchookskeeper.NewKeeper(
+		keys[ibchookstypes.StoreKey],
+	)
+
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec, keys[icahosttypes.StoreKey],
 		app.GetSubspace(icahosttypes.SubModuleName),
@@ -621,7 +630,7 @@ func New(
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
 	availableCapabilities := strings.Join(AllCapabilities(), ",")
-	app.WasmKeeper = wasmkeeper.NewKeeper(
+	wasmKeeper := wasmkeeper.NewKeeper(
 		appCodec,
 		keys[wasmtypes.StoreKey],
 		app.AccountKeeper,
@@ -640,6 +649,7 @@ func New(
 		availableCapabilities,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
+	app.WasmKeeper = &wasmKeeper
 
 	// Create evidence Keeper for to register the IBC light client misbehavior evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -733,6 +743,12 @@ func New(
 	// Create transfer ibc Stack
 	var transferIBCModule ibcporttypes.IBCModule
 	transferIBCModule = transfer.NewIBCModule(app.TransferKeeper)
+	ics20WasmHooks := ibchooks.NewWasmHooks(&app.IBCHooksKeeper, app.WasmKeeper, AccountAddressPrefix)
+	hooksICS4Wrapper := ibchooks.NewICS4Middleware(
+		app.IBCKeeper.ChannelKeeper,
+		ics20WasmHooks,
+	)
+	transferIBCModule = ibchooks.NewIBCMiddleware(transferIBCModule, &hooksICS4Wrapper)
 	transferIBCModule = packetforward.NewIBCMiddleware(
 		transferIBCModule,
 		app.PacketForwardKeeper,
@@ -805,10 +821,11 @@ func New(
 		upgrade.NewAppModule(app.UpgradeKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
-		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
+		wasm.NewAppModule(appCodec, app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
 		ibc.NewAppModule(app.IBCKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
+		ibchooks.NewAppModule(app.AccountKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
@@ -857,6 +874,7 @@ func New(
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		ibcfeetypes.ModuleName,
+		ibchookstypes.ModuleName,
 		wasmtypes.ModuleName,
 		nftmintmoduletypes.ModuleName,
 		nfttransfertypes.ModuleName,
@@ -888,6 +906,7 @@ func New(
 		upgradetypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		ibcfeetypes.ModuleName,
+		ibchookstypes.ModuleName,
 		wasmtypes.ModuleName,
 		validatorrewardtypes.ModuleName,
 		nftmintmoduletypes.ModuleName,
@@ -930,6 +949,7 @@ func New(
 		consensusparamtypes.ModuleName,
 		crisistypes.ModuleName,
 		ibcfeetypes.ModuleName,
+		ibchookstypes.ModuleName,
 		// wasm must after ibc transfer
 		wasmtypes.ModuleName,
 		validatorrewardtypes.ModuleName,
@@ -995,7 +1015,7 @@ func New(
 	// see cmd/wasmd/root.go: 206 - 214 approx
 	if manager := app.SnapshotManager(); manager != nil {
 		err := manager.RegisterExtensions(
-			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.WasmKeeper),
+			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), app.WasmKeeper),
 		)
 		if err != nil {
 			panic(fmt.Errorf("failed to register snapshot extension: %s", err))
@@ -1046,7 +1066,7 @@ func (app *App) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64, wa
 
 		WasmConfig:        &wasmConfig,
 		TXCounterStoreKey: txCounterStoreKey,
-		WasmKeeper:        &app.WasmKeeper,
+		WasmKeeper:        app.WasmKeeper,
 	})
 	if err != nil {
 		panic(err)
