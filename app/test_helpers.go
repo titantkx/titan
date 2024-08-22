@@ -22,7 +22,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/snapshots"
 	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
 	pruningtypes "github.com/cosmos/cosmos-sdk/store/pruning/types"
-	"github.com/cosmos/cosmos-sdk/testutil"
+	sdktestutil "github.com/cosmos/cosmos-sdk/testutil"
 	"github.com/cosmos/cosmos-sdk/testutil/mock"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdksimtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
@@ -35,6 +35,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/titantkx/ethermint/crypto/ethsecp256k1"
 	"github.com/titantkx/titan/app/params"
+	"github.com/titantkx/titan/testutil"
 	"github.com/titantkx/titan/utils"
 )
 
@@ -154,7 +155,7 @@ func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 		Address: genAcc.GetAddress().String(),
 		Coins: sdk.NewCoins(
 			sdk.NewCoin(utils.BaseDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18))),
-			sdk.NewCoin(utils.SecondaryDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18))),
+			sdk.NewCoin(testutil.SecondaryDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18))),
 		),
 	}
 	app := SetupWithGenesisValSet(t, isCheckTx, valSet, []authtypes.GenesisAccount{genAcc}, balance)
@@ -187,7 +188,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 	utils.RegisterDenoms()
 
 	snapshotTimeout := 1 * time.Minute
-	snapshotStore, err := snapshots.NewStore(dbm.NewMemDB(), testutil.GetTempDir(t))
+	snapshotStore, err := snapshots.NewStore(dbm.NewMemDB(), sdktestutil.GetTempDir(t))
 	require.NoError(t, err)
 
 	app, genesisState, _ := setup(true, 5,

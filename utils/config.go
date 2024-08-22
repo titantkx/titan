@@ -16,8 +16,6 @@ const (
 	TestnetChainID = "titan_18889"
 	// DisplayDenom defines the denomination displayed to users in client applications.
 	DisplayDenom = "tkx"
-
-	SecondaryDenom = "token"
 )
 
 var (

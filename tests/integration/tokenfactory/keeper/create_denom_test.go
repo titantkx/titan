@@ -6,6 +6,7 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/titantkx/titan/testutil"
 	"github.com/titantkx/titan/testutil/sample"
 	"github.com/titantkx/titan/utils"
 	"github.com/titantkx/titan/x/tokenfactory/types"
@@ -81,7 +82,7 @@ func (s *KeeperTestSuite) TestMsgCreateDenom() {
 func (s *KeeperTestSuite) TestCreateDenom() {
 	var (
 		primaryDenom            = utils.BaseDenom
-		secondaryDenom          = utils.SecondaryDenom
+		secondaryDenom          = testutil.SecondaryDenom
 		defaultDenomCreationFee = types.Params{DenomCreationFee: sdk.NewCoins(sdk.NewCoin(primaryDenom, math.NewInt(50000000)))}
 		twoDenomCreationFee     = types.Params{DenomCreationFee: sdk.NewCoins(sdk.NewCoin(primaryDenom, math.NewInt(50000000)), sdk.NewCoin(secondaryDenom, math.NewInt(50000000)))}
 		nilCreationFee          = types.Params{DenomCreationFee: nil}
