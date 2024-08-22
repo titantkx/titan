@@ -7,6 +7,7 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
 	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/types"
+	tokenfactorytypes "github.com/titantkx/titan/x/tokenfactory/types"
 )
 
 func CreateStoreUpgrade() *storetypes.StoreUpgrades {
@@ -14,6 +15,7 @@ func CreateStoreUpgrade() *storetypes.StoreUpgrades {
 		Added: []string{
 			packetforwardtypes.StoreKey,
 			ibchookstypes.StoreKey,
+			tokenfactorytypes.StoreKey,
 		},
 	}
 }
