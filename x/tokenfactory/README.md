@@ -8,78 +8,13 @@ account can create multiple denoms, by providing a unique subdenom for each
 created denom. Once a denom is created, the original creator is given
 "admin" privileges over the asset. This allows them to:
 
-- Mint their denom to any account
-- Burn their denom from any account
-- Create a transfer of their denom between any two accounts
+- Mint their denom to any account.
+- Burn their denom.
 - Change the admin. In the future, more admin capabilities may be added. Admins
   can choose to share admin privileges with other accounts using the authz
   module. The `ChangeAdmin` functionality, allows changing the master admin
   account, or even setting it to `""`, meaning no account has admin privileges
   of the asset.
-
-## Bank hooks (`TrackBeforeSend`, `BlockBeforeSend`)
-
-In our fork of [cosmos-sdk](https://github.com/titantkx/cosmos-sdk), we have added two hooks: TrackBeforeSend and BlockBeforeSend.
-
-The APIs for TrackBeforeSend and BlockBeforeSend are as follows:
-
-```go
-TrackBeforeSend(ctx sdk.Context, from, to sdk.AccAddress, amount sdk.Coins) 
-BlockBeforeSend(ctx sdk.Context, from, to sdk.AccAddress, amount sdk.Coins) error 
-```
-
-Note that both hooks take the same arguments, but BlockBeforeSend returns and triggers an error, while TrackBeforeSend does not. That is, any error triggered by the BlockBeforeSend hook implementation would cancel the state transition and, consequently, the send itself, while any error omitted from TrackBeforeSend would be gracefully silenced.
-
-TrackBeforeSend and BlockBeforeSend are both triggered before any send action occurs, specifically before we call sendCoins, the internal API for transferring coins.
-
-```go
-func (k BaseSendKeeper) SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error {
-  err := k.BlockBeforeSend(ctx, fromAddr, toAddr, amt)
-  if err != nil {
-    return err
-  }
-
-  return k.sendCoins(ctx, fromAddr, toAddr, amt)
-}
-```
-
-Note that for Module to Module send, the BlockBeforeSend hooks are not triggered, as we do not want to block module-to-module sends in any case.
-
-Please see [PR4](https://github.com/titantkx/cosmos-sdk/pull/4) for more implementation details.
-
-### Token factory integration with Bank Hooks
-
-Due to the difference two hooks mentioned above, `TrackBeforeSend` is useful for cases when a contract needs to track specific send actions of the token factory denom, whilst `BlockBeforeSend` would be more useful for situations when we want to block specific sends using contracts.
-
-Each Token Factory denom allows the registration of one contract address. This contract is sudo-called every time the aforementioned bank hooks are activated.
-
-Contracts are able to integrate with these hooks by implementing `BlockBeforeSend` and `TrackBeforeSend` message as the following example:
-
-```rust
-#[entry_point]
-pub fn sudo(deps: DepsMut, env: Env, msg: SudoMsg) ->  StdResult<Response> {
-    match &msg{
-        SudoMsg::BlockBeforeSend { from, to, amount} => {
-            Ok(Response::new().add_attributes(vec![
-                ("hook", "block"),
-                ("from", from),
-                ("to", to),
-                ("amount", &amount.to_string())
-            ]))
-        },
-        SudoMsg::TrackBeforeSend { from, to, amount} => {
-            Ok(Response::new().add_attributes(vec![
-                ("hook", "track"),
-                ("from", from),
-                ("to", to),
-                ("amount", &amount.to_string())
-            ]))
-        }
-    }
-}
-```
-
-Note that since `TrackBeforeSend` hook can also be triggered upon module to module send (which is not gas metered), we internally gas meter `TrackBeforeSend` with a gas limit of 100_000.
 
 ## Messages
 
