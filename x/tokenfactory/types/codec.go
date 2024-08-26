@@ -16,7 +16,6 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	legacy.RegisterAminoMsg(cdc, &MsgBurn{}, "titan/tokenfactory/burn")
 	legacy.RegisterAminoMsg(cdc, &MsgChangeAdmin{}, "titan/tokenfactory/change-admin")
 	legacy.RegisterAminoMsg(cdc, &MsgSetDenomMetadata{}, "titan/tokenfactory/set-denom-metadata")
-	legacy.RegisterAminoMsg(cdc, &MsgForceTransfer{}, "titan/tokenfactory/force-transfer")
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -27,7 +26,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgBurn{},
 		&MsgChangeAdmin{},
 		&MsgSetDenomMetadata{},
-		&MsgForceTransfer{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

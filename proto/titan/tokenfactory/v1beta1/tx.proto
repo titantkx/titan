@@ -25,9 +25,6 @@ service Msg {
 
   // CreateClass defines a method to set metadata for a denom.
   rpc SetDenomMetadata(MsgSetDenomMetadata) returns (MsgSetDenomMetadataResponse);
-
-  // CreateClass defines a method to force transfer tokens.
-  rpc ForceTransfer(MsgForceTransfer) returns (MsgForceTransferResponse);
 }
 
 // MsgCreateDenom defines the message structure for the CreateDenom gRPC service
@@ -111,18 +108,3 @@ message MsgSetDenomMetadata {
 
 // MsgMintResponse defines the Msg/SetDenomMetadata response type.
 message MsgSetDenomMetadataResponse {}
-
-// MsgForceTransfer represents a message to force transfer tokens from an
-// address to another address.
-message MsgForceTransfer {
-  option (amino.name)           = "titan/tokenfactory/force-transfer";
-  option (cosmos.msg.v1.signer) = "sender";
-
-  string                   sender = 1 [(gogoproto.moretags) = "yaml:\"sender\""];
-  cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.moretags) = "yaml:\"amount\"", (gogoproto.nullable) = false];
-  string                   transfer_from_address = 3 [(gogoproto.moretags) = "yaml:\"transfer_from_address\""];
-  string                   transfer_to_address   = 4 [(gogoproto.moretags) = "yaml:\"transfer_to_address\""];
-}
-
-// MsgMintResponse defines the Msg/ForceTransfer response type.
-message MsgForceTransferResponse {}

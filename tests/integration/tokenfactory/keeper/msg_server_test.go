@@ -5,7 +5,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/titantkx/titan/testutil/sample"
 	"github.com/titantkx/titan/utils"
 	"github.com/titantkx/titan/x/tokenfactory/types"
@@ -103,28 +102,6 @@ func (s *KeeperTestSuite) TestBurnDenomMsg() {
 			s.AssertEventEmitted(ctx, types.TypeMsgBurn, tc.expectedMessageEvents)
 		})
 	}
-}
-
-func (s *KeeperTestSuite) TestForceTransferMsg() {
-	addr0 := sample.AccAddress()
-	addr1 := sample.AccAddress()
-
-	denom := s.CreateDenom(addr0.String(), "bitcoin")
-
-	s.Run("test force transfer", func() {
-		mintAmt := sdk.NewInt64Coin(denom, 10)
-
-		_, err := s.msgServer.Mint(s.ctx, types.NewMsgMint(addr0.String(), mintAmt))
-		s.Require().NoError(err)
-
-		govModAcc := s.app.AccountKeeper.GetModuleAccount(s.ctx, govtypes.ModuleName)
-
-		err = s.app.BankKeeper.SendCoins(s.ctx, addr0, govModAcc.GetAddress(), sdk.NewCoins(mintAmt))
-		s.Require().NoError(err)
-
-		_, err = s.msgServer.ForceTransfer(s.ctx, types.NewMsgForceTransfer(addr0.String(), mintAmt, govModAcc.GetAddress().String(), addr1.String()))
-		s.Require().ErrorContains(err, "send from module acc not available")
-	})
 }
 
 // TestCreateDenomMsg tests TypeMsgCreateDenom message is emitted on a successful denom creation

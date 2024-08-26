@@ -38,14 +38,6 @@ func (s *KeeperTestSuite) TestAdminMsgs() {
 	s.Require().NoError(err)
 	s.Require().True(s.app.BankKeeper.GetBalance(s.ctx, addr1, denom).Amount.Int64() == addr1bal, s.app.BankKeeper.GetBalance(s.ctx, addr1, denom))
 
-	// Test force transferring
-	_, err = s.msgServer.ForceTransfer(s.ctx, types.NewMsgForceTransfer(addr0.String(), sdk.NewInt64Coin(denom, 5), addr1.String(), addr0.String()))
-	addr1bal -= 5
-	addr0bal += 5
-	s.Require().NoError(err)
-	s.Require().True(s.app.BankKeeper.GetBalance(s.ctx, addr0, denom).Amount.Int64() == addr0bal, s.app.BankKeeper.GetBalance(s.ctx, addr0, denom))
-	s.Require().True(s.app.BankKeeper.GetBalance(s.ctx, addr1, denom).Amount.Int64() == addr1bal, s.app.BankKeeper.GetBalance(s.ctx, addr1, denom))
-
 	// Test burning from own account
 	_, err = s.msgServer.Burn(s.ctx, types.NewMsgBurn(addr0.String(), sdk.NewInt64Coin(denom, 5)))
 	s.Require().NoError(err)
@@ -257,99 +249,6 @@ func (s *KeeperTestSuite) TestBurnDenom() {
 			burnFromAddr, _ := sdk.AccAddressFromBech32(tc.burnMsg.BurnFromAddress)
 			bal := s.app.BankKeeper.GetBalance(s.ctx, burnFromAddr, denom).Amount
 			s.Require().Equal(bal.Int64(), balances[tc.burnMsg.BurnFromAddress])
-		})
-	}
-}
-
-func (s *KeeperTestSuite) TestForceTransferDenom() {
-	addr0 := sample.AccAddress()
-	addr1 := sample.AccAddress()
-	addr2 := sample.AccAddress()
-
-	denom := s.CreateDenom(addr0.String(), "bitcoin")
-
-	// mint 1000 tokens for all test accounts
-	_, err := s.msgServer.Mint(s.ctx, types.NewMsgMintTo(addr0.String(), sdk.NewInt64Coin(denom, 1000), addr0.String()))
-	s.Require().NoError(err)
-
-	_, err = s.msgServer.Mint(s.ctx, types.NewMsgMintTo(addr0.String(), sdk.NewInt64Coin(denom, 1000), addr1.String()))
-	s.Require().NoError(err)
-
-	_, err = s.msgServer.Mint(s.ctx, types.NewMsgMintTo(addr0.String(), sdk.NewInt64Coin(denom, 1000), addr2.String()))
-	s.Require().NoError(err)
-
-	balances := map[string]int64{
-		addr0.String(): 1000,
-		addr1.String(): 1000,
-		addr2.String(): 1000,
-	}
-
-	for _, tc := range []struct {
-		desc             string
-		forceTransferMsg types.MsgForceTransfer
-		expectPass       bool
-	}{
-		{
-			desc: "valid force transfer",
-			forceTransferMsg: *types.NewMsgForceTransfer(
-				addr0.String(),
-				sdk.NewInt64Coin(denom, 10),
-				addr1.String(),
-				addr2.String(),
-			),
-			expectPass: true,
-		},
-		{
-			desc: "denom does not exist",
-			forceTransferMsg: *types.NewMsgForceTransfer(
-				addr0.String(),
-				sdk.NewInt64Coin("factory/titan1tk9ahr5eann843v82z50z8mx6p7lw7dm22t5kl/evmos", 10),
-				addr1.String(),
-				addr2.String(),
-			),
-			expectPass: false,
-		},
-		{
-			desc: "forceTransfer is not by the admin",
-			forceTransferMsg: *types.NewMsgForceTransfer(
-				addr1.String(),
-				sdk.NewInt64Coin(denom, 10),
-				addr1.String(),
-				addr2.String(),
-			),
-			expectPass: false,
-		},
-		{
-			desc: "forceTransfer is greater than the balance of",
-			forceTransferMsg: *types.NewMsgForceTransfer(
-				addr0.String(),
-				sdk.NewInt64Coin(denom, 10000),
-				addr1.String(),
-				addr2.String(),
-			),
-			expectPass: false,
-		},
-	} {
-		s.Run(fmt.Sprintf("Case %s", tc.desc), func() {
-			_, err := s.msgServer.ForceTransfer(s.ctx, &tc.forceTransferMsg)
-			if tc.expectPass {
-				s.Require().NoError(err)
-
-				balances[tc.forceTransferMsg.TransferFromAddress] -= tc.forceTransferMsg.Amount.Amount.Int64()
-				balances[tc.forceTransferMsg.TransferToAddress] += tc.forceTransferMsg.Amount.Amount.Int64()
-			} else {
-				s.Require().Error(err)
-			}
-
-			fromAddr, err := sdk.AccAddressFromBech32(tc.forceTransferMsg.TransferFromAddress)
-			s.Require().NoError(err)
-			fromBal := s.app.BankKeeper.GetBalance(s.ctx, fromAddr, denom).Amount
-			s.Require().True(fromBal.Int64() == balances[tc.forceTransferMsg.TransferFromAddress])
-
-			toAddr, err := sdk.AccAddressFromBech32(tc.forceTransferMsg.TransferToAddress)
-			s.Require().NoError(err)
-			toBal := s.app.BankKeeper.GetBalance(s.ctx, toAddr, denom).Amount
-			s.Require().True(toBal.Int64() == balances[tc.forceTransferMsg.TransferToAddress])
 		})
 	}
 }
