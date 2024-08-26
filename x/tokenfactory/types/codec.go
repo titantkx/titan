@@ -11,13 +11,12 @@ import (
 )
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	legacy.RegisterAminoMsg(cdc, &MsgCreateDenom{}, "osmosis/tokenfactory/create-denom")
-	legacy.RegisterAminoMsg(cdc, &MsgMint{}, "osmosis/tokenfactory/mint")
-	legacy.RegisterAminoMsg(cdc, &MsgBurn{}, "osmosis/tokenfactory/burn")
-	legacy.RegisterAminoMsg(cdc, &MsgChangeAdmin{}, "osmosis/tokenfactory/change-admin")
-	legacy.RegisterAminoMsg(cdc, &MsgSetDenomMetadata{}, "osmosis/tokenfactory/set-denom-metadata")
-	legacy.RegisterAminoMsg(cdc, &MsgSetBeforeSendHook{}, "osmosis/tokenfactory/set-bef-send-hook")
-	legacy.RegisterAminoMsg(cdc, &MsgForceTransfer{}, "osmosis/tokenfactory/force-transfer")
+	legacy.RegisterAminoMsg(cdc, &MsgCreateDenom{}, "titan/tokenfactory/create-denom")
+	legacy.RegisterAminoMsg(cdc, &MsgMint{}, "titan/tokenfactory/mint")
+	legacy.RegisterAminoMsg(cdc, &MsgBurn{}, "titan/tokenfactory/burn")
+	legacy.RegisterAminoMsg(cdc, &MsgChangeAdmin{}, "titan/tokenfactory/change-admin")
+	legacy.RegisterAminoMsg(cdc, &MsgSetDenomMetadata{}, "titan/tokenfactory/set-denom-metadata")
+	legacy.RegisterAminoMsg(cdc, &MsgForceTransfer{}, "titan/tokenfactory/force-transfer")
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -28,7 +27,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgBurn{},
 		&MsgChangeAdmin{},
 		&MsgSetDenomMetadata{},
-		&MsgSetBeforeSendHook{},
 		&MsgForceTransfer{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

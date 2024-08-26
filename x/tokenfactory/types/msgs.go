@@ -10,13 +10,12 @@ import (
 
 // constants
 const (
-	TypeMsgCreateDenom       = "create_denom"
-	TypeMsgMint              = "tf_mint"
-	TypeMsgBurn              = "tf_burn"
-	TypeMsgForceTransfer     = "force_transfer"
-	TypeMsgChangeAdmin       = "change_admin"
-	TypeMsgSetDenomMetadata  = "set_denom_metadata"
-	TypeMsgSetBeforeSendHook = "set_before_send_hook"
+	TypeMsgCreateDenom      = "create_denom"
+	TypeMsgMint             = "tf_mint"
+	TypeMsgBurn             = "tf_burn"
+	TypeMsgForceTransfer    = "force_transfer"
+	TypeMsgChangeAdmin      = "change_admin"
+	TypeMsgSetDenomMetadata = "set_denom_metadata"
 )
 
 var _ sdk.Msg = &MsgCreateDenom{}
@@ -237,45 +236,6 @@ func (m MsgSetDenomMetadata) ValidateBasic() error {
 }
 
 func (m MsgSetDenomMetadata) GetSigners() []sdk.AccAddress {
-	sender, _ := sdk.AccAddressFromBech32(m.Sender)
-	return []sdk.AccAddress{sender}
-}
-
-var _ sdk.Msg = &MsgSetBeforeSendHook{}
-
-// NewMsgSetBeforeSendHook creates a message to set a new before send hook
-func NewMsgSetBeforeSendHook(sender string, denom string, cosmwasmAddress string) *MsgSetBeforeSendHook {
-	return &MsgSetBeforeSendHook{
-		Sender:          sender,
-		Denom:           denom,
-		CosmwasmAddress: cosmwasmAddress,
-	}
-}
-
-func (m MsgSetBeforeSendHook) Route() string { return RouterKey }
-func (m MsgSetBeforeSendHook) Type() string  { return TypeMsgSetBeforeSendHook }
-func (m MsgSetBeforeSendHook) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(m.Sender)
-	if err != nil {
-		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "Invalid sender address (%s)", err)
-	}
-
-	if m.CosmwasmAddress != "" {
-		_, err = sdk.AccAddressFromBech32(m.CosmwasmAddress)
-		if err != nil {
-			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "Invalid cosmwasm contract address (%s)", err)
-		}
-	}
-
-	_, _, err = DeconstructDenom(m.Denom)
-	if err != nil {
-		return ErrInvalidDenom
-	}
-
-	return nil
-}
-
-func (m MsgSetBeforeSendHook) GetSigners() []sdk.AccAddress {
 	sender, _ := sdk.AccAddressFromBech32(m.Sender)
 	return []sdk.AccAddress{sender}
 }

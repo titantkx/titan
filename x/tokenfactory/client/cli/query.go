@@ -22,8 +22,6 @@ func GetQueryCmd() *cobra.Command {
 	cmd.AddCommand(CmdQueryParams())
 	cmd.AddCommand(CmdQueryDenomAuthorityMetadata())
 	cmd.AddCommand(CmdQueryDenomsFromCreator())
-	cmd.AddCommand(CmdQueryAllBeforeSendHooks())
-	cmd.AddCommand(CmdQueryDenomBeforeSendHook())
 
 	return cmd
 }

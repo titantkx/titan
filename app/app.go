@@ -137,8 +137,8 @@ import (
 
 	"github.com/titantkx/titan/app/ante"
 	"github.com/titantkx/titan/app/posthandler"
-	"github.com/titantkx/titan/app/upgrades/v1"
-	"github.com/titantkx/titan/app/upgrades/v2"
+	v1 "github.com/titantkx/titan/app/upgrades/v1"
+	v2 "github.com/titantkx/titan/app/upgrades/v2"
 	"github.com/titantkx/titan/app/upgrades/v2_0_1"
 	"github.com/titantkx/titan/app/upgrades/v3_0_0"
 	v3_0_0_rc_0 "github.com/titantkx/titan/app/upgrades/v3_0_0/rc_0"
@@ -301,7 +301,7 @@ type App struct {
 	// keepers
 	AccountKeeper         authkeeper.AccountKeeper
 	AuthzKeeper           authzkeeper.Keeper
-	BankKeeper            *bankkeeper.BaseKeeper
+	BankKeeper            bankkeeper.BaseKeeper
 	CapabilityKeeper      *capabilitykeeper.Keeper
 	StakingKeeper         *stakingkeeper.Keeper
 	SlashingKeeper        slashingkeeper.Keeper
@@ -468,14 +468,13 @@ func New(
 		app.AccountKeeper,
 	)
 
-	bankKeeper := bankkeeper.NewBaseKeeper(
+	app.BankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec,
 		keys[banktypes.StoreKey],
 		app.AccountKeeper,
 		app.BlockedModuleAccountAddrs(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	app.BankKeeper = &bankKeeper
 
 	app.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
@@ -803,12 +802,6 @@ func New(
 	/**** Module Hooks ****/
 
 	// register hooks after all modules have been initialized
-
-	app.BankKeeper.SetHooks(
-		banktypes.NewMultiBankHooks(
-			app.TokenfactoryKeeper.Hooks(),
-		),
-	)
 
 	app.StakingKeeper.SetHooks(
 		stakingtypes.NewMultiStakingHooks(
