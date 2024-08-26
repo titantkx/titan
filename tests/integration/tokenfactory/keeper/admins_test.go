@@ -168,9 +168,6 @@ func (s *KeeperTestSuite) TestBurnDenom() {
 		addr1.String(): 1000,
 	}
 
-	// save sample module account address for testing
-	moduleAdress := s.app.AccountKeeper.GetModuleAddress(types.ModuleName)
-
 	for _, tc := range []struct {
 		desc       string
 		burnMsg    types.MsgBurn
@@ -186,10 +183,9 @@ func (s *KeeperTestSuite) TestBurnDenom() {
 		},
 		{
 			desc: "burn is not by the admin",
-			burnMsg: *types.NewMsgBurnFrom(
+			burnMsg: *types.NewMsgBurn(
 				addr1.String(),
 				sdk.NewInt64Coin(denom, 10),
-				addr0.String(),
 			),
 			expectPass: false,
 		},
@@ -210,29 +206,10 @@ func (s *KeeperTestSuite) TestBurnDenom() {
 			expectPass: true,
 		},
 		{
-			desc: "success case - burn from another address",
-			burnMsg: *types.NewMsgBurnFrom(
-				addr0.String(),
-				sdk.NewInt64Coin(denom, 10),
-				addr1.String(),
-			),
-			expectPass: true,
-		},
-		{
-			desc: "fail case - burn from module account",
-			burnMsg: *types.NewMsgBurnFrom(
-				addr0.String(),
-				sdk.NewInt64Coin(denom, 10),
-				moduleAdress.String(),
-			),
-			expectPass: false,
-		},
-		{
 			desc: "fail case - burn non-tokenfactory denom",
-			burnMsg: *types.NewMsgBurnFrom(
+			burnMsg: *types.NewMsgBurn(
 				addr0.String(),
 				sdk.NewInt64Coin(utils.BaseDenom, 10),
-				moduleAdress.String(),
 			),
 			expectPass: false,
 		},
@@ -241,14 +218,14 @@ func (s *KeeperTestSuite) TestBurnDenom() {
 			_, err := s.msgServer.Burn(s.ctx, &tc.burnMsg)
 			if tc.expectPass {
 				s.Require().NoError(err)
-				balances[tc.burnMsg.BurnFromAddress] -= tc.burnMsg.Amount.Amount.Int64()
+				balances[tc.burnMsg.Sender] -= tc.burnMsg.Amount.Amount.Int64()
 			} else {
 				s.Require().Error(err)
 			}
 
-			burnFromAddr, _ := sdk.AccAddressFromBech32(tc.burnMsg.BurnFromAddress)
+			burnFromAddr, _ := sdk.AccAddressFromBech32(tc.burnMsg.Sender)
 			bal := s.app.BankKeeper.GetBalance(s.ctx, burnFromAddr, denom).Amount
-			s.Require().Equal(bal.Int64(), balances[tc.burnMsg.BurnFromAddress])
+			s.Require().Equal(bal.Int64(), balances[tc.burnMsg.Sender])
 		})
 	}
 }

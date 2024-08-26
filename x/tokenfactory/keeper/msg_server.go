@@ -4,7 +4,6 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/titantkx/titan/x/tokenfactory/types"
 )
 
@@ -91,17 +90,7 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 		return nil, types.ErrUnauthorized
 	}
 
-	if msg.BurnFromAddress == "" {
-		msg.BurnFromAddress = msg.Sender
-	}
-
-	accountI := server.Keeper.accountKeeper.GetAccount(ctx, sdk.AccAddress(msg.BurnFromAddress))
-	_, ok := accountI.(authtypes.ModuleAccountI)
-	if ok {
-		return nil, types.ErrBurnFromModuleAccount
-	}
-
-	err = server.Keeper.burnFrom(ctx, msg.Amount, msg.BurnFromAddress)
+	err = server.Keeper.burnFrom(ctx, msg.Amount, msg.Sender)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +98,7 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.TypeMsgBurn,
-			sdk.NewAttribute(types.AttributeBurnFromAddress, msg.BurnFromAddress),
+			sdk.NewAttribute(types.AttributeBurnFromAddress, msg.Sender),
 			sdk.NewAttribute(types.AttributeAmount, msg.Amount.String()),
 		),
 	})

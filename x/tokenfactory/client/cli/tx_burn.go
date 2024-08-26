@@ -16,18 +16,13 @@ var _ = strconv.Itoa(0)
 
 func CmdBurn() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "burn [amount] [burn-from-address] --from [admin] [flags]",
-		Short: "Burn tokens from an address (must have admin authority to do so)",
-		Args:  cobra.RangeArgs(1, 2),
+		Use:   "burn [amount] --from [admin] [flags]",
+		Short: "Burn tokens (must have admin authority to do so)",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argAmount, err := sdk.ParseCoinNormalized(args[0])
 			if err != nil {
 				return err
-			}
-
-			var argBurnFromAddress string
-			if len(args) == 2 {
-				argBurnFromAddress = args[1]
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -35,10 +30,9 @@ func CmdBurn() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgBurnFrom(
+			msg := types.NewMsgBurn(
 				clientCtx.GetFromAddress().String(),
 				argAmount,
-				argBurnFromAddress,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
