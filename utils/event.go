@@ -11,6 +11,15 @@ import (
 
 var ErrTypedEventNotFound = errors.New("typed event not found")
 
+func GetABCIEventAttribute(event *abci.Event, key string) string {
+	for _, attr := range event.Attributes {
+		if attr.Key == key {
+			return attr.Value
+		}
+	}
+	return ""
+}
+
 func GetABCIEvent(ctx sdk.Context, eventType string) *abci.Event {
 	events := ctx.EventManager().ABCIEvents()
 	for i := range events {

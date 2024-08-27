@@ -22,6 +22,10 @@ type (
 		bankKeeper          types.BankKeeper
 		contractKeeper      types.ContractKeeper
 		communityPoolKeeper types.CommunityPoolKeeper
+
+		// The address capable of executing a MsgUpdateParams message. Typically, this
+		// should be the x/gov module account.
+		authority string
 	}
 )
 
@@ -35,6 +39,7 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	contractKeeper types.ContractKeeper,
 	communityPoolKeeper types.CommunityPoolKeeper,
+	authority string,
 ) *Keeper {
 	permAddrs := make(map[string]authtypes.PermissionsForAddress)
 	for name, perms := range maccPerms {
@@ -50,6 +55,7 @@ func NewKeeper(
 		bankKeeper:          bankKeeper,
 		contractKeeper:      contractKeeper,
 		communityPoolKeeper: communityPoolKeeper,
+		authority:           authority,
 	}
 }
 

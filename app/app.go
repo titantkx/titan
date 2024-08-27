@@ -739,6 +739,7 @@ func New(
 		app.BankKeeper,
 		app.WasmKeeper,
 		app.DistrKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
