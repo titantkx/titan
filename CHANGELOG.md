@@ -43,6 +43,7 @@ Ref: https://keepachangelog.com/en/1.1.0/
 - (deps) upgrade cometbft to 0.37.6, ibc-go to 7.4.0, gogoproto to 1.4.12
 - (ibc) [#81](https://github.com/titantkx/titan/issues/81) Integrate `packetForward` middleware for ibc transfer.
 - (ibc) [[#84](https://github.com/titantkx/titan/issues/84)] Integrate `ibcHook` middleware for ibc transfer.
+- (tokenfactory) [#88](https://github.com/titantkx/titan/pull/88) Add tokenfactory module.
 
 ### Features
 
@@ -55,5 +56,9 @@ Ref: https://keepachangelog.com/en/1.1.0/
 - Fix simulation tests.
 
 - Add simulation tests for module `validatorreward`.
+
+- (testutil) [#88](https://github.com/titantkx/titan/pull/88) Change function `sample.AccAddress` return type.
+
+- (.golangci.yml) [#88](https://github.com/titantkx/titan/pull/88) Remove rule `allow-leading-space`.
 
 ## [v2.0.1](https://github.com/titantkx/titan/releases/tag/v2.0.1)
