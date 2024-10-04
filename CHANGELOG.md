@@ -49,6 +49,10 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 - (amino) [#73](https://github.com/titantkx/titan/issues/73) Add regis amino codec of `nftmint` and `validatorreward` module for `gov`,`authz`,`group`.
 
+### Bug Fixes
+
+- (distribution) [#86](https://github.com/titantkx/titan/issues/86) Avoid panic in abci endblocker from `gov` module.
+
 ### Miscellaneous
 
 - (Makefile) Update to use fork version of ignite cli.
