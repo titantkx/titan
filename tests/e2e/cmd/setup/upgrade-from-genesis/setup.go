@@ -12,7 +12,10 @@ import (
 	"github.com/titantkx/titan/testutil/cmd/keys"
 )
 
-const UpgradeName = "v3_0_0_rc_0"
+const (
+	UpgradeName     = "v3_0_0_rc_0"
+	GenesisFileName = "genesis.json"
+)
 
 func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 	t := testutil.NewMockTest(os.Stderr)
@@ -28,7 +31,7 @@ func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 	cmd.MustInit(t, homeDir)
 
 	// Check if genesis.json exists
-	f, err := os.Open("genesis.json")
+	f, err := os.Open(GenesisFileName)
 	if err != nil {
 		panic("Cannot open genesis.json: " + err.Error())
 	}
@@ -43,7 +46,7 @@ func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 	setup.StopChain(t, logger, "docker-compose-genesis.yml") // Stop any running instance
 
 	fmt.Println("Initializing blockchain...")
-	cmd.MustExecWrite(t, logger, "sh", "init.sh")
+	cmd.MustExecWrite(t, logger, "sh", "init.sh", GenesisFileName)
 
 	fmt.Println("Starting blockchain...")
 	ready, upgrade, done := setup.StartChainAndListenForUpgrade(t, logger, "docker-compose-genesis.yml", UpgradeName)

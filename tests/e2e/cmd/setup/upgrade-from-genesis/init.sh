@@ -2,6 +2,9 @@
 
 set -e
 
+# receive first argument as genesis file name
+genesis_file=$1
+
 # Detect platform
 platform=$(uname)
 if [ "$platform" = "Darwin" ]; then
@@ -29,7 +32,7 @@ $SED_INPLACE 's/^timeout_commit = ".*"/timeout_commit = "0.5s"/' tmp/val2/.titan
 ### On val1 machine
 
 # Copy from existing genesis file
-cp genesis.json tmp/val1/.titand/config/genesis.json
+cp "$genesis_file" tmp/val1/.titand/config/genesis.json
 
 # Config genesis file
 config="
