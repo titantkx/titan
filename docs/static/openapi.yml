@@ -57510,6 +57510,181 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
+  /titan/tokenfactory/v1beta1/denoms/{denom}/authority_metadata:
+    get:
+      summary: |-
+        DenomAuthorityMetadata defines a gRPC query method for fetching
+        DenomAuthorityMetadata for a particular denom.
+      operationId: TitanTokenfactoryV1Beta1DenomAuthorityMetadata
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              authority_metadata:
+                type: object
+                properties:
+                  admin:
+                    type: string
+                    title: Can be empty for no admin, or a valid titan address
+                description: >-
+                  DenomAuthorityMetadata specifies metadata for addresses that
+                  have specific
+
+                  capabilities over a token factory denom. Right now there is
+                  only one Admin
+
+                  permission, but is planned to be extended to the future.
+            description: |-
+              QueryDenomAuthorityMetadataResponse is response type for the
+              Query/DenomAuthorityMetadata RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: denom
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /titan/tokenfactory/v1beta1/denoms_from_creator/{creator}:
+    get:
+      summary: |-
+        DenomsFromCreator defines a gRPC query method for fetching all
+        denominations created by a specific admin/creator.
+      operationId: TitanTokenfactoryV1Beta1DenomsFromCreator
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              denoms:
+                type: array
+                items:
+                  type: string
+            description: |-
+              QueryDenomsFromCreatorResponse is response type for the
+              Query/DenomsFromCreator RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: creator
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /titan/tokenfactory/v1beta1/params:
+    get:
+      summary: >-
+        Params defines a gRPC query method that returns the tokenfactory
+        module's
+
+        parameters.
+      operationId: TitanTokenfactoryV1Beta1Params
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params defines the parameters of the module.
+                type: object
+                properties:
+                  denom_creation_fee:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    description: >-
+                      DenomCreationFee defines the fee to be charged on the
+                      creation of a new
+
+                      denom. The fee is drawn from the MsgCreateDenom's sender
+                      account, and
+
+                      transferred to the community pool.
+                  denom_creation_gas_consume:
+                    type: string
+                    format: uint64
+                    description: >-
+                      DenomCreationGasConsume defines the gas cost for creating
+                      a new denom.
+
+                      This is intended as a spam deterrence mechanism.
+
+
+                      See: https://github.com/CosmWasm/token-factory/issues/11
+            description: >-
+              QueryParamsResponse is the response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
   /titantkx/titan/validatorreward/params:
     get:
       summary: Parameters queries the parameters of the module.
@@ -89372,6 +89547,144 @@ definitions:
           next_class_id is the unique identifier of the next class that will be
           created.
     description: SystemInfo defines the system info of this module.
+  titan.tokenfactory.v1beta1.DenomAuthorityMetadata:
+    type: object
+    properties:
+      admin:
+        type: string
+        title: Can be empty for no admin, or a valid titan address
+    description: |-
+      DenomAuthorityMetadata specifies metadata for addresses that have specific
+      capabilities over a token factory denom. Right now there is only one Admin
+      permission, but is planned to be extended to the future.
+  titan.tokenfactory.v1beta1.MsgBurnResponse:
+    type: object
+    description: MsgMintResponse defines the Msg/Burn response type.
+  titan.tokenfactory.v1beta1.MsgChangeAdminResponse:
+    type: object
+    description: MsgMintResponse defines the Msg/ChangeAdmin response type.
+  titan.tokenfactory.v1beta1.MsgCreateDenomResponse:
+    type: object
+    properties:
+      new_token_denom:
+        type: string
+    description: MsgMintResponse defines the Msg/CreateDenom response type.
+  titan.tokenfactory.v1beta1.MsgMintResponse:
+    type: object
+    description: MsgMintResponse defines the Msg/Mint response type.
+  titan.tokenfactory.v1beta1.MsgSetDenomMetadataResponse:
+    type: object
+    description: MsgMintResponse defines the Msg/SetDenomMetadata response type.
+  titan.tokenfactory.v1beta1.MsgUpdateParamsResponse:
+    type: object
+    description: MsgUpdateParamsResponse defines the Msg/UpdateParams response type.
+  titan.tokenfactory.v1beta1.Params:
+    type: object
+    properties:
+      denom_creation_fee:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        description: >-
+          DenomCreationFee defines the fee to be charged on the creation of a
+          new
+
+          denom. The fee is drawn from the MsgCreateDenom's sender account, and
+
+          transferred to the community pool.
+      denom_creation_gas_consume:
+        type: string
+        format: uint64
+        description: |-
+          DenomCreationGasConsume defines the gas cost for creating a new denom.
+          This is intended as a spam deterrence mechanism.
+
+          See: https://github.com/CosmWasm/token-factory/issues/11
+    description: Params defines the parameters for the tokenfactory module.
+  titan.tokenfactory.v1beta1.QueryDenomAuthorityMetadataResponse:
+    type: object
+    properties:
+      authority_metadata:
+        type: object
+        properties:
+          admin:
+            type: string
+            title: Can be empty for no admin, or a valid titan address
+        description: >-
+          DenomAuthorityMetadata specifies metadata for addresses that have
+          specific
+
+          capabilities over a token factory denom. Right now there is only one
+          Admin
+
+          permission, but is planned to be extended to the future.
+    description: |-
+      QueryDenomAuthorityMetadataResponse is response type for the
+      Query/DenomAuthorityMetadata RPC method.
+  titan.tokenfactory.v1beta1.QueryDenomsFromCreatorResponse:
+    type: object
+    properties:
+      denoms:
+        type: array
+        items:
+          type: string
+    description: |-
+      QueryDenomsFromCreatorResponse is response type for the
+      Query/DenomsFromCreator RPC method.
+  titan.tokenfactory.v1beta1.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params defines the parameters of the module.
+        type: object
+        properties:
+          denom_creation_fee:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            description: >-
+              DenomCreationFee defines the fee to be charged on the creation of
+              a new
+
+              denom. The fee is drawn from the MsgCreateDenom's sender account,
+              and
+
+              transferred to the community pool.
+          denom_creation_gas_consume:
+            type: string
+            format: uint64
+            description: >-
+              DenomCreationGasConsume defines the gas cost for creating a new
+              denom.
+
+              This is intended as a spam deterrence mechanism.
+
+
+              See: https://github.com/CosmWasm/token-factory/issues/11
+    description: QueryParamsResponse is the response type for the Query/Params RPC method.
   titan.validatorreward.MsgFundRewardPoolResponse:
     type: object
     description: MsgFundRewardPoolResponse defines the Msg/FundRewardPool response type.
