@@ -42,13 +42,15 @@ func NewKeeper(
 // The amount is first added to the distribution module account and then directly
 // added to the pool. An error is returned if the amount cannot be sent to the
 // module account.
-func (k Keeper) FundCommunityPoolFromModule(ctx sdk.Context, amount sdk.Coins, senderModule string) error {
-	if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, senderModule, types.ModuleName, amount); err != nil {
+func (k Keeper) FundCommunityPoolFromModule(ctx sdk.Context, amounts sdk.Coins, senderModule string) error {
+	// ensure amount not contains zero
+	amounts = sdk.NewCoins(amounts...)
+	if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, senderModule, types.ModuleName, amounts); err != nil {
 		return err
 	}
 
 	feePool := k.GetFeePool(ctx)
-	feePool.CommunityPool = feePool.CommunityPool.Add(sdk.NewDecCoinsFromCoins(amount...)...)
+	feePool.CommunityPool = feePool.CommunityPool.Add(sdk.NewDecCoinsFromCoins(amounts...)...)
 	k.SetFeePool(ctx, feePool)
 
 	return nil
