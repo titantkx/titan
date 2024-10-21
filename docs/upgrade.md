@@ -100,9 +100,17 @@ After regis, upgrade module will call this migration function when upgrade modul
 
 ### 4. Declare new version and regis upgrade handler for app
 
-### 5. Build and publish new binary file for new version
+### 5. Create branch for new version e.g. `release/v3.0.0`
 
-### 6. Create proposal to upgrade chain at specific block height
+### 6. Prepare release for testnet upgrade by create tag `release/v3.0.0-rcX` on branch `release/v3.0.0`
+
+### 7. Github flow will auto build and publish new binary file for new version for testnet upgrade
+
+### 8. Merge branch `release/v3.0.0` to `master`. Create tag `v3.0.0` on `master`
+
+### 9. Github flow will auto build and publish new binary file for new version for mainnet upgrade
+
+### 10. Create proposal to upgrade chain at specific block height
 
 example:
 
