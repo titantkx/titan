@@ -3,16 +3,6 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - release/**
-    paths:
-      - "**/**.go"
-      - "**/init.sh"
-      - "**/docker-compose-genesis.yml"
-      - "**/docker-compose-latest.yml"
-      - go.mod
-      - go.sum
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
