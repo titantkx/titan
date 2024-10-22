@@ -34,13 +34,21 @@ $SED_INPLACE 's/^timeout_commit = ".*"/timeout_commit = "0.5s"/' tmp/val2/.titan
 # Copy from existing genesis file
 cp "$genesis_file" tmp/val1/.titand/config/genesis.json
 
+# Add reward-pool-admin account
+docker compose -f docker-compose-genesis.yml run --rm -i val1 keys add reward-pool-admin
+reward_pool_admin=$(docker compose -f docker-compose-genesis.yml run --rm -i val1 keys show reward-pool-admin --address)
+# Add balance to reward-pool-admin
+docker compose -f docker-compose-genesis.yml run --rm -i val1 add-genesis-account $reward_pool_admin 1000tkx
+
 # Config genesis file
 config="
+. as \$root |
 .chain_id = \"titan_18887-1\" |
 .validators = [] |
 .app_state.bank.supply = [] |
 .app_state.bank.balances |= map(if .address == \"titan1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3ljrm26\" then .coins = [] else . end) |
 .app_state.bank.balances |= map(if .address == \"titan1tygms3xhhs3yv487phx3dw4a95jn7t7ltjl2uw\" then .coins = [] else . end) |
+.app_state.bank.balances |= map(if .address == \"titan1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8dkwg6j\" then .coins = (\$root.app_state.distribution.fee_pool.community_pool | map({amount: (.amount | split(\".\") | .[0]), denom: .denom }) ) else . end) |
 del(.app_state.ibc.connection_genesis.connections[] | select(.client_id == \"09-localhost\")) |
 .app_state.staking.params.global_min_self_delegation = \"5000000000000000000\" |
 .app_state.staking.last_total_power = \"0\" |
@@ -60,8 +68,12 @@ del(.app_state.ibc.connection_genesis.connections[] | select(.client_id == \"09-
 .app_state.gov.params.min_deposit[0].denom = \"atkx\" |
 .app_state.gov.params.min_deposit[0].amount = \"250000000000000000000\" |
 .app_state.gov.params.max_deposit_period = \"15s\" |
-.app_state.gov.params.voting_period = \"30s\"
+.app_state.gov.params.voting_period = \"30s\" |
+.app_state.validatorreward.params.authority = \"$reward_pool_admin\" |
+.app_state.slashing.params.signed_blocks_window = \"100\" |
+.app_state.slashing.params.min_signed_per_window = \"0.500000000000000000\" 
 "
+
 echo "$(jq "$config" tmp/val1/.titand/config/genesis.json)" >tmp/val1/.titand/config/genesis.json
 
 # Add faucet account

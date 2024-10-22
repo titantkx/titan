@@ -14,10 +14,10 @@ import (
 
 const (
 	UpgradeName     = "v3_0_0_rc_0"
-	GenesisFileName = "genesis.json"
+	GenesisFileName = "genesis_mainnet_zero.json"
 )
 
-func Setup(_ *testing.M, rootDir string, logger io.Writer) {
+func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	t := testutil.NewMockTest(os.Stderr)
 	defer t.Finish()
 	testutil.HandleOSInterrupt(func() {
@@ -77,8 +77,10 @@ func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 		panic("Blockchain is stopped before ready")
 	}
 
+	code := m.Run()
+
 	setup.StopChain(t, logger, "docker-compose-local.yml")
 
-	//nolint:gocritic // Using os.Exit(0) here is necessary to terminate the test
-	os.Exit(0)
+	//nolint:gocritic // We need to exit with the code
+	os.Exit(code)
 }
