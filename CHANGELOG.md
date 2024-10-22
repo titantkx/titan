@@ -38,6 +38,8 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+## [v3.0.0-rc.0](https://github.com/titantkx/titan/releases/tag/v3.0.0-rc.0)
+
 ### State Machine Breaking
 
 - (deps) upgrade cometbft to 0.37.6, ibc-go to 7.4.0, gogoproto to 1.4.12
@@ -48,6 +50,7 @@ Ref: https://keepachangelog.com/en/1.1.0/
 ### Features
 
 - (amino) [#73](https://github.com/titantkx/titan/issues/73) Add regis amino codec of `nftmint` and `validatorreward` module for `gov`,`authz`,`group`.
+- (bank) Update Cosmos sdk to v0.47.6-titan.7: Support before send hook logic for bank module.
 
 ### Bug Fixes
 
