@@ -1,3 +1,5 @@
+#!/bin/sh
+
 set -e
 
 # Detect platform
@@ -84,7 +86,7 @@ config="
 .app_state.bank.denom_metadata[0].denom_units[3].denom = \"tkx\" |
 .app_state.bank.denom_metadata[0].denom_units[3].exponent = 18
 "
-echo $(jq "$config" tmp/val1/.titand/config/genesis.json) > tmp/val1/.titand/config/genesis.json
+echo "$(jq "$config" tmp/val1/.titand/config/genesis.json)" >tmp/val1/.titand/config/genesis.json
 
 # Copy genesis file from val1 machine to val2 machine
 cp tmp/val1/.titand/config/genesis.json tmp/val2/.titand/config/genesis.json

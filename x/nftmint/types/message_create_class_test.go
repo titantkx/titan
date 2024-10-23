@@ -16,7 +16,7 @@ func TestMsgCreateClass_ValidateBasic(t *testing.T) {
 		{
 			name: "valid msg",
 			msg: MsgCreateClass{
-				Creator: sample.AccAddress(),
+				Creator: sample.AccAddress().String(),
 			},
 		},
 		{

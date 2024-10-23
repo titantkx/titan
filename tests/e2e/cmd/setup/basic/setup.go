@@ -48,5 +48,6 @@ func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	<-done
 	fmt.Println("Stopped blockchain")
 
+	//nolint:gocritic // Using os.Exit here is necessary to terminate the test
 	os.Exit(code)
 }

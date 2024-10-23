@@ -57,7 +57,7 @@ func TestMsgServer_SetRate(t *testing.T) {
 		},
 		{
 			name:      "Invalid authority address",
-			authority: sample.AccAddress(),
+			authority: sample.AccAddress().String(),
 			rate:      sdk.NewDecWithPrec(5, 1),
 			expect: func(ms types.MsgServer, ctx sdk.Context, k *keeper.Keeper, authority string, rate sdk.Dec) {
 				oldRate := k.GetRate(ctx)
@@ -75,7 +75,7 @@ func TestMsgServer_SetRate(t *testing.T) {
 	for _, tc := range testCases {
 		ms, ctx, k := setupMsgServer(t)
 
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.name, func(_ *testing.T) {
 			tc.expect(ms, ctx, k, tc.authority, tc.rate)
 		})
 	}

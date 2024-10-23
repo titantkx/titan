@@ -7,12 +7,22 @@ export MAKE_PROJECT_ROOT := $(CURDIR)
 LEDGER_ENABLED ?= true
 BINDIR ?= $(GOPATH)/bin
 BUILDDIR ?= $(CURDIR)/build
+HTTPS_GIT := https://github.com/titantkx/titan.git
 DOCKER := $(shell which docker)
 PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 COSMOS_VERSION = $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
-IGNITE_VERSION = v0.27.1
+IGNITE_VERSION = v0.27.2-titan.1
 MOCKS_DIR = $(CURDIR)/tests/mocks
 DOCKER_IMAGE := titantkx/titand
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+		SED_INPLACE = sed -i ''
+else ifeq ($(UNAME_S),Linux)
+		SED_INPLACE = sed -i
+else
+		$(error platform is not supported)
+endif
 
 # $(info GOOS: $(GOOS), GOARCH: $(GOARCH), CC: $(CC), CXX: $(CXX))
 
@@ -112,10 +122,10 @@ all: build-with-regen
 
 lint:	golangci-lint
 	go mod verify	
-	golangci-lint run --out-format=tab --timeout 2m0s
+	golangci-lint run --out-format=tab
 
 lint-fix:	golangci-lint	
-	golangci-lint run --fix --out-format=tab --issues-exit-code=0 --timeout 2m0s
+	golangci-lint run --fix --out-format=tab --issues-exit-code=0
 
 .PHONY: lint lint-fix
 
@@ -164,17 +174,22 @@ docker-build:
 	@echo "Building Docker image"
 	@docker build -t $(DOCKER_IMAGE):v$(VERSION) .
 
+docker-build-local:
+	@echo "Building Docker image"
+	@docker build -t $(DOCKER_IMAGE):local .
+
+
 ###############################################################################
 ###                                Protobuf                                 ###
 ###############################################################################
 
-protoVer=0.11.2
+protoVer=0.13.0
 protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
 protoContainerName=protobuilder-titan-$(subst /,_,$(subst \,_,$(CURDIR)))
 protoImage=$(DOCKER) run -v $(CURDIR):/workspace --workdir /workspace --user 0 --name $(protoContainerName) $(protoImageName)
 protoFormatImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace --user 0 $(protoImageName)
 
-proto-all: proto-format proto-lint proto-gen
+proto-all: proto-format proto-lint proto-check-breaking proto-gen
 
 proto-gen:
 	@echo "Generating Protobuf files"	
@@ -191,6 +206,9 @@ proto-format:
 proto-lint:
 	@$(protoFormatImage) buf lint --error-format=json
 
+proto-check-breaking:
+	@echo "Checking Protobuf files for breaking changes"
+	$(protoFormatImage) buf breaking --against $(HTTPS_GIT)#branch=main
 
 ###############################################################################
 ###                              Documentation                              ###
@@ -208,7 +226,7 @@ update-swagger-docs-by-ignite:
 ignite:
 	@echo "Installing ignite (tag ${IGNITE_VERSION}) ..."
 	rm -rf ignite_tmp	
-	git clone --depth 1 --branch ${IGNITE_VERSION} https://github.com/ignite/cli.git ignite_tmp	
+	git clone --depth 1 --branch ${IGNITE_VERSION} https://github.com/titantkx/ignite-cli.git ignite_tmp
 	cd ignite_tmp && make install
 	rm -rf ignite_tmp
 
@@ -220,7 +238,7 @@ cosmovisor:
 	cp cosmovisor_tmp/tools/cosmovisor/cosmovisor build/cosmovisor
 	rm -rf cosmovisor_tmp
 
-GOLANGCI_VERSION=v1.52.2
+GOLANGCI_VERSION=latest
 
 golangci-lint:
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_VERSION)
@@ -277,14 +295,29 @@ test-e2e-upgrade:
 test-e2e-upgrade-from-genesis:
 	TEST_TYPE=upgrade-from-genesis go test -timeout 1200s -count=1 github.com/titantkx/titan/tests/e2e/cmd -v
 
+test-interchain: docker-build-local
+	$(MAKE) -C tests/interchain test-interchain
+
 test-all: test-testutil test-unit test-app test-integration test-e2e-cmd
+
+test-benchmark: 
+	go test -benchmem -run=^$$ -bench=^BenchmarkSimulation$$ ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true
+
+test-determinism:
+	go test -benchmem -run=^TestAppStateDeterminism$$ -bench ^$$ ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true
+
+test-import-export:
+	go test -benchmem -run=^TestAppImportExport$$ -bench ^$$ ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true
+
+test-after-import:
+	go test -benchmem -run=^TestAppSimulationAfterImport$$ -bench ^$$ ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true
 
 ###############################################################################
 ###                                Releasing                                ###
 ###############################################################################
 
 PACKAGE_NAME:=github.com/titantkx/titan
-GOLANG_CROSS_VERSION  = v1.20
+GOLANG_CROSS_VERSION  = v1.22
 GOPATH ?= '$(HOME)/go'
 release-dry-run:
 	./scripts/release.sh --dry-run

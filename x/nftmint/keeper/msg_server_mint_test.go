@@ -23,6 +23,7 @@ func msgMint(minter string, receiver string, classId string) *types.MsgMint {
 	}
 }
 
+//nolint:revive	// ctx at third position .
 func mustMintNFT(t testing.TB, ms types.MsgServer, ctx context.Context, ctrl *gomock.Controller, nftKeeper *testutil.MockNFTKeeper, minter string, receiver string, classId string) string {
 	nftKeeper.EXPECT().Mint(ctx, gomock.Any(), sdk.MustAccAddressFromBech32(receiver)).Return(nil)
 

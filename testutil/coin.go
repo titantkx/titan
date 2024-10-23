@@ -108,8 +108,9 @@ func (coins Coins) GetBaseDenomAmount() Int {
 }
 
 func ParseAmount(txt string) (Coins, error) {
-	var coins Coins
-	for _, txt := range strings.Split(txt, ",") {
+	coinTxts := strings.Split(txt, ",")
+	coins := make(Coins, 0, len(coinTxts))
+	for _, txt := range coinTxts {
 		coin, err := ParseCoin(txt)
 		if err != nil {
 			return nil, err
@@ -120,8 +121,9 @@ func ParseAmount(txt string) (Coins, error) {
 }
 
 func MustParseAmount(t TestingT, amount string) Coins {
-	var coins Coins
-	for _, txt := range strings.Split(amount, ",") {
+	coinTxts := strings.Split(amount, ",")
+	coins := make(Coins, 0, len(coinTxts))
+	for _, txt := range coinTxts {
 		coin := MustParseCoin(t, txt)
 		coins = append(coins, coin)
 	}

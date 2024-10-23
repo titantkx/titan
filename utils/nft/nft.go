@@ -73,9 +73,8 @@ func (k Keeper) CreateOrUpdateClass(ctx sdk.Context, classID, classURI, classDat
 	}
 	if !k.HasClass(ctx, classID) {
 		return k.SaveClass(ctx, class)
-	} else {
-		return k.UpdateClass(ctx, class)
 	}
+	return k.UpdateClass(ctx, class)
 }
 
 func (k Keeper) Mint(ctx sdk.Context, classID, tokenID, tokenURI, tokenData string, receiver sdk.AccAddress) error {
@@ -92,6 +91,7 @@ func (k Keeper) Mint(ctx sdk.Context, classID, tokenID, tokenURI, tokenData stri
 	return k.Keeper.Mint(ctx, token, receiver)
 }
 
+//nolint:revive	// keep tokenData for clear meaning of param
 func (k Keeper) Transfer(ctx sdk.Context, classID, tokenID, tokenData string, receiver sdk.AccAddress) error {
 	return k.Keeper.Transfer(ctx, classID, tokenID, receiver)
 }

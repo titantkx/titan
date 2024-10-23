@@ -1,6 +1,7 @@
 # Upgrade chain
 
-Every change to the chain state is a breaking change. This means that the chain state is not compatible with the previous version of the chain. It will cause consensus failure if the chain is upgraded without proper migration. Even changed in verify transaction logic will cause consensus failure.
+Every change to the chain state is a breaking change. This means that the chain state is not compatible with the previous version of the chain.
+It will cause consensus failure if the chain is upgraded without proper migration. Even changed in verify transaction logic will cause consensus failure.
 
 ## Versioning
 
@@ -10,9 +11,14 @@ In cosmos base chain, we have version of application and version for each module
 
 Version of application will be store in `app/upgrades/[version]/keys.go`. We declare constant `UpgradeName` for each version.
 
-App version will use format `v[major].[minor].[patch]`. Where major will be increase when we add new module. Minor will be increase when we change the logic of existing module. Patch will increase when there is a patch without changing the logic of existing modules. **NOTE: But we will use format `v[major]_[minor]_[patch]` for every where in code base because cosmos proposal only accept `_` character**
+App version will use format `v[major].[minor].[patch]`.
+Where major will be increase when we add new module.
+Minor will be increase when we change the logic of existing module.
+Patch will increase when there is a patch without changing the logic of existing modules.
+**NOTE: But we will use format `v[major]_[minor]_[patch]` for every where in code base because cosmos proposal only accept `_` character**
 
-In `app.go` we declare method `setupUpgradeHandlers` to clarify what must todo when upgrade to specific version. We use `app.UpgradeKeeper.SetUpgradeHandler` to register upgrade handler for each version.
+In `app.go` we declare method `setupUpgradeHandlers` to clarify what must todo when upgrade to specific version.
+We use `app.UpgradeKeeper.SetUpgradeHandler` to register upgrade handler for each version.
 
   ```go
   app.UpgradeKeeper.SetUpgradeHandler(
@@ -55,11 +61,13 @@ An upgrade cannot be process if it do not register in `setupUpgradeHandlers`.
 
 ### Module version
 
-Each module version will be understand as consensus version, that is **interger number**, count from 1. Module version define will be store in `x/[module]/migrations/cv[version]/types/keys.go` where we declare constant `ConsensusVersion` for each version.
+Each module version will be understand as consensus version, that is **interger number**, count from 1.
+Module version define will be store in `x/[module]/migrations/cv[version]/types/keys.go` where we declare constant `ConsensusVersion` for each version.
 
 Module version must increase by 1 for each upgrade.
 
-Module `github.com/cosmos/cosmos-sdk/x/upgrade` will store version map for every module in database. So When a module upgrade, it return it own current module version to upgrade module, upgrade module will know what module need to be upgrade.
+Module `github.com/cosmos/cosmos-sdk/x/upgrade` will store version map for every module in database.
+So When a module upgrade, it return it own current module version to upgrade module, upgrade module will know what module need to be upgrade.
 
 In `x/[module]/module.go` method `ConsensusVersion` will return current module version.
 
@@ -92,9 +100,17 @@ After regis, upgrade module will call this migration function when upgrade modul
 
 ### 4. Declare new version and regis upgrade handler for app
 
-### 5. Build and publish new binary file for new version
+### 5. Create branch for new version e.g. `release/v3.0.0`
 
-### 6. Create proposal to upgrade chain at specific block height
+### 6. Prepare release for testnet upgrade by create tag `release/v3.0.0-rcX` on branch `release/v3.0.0`
+
+### 7. Github flow will auto build and publish new binary file for new version for testnet upgrade
+
+### 8. Merge branch `release/v3.0.0` to `master`. Create tag `v3.0.0` on `master`
+
+### 9. Github flow will auto build and publish new binary file for new version for mainnet upgrade
+
+### 10. Create proposal to upgrade chain at specific block height
 
 example:
 

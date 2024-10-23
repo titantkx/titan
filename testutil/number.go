@@ -125,7 +125,10 @@ func (n Float) String() string {
 
 func (n Float) Format(s fmt.State, r rune) {
 	if r == 's' {
-		io.WriteString(s, n.String())
+		_, err := io.WriteString(s, n.String())
+		if err != nil {
+			panic(err)
+		}
 	} else {
 		n.v.Format(s, r)
 	}
@@ -165,8 +168,8 @@ func (n Float) Float64() float64 {
 	return v
 }
 
-func (b Float) Int() Int {
-	i, _ := b.v.Int(nil)
+func (n Float) Int() Int {
+	i, _ := n.v.Int(nil)
 	return Int{i}
 }
 

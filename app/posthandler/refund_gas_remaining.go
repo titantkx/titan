@@ -101,11 +101,7 @@ func (d RefundGasRemainingDecorator) maybeRefund(ctx sdk.Context, tx sdk.Tx, sim
 	refund := getRefund(gasMeter, feeTx)
 	recipient := getRecipient(feeTx)
 
-	if err := d.processRefund(ctx, refund, recipient); err != nil {
-		return err
-	}
-
-	return nil
+	return d.processRefund(ctx, refund, recipient)
 }
 
 // processRefund sends amountToRefund from the fee collector module account to the recipient.

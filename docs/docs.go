@@ -28,7 +28,7 @@ func RegisterOpenAPIService(appName string, rtr *mux.Router) {
 func handler(title string) http.HandlerFunc {
 	t, _ := httptemplate.ParseFS(template, indexFile)
 
-	return func(w http.ResponseWriter, req *http.Request) {
+	return func(w http.ResponseWriter, _ *http.Request) {
 		t.Execute(w, struct { //nolint:errcheck
 			Title string
 			URL   string

@@ -26,7 +26,9 @@ func (k msgServer) SetAuthority(goCtx context.Context, msg *types.MsgSetAuthorit
 		return nil, sdkerrors.ErrInvalidAddress.Wrap("invalid new authority address")
 	}
 
-	k.Keeper.SetAuthority(ctx, newAuthorityAcc)
+	if err := k.Keeper.SetAuthority(ctx, newAuthorityAcc); err != nil {
+		return nil, err
+	}
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(

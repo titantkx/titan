@@ -1,0 +1,13 @@
+name: "Consensus Warn"
+on: pull_request
+
+jobs:
+  main:
+    permissions:
+      pull-requests: write # For reading the PR and posting comment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: InnerPeace080/consensuswarn@main
+        with:
+          roots: "github.com/titantkx/titan/app.App.BaseApp.DeliverTx,github.com/titantkx/titan/app.App.BeginBlocker,github.com/titantkx/titan/app.App.EndBlocker"

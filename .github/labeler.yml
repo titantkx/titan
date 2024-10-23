@@ -1,0 +1,64 @@
+proto:
+  - changed-files:
+      - any-glob-to-any-file: 
+        - "proto/**/*"
+        - "**/*.pb.go"
+        - "**/*.pb.gw.go"
+      
+types:
+  - changed-files:
+      - any-glob-to-any-file: 
+        - "types/**/*"
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: 
+        - "docs/**/*"
+        - ".markdownlint.json"
+        - "README.md"
+        - "CONTRIBUTING.md"
+
+license:
+  - changed-files: 
+      - any-glob-to-any-file: 
+        - "LICENSE"
+        - "CODE_OF_CONDUCT.md"
+
+build:
+  - changed-files:
+      - any-glob-to-any-file: 
+        - "Makefile"
+        - ".goreleaser.yml"
+        - "Dockerfile"        
+        - "scripts/*"
+        - "config.yml"
+        - "config.pro.yml"
+        - "go.mod"
+        - "go.sum"
+
+CI:
+  - changed-files:
+      - any-glob-to-any-file: 
+        - ".github/**/*"
+        - ".mergify.yml"
+        - ".goreleaser.yml"
+        - "buf.yaml"
+      
+CLI:
+  - changed-files:
+      - any-glob-to-any-file: 
+        - "x/*/client/**/*"
+      
+tests:
+  - changed-files:
+      - any-glob-to-any-file: 
+        - "tests/**/*"
+        - "testutil/**/*"
+        - "**/*_test.go"
+      
+
+
+release:
+  - base-branch: "^release/"
+feature:
+  - head-branch: "^feature/"

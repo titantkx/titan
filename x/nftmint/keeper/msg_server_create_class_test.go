@@ -25,7 +25,8 @@ func msgCreateClass(creator string) *types.MsgCreateClass {
 	}
 }
 
-func mustCreateClass(t testing.TB, ms types.MsgServer, ctx context.Context, ctrl *gomock.Controller, nftKeeper *testutil.MockNFTKeeper, creator string) string {
+//nolint:revive	// ctx at third position .
+func mustCreateClass(t testing.TB, ms types.MsgServer, ctx context.Context, _ *gomock.Controller, nftKeeper *testutil.MockNFTKeeper, creator string) string {
 	nftKeeper.EXPECT().SaveClass(ctx, gomock.Any()).Return(nil)
 
 	resp, err := ms.CreateClass(ctx, msgCreateClass(creator))

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"github.com/titantkx/titan/testutil"
@@ -49,6 +50,10 @@ func StartChain(t testutil.TestingT, w io.Writer, dcFile string) (ready chan str
 				break
 			}
 			require.NoError(t, err)
+			if !isRunning {
+				fmt.Println(string(line))
+			}
+			//nolint:errcheck	// accept the error
 			w.Write(line)
 			if !isPrefix {
 				fmt.Fprintln(w)
@@ -73,23 +78,39 @@ func StartChainAndListenForUpgrade(t testutil.TestingT, w io.Writer, dcFile stri
 	s := testutil.NewStreamer()
 
 	readyCh, doneCh := StartChain(t, s, dcFile)
+	needUpgrade := false
 
 	go func() {
-		needUpgrade := false
+		// after `needUpgrade` = true, wait for 5 seconds then send upgrade signal to `upgradeCh`
+		for {
+			time.Sleep(1 * time.Second)
+			if needUpgrade {
+				time.Sleep(15 * time.Second)
+				upgradeCh <- struct{}{}
+				break
+			}
+		}
+	}()
+
+	go func() {
 		r := bufio.NewReader(s)
+
 		for {
 			line, isPrefix, err := r.ReadLine()
 			if err == io.EOF {
 				break
 			}
 			require.NoError(t, err)
+			//nolint:errcheck	// accept the error
 			w.Write(line)
 			if !isPrefix {
 				fmt.Fprintln(w)
 			}
 			if !needUpgrade && strings.Contains(string(line), `UPGRADE "`+upgradeName+`" NEEDED`) {
 				needUpgrade = true
-				upgradeCh <- struct{}{}
+			}
+			if needUpgrade {
+				fmt.Println(string(line))
 			}
 		}
 	}()

@@ -12,6 +12,7 @@ func CmdListMintingInfo() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-minting-info",
 		Short: "List all minting info",
+		//nolint:revive	// keep `args` for clear meaning
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {

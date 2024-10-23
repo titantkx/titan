@@ -22,6 +22,7 @@ func (k Keeper) MintingInfos(goCtx context.Context, req *types.QueryMintingInfos
 	store := ctx.KVStore(k.storeKey)
 	mintingInfoStore := prefix.NewStore(store, types.KeyPrefix(types.MintingInfoKeyPrefix))
 
+	//nolint:revive	// keep `key` for clear meaning
 	pageRes, err := query.Paginate(mintingInfoStore, req.Pagination, func(key []byte, value []byte) error {
 		var mintingInfo types.MintingInfo
 		if err := k.cdc.Unmarshal(value, &mintingInfo); err != nil {

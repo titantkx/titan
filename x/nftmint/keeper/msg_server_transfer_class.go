@@ -22,11 +22,14 @@ func (k msgServer) TransferClass(goCtx context.Context, msg *types.MsgTransferCl
 	mintingInfo.Owner = msg.Receiver
 	k.SetMintingInfo(ctx, mintingInfo)
 
-	ctx.EventManager().EmitTypedEvent(&types.EventTransferClass{
+	err := ctx.EventManager().EmitTypedEvent(&types.EventTransferClass{
 		Id:       msg.ClassId,
 		OldOwner: msg.Creator,
 		NewOwner: msg.Receiver,
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	return &types.MsgTransferClassResponse{}, nil
 }

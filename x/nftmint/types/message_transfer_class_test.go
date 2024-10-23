@@ -16,9 +16,9 @@ func TestMsgTransferClass_ValidateBasic(t *testing.T) {
 		{
 			name: "valid msg",
 			msg: MsgTransferClass{
-				Creator:  sample.AccAddress(),
+				Creator:  sample.AccAddress().String(),
 				ClassId:  sample.ClassId(),
-				Receiver: sample.AccAddress(),
+				Receiver: sample.AccAddress().String(),
 			},
 		},
 		{
@@ -26,14 +26,14 @@ func TestMsgTransferClass_ValidateBasic(t *testing.T) {
 			msg: MsgTransferClass{
 				Creator:  "invalid_address",
 				ClassId:  sample.ClassId(),
-				Receiver: sample.AccAddress(),
+				Receiver: sample.AccAddress().String(),
 			},
 			err: ErrInvalidAddress,
 		},
 		{
 			name: "invalid receiver address",
 			msg: MsgTransferClass{
-				Creator:  sample.AccAddress(),
+				Creator:  sample.AccAddress().String(),
 				ClassId:  sample.ClassId(),
 				Receiver: "invalid_address",
 			},
@@ -42,9 +42,9 @@ func TestMsgTransferClass_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid class id",
 			msg: MsgTransferClass{
-				Creator:  sample.AccAddress(),
+				Creator:  sample.AccAddress().String(),
 				ClassId:  "invalid_class_id",
-				Receiver: sample.AccAddress(),
+				Receiver: sample.AccAddress().String(),
 			},
 			err: ErrInvalidClassId,
 		},

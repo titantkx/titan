@@ -82,12 +82,17 @@ import (
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-	sdkstaking "github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward"
+	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/keeper"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
+	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7"
+	ibchookskeeper "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/keeper"
+	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/types"
 	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
 	icacontroller "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller"
 	icacontrollerkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/keeper"
@@ -135,6 +140,8 @@ import (
 	v1 "github.com/titantkx/titan/app/upgrades/v1"
 	v2 "github.com/titantkx/titan/app/upgrades/v2"
 	"github.com/titantkx/titan/app/upgrades/v2_0_1"
+	"github.com/titantkx/titan/app/upgrades/v3_0_0"
+	v3_0_0_rc_0 "github.com/titantkx/titan/app/upgrades/v3_0_0/rc_0"
 	"github.com/titantkx/titan/docs"
 	"github.com/titantkx/titan/utils"
 	nftutil "github.com/titantkx/titan/utils/nft"
@@ -148,13 +155,17 @@ import (
 	validatorrewardkeeper "github.com/titantkx/titan/x/validatorreward/keeper"
 	validatorrewardtypes "github.com/titantkx/titan/x/validatorreward/types"
 
-	nftmintmodule "github.com/titantkx/titan/x/nftmint"
-	nftmintmodulekeeper "github.com/titantkx/titan/x/nftmint/keeper"
-	nftmintmoduletypes "github.com/titantkx/titan/x/nftmint/types"
+	"github.com/titantkx/titan/x/nftmint"
+	nftmintkeeper "github.com/titantkx/titan/x/nftmint/keeper"
+	nftminttypes "github.com/titantkx/titan/x/nftmint/types"
 
 	nfttransfer "github.com/bianjieai/nft-transfer"
 	nfttransferkeeper "github.com/bianjieai/nft-transfer/keeper"
 	nfttransfertypes "github.com/bianjieai/nft-transfer/types"
+
+	"github.com/titantkx/titan/x/tokenfactory"
+	tokenfactorykeeper "github.com/titantkx/titan/x/tokenfactory/keeper"
+	tokenfactorytypes "github.com/titantkx/titan/x/tokenfactory/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
@@ -198,7 +209,7 @@ var (
 		genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
 		bank.AppModuleBasic{},
 		capability.AppModuleBasic{},
-		sdkstaking.AppModuleBasic{},
+		staking.AppModuleBasic{},
 		sdkdistr.AppModuleBasic{},
 		sdkgov.NewAppModuleBasic(getGovProposalHandlers()),
 		params.AppModuleBasic{},
@@ -216,6 +227,9 @@ var (
 		ica.AppModuleBasic{},
 		consensus.AppModuleBasic{},
 		nftmodule.AppModuleBasic{},
+		// non standard modules
+		packetforward.AppModuleBasic{},
+		ibchooks.AppModuleBasic{},
 
 		// Ethermint modules
 		evm.AppModuleBasic{},
@@ -224,13 +238,14 @@ var (
 		wasm.AppModuleBasic{},
 		//
 		validatorreward.AppModuleBasic{},
-		nftmintmodule.AppModuleBasic{},
+		nftmint.AppModuleBasic{},
 		nfttransfer.AppModuleBasic{},
+		tokenfactory.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
 	// module account permissions
-	maccPerms = map[string][]string{
+	MaccPerms = map[string][]string{
 		validatorrewardtypes.ValidatorRewardCollectorName: nil,
 		authtypes.FeeCollectorName:                        nil,
 		distrtypes.ModuleName:                             nil,
@@ -244,6 +259,9 @@ var (
 		nft.ModuleName:                                    nil,
 		validatorrewardtypes.ModuleName:                   nil,
 		ibcfeetypes.ModuleName:                            nil,
+		nftminttypes.ModuleName:                           nil,
+		nfttransfertypes.ModuleName:                       nil,
+		tokenfactorytypes.ModuleName:                      {authtypes.Minter, authtypes.Burner},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -283,7 +301,7 @@ type App struct {
 	// keepers
 	AccountKeeper         authkeeper.AccountKeeper
 	AuthzKeeper           authzkeeper.Keeper
-	BankKeeper            bankkeeper.Keeper
+	BankKeeper            bankkeeper.BaseKeeper
 	CapabilityKeeper      *capabilitykeeper.Keeper
 	StakingKeeper         *stakingkeeper.Keeper
 	SlashingKeeper        slashingkeeper.Keeper
@@ -293,6 +311,7 @@ type App struct {
 	UpgradeKeeper         *upgradekeeper.Keeper
 	ParamsKeeper          paramskeeper.Keeper
 	IBCKeeper             *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	PacketForwardKeeper   *packetforwardkeeper.Keeper
 	IBCFeeKeeper          ibcfeekeeper.Keeper
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
@@ -302,7 +321,8 @@ type App struct {
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	NFTKeeper             nftkeeper.Keeper
-	WasmKeeper            wasmkeeper.Keeper
+	WasmKeeper            *wasmkeeper.Keeper
+	IBCHooksKeeper        ibchookskeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -317,9 +337,11 @@ type App struct {
 
 	ValidatorrewardKeeper validatorrewardkeeper.Keeper
 
-	NftmintKeeper nftmintmodulekeeper.Keeper
+	NftmintKeeper nftmintkeeper.Keeper
 
 	NFTTransferKeeper nfttransferkeeper.Keeper
+
+	TokenfactoryKeeper tokenfactorykeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -375,15 +397,16 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibcexported.StoreKey, upgradetypes.StoreKey,
 		feegrant.StoreKey, evidencetypes.StoreKey, ibctransfertypes.StoreKey, icahosttypes.StoreKey,
 		capabilitytypes.StoreKey, group.StoreKey, icacontrollertypes.StoreKey, consensusparamtypes.StoreKey,
-		ibcfeetypes.StoreKey,
+		ibcfeetypes.StoreKey, packetforwardtypes.StoreKey, ibchookstypes.StoreKey,
 		nftkeeper.StoreKey,
 		wasmtypes.StoreKey,
 		// ethermint keys
 		evmtypes.StoreKey, feemarkettypes.StoreKey,
 
 		validatorrewardtypes.StoreKey,
-		nftmintmoduletypes.StoreKey,
+		nftminttypes.StoreKey,
 		nfttransfertypes.StoreKey,
+		tokenfactorytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
@@ -433,7 +456,7 @@ func New(
 		appCodec,
 		keys[authtypes.StoreKey],
 		ethermint.ProtoAccount,
-		maccPerms,
+		MaccPerms,
 		sdk.Bech32PrefixAccAddr,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
@@ -575,6 +598,22 @@ func New(
 		scopedTransferKeeper,
 	)
 
+	// Create the packet forward middleware keeper
+	app.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
+		appCodec,
+		keys[packetforwardtypes.StoreKey],
+		app.TransferKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		app.DistrKeeper,
+		app.BankKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	app.IBCHooksKeeper = ibchookskeeper.NewKeeper(
+		keys[ibchookstypes.StoreKey],
+	)
+
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec, keys[icahosttypes.StoreKey],
 		app.GetSubspace(icahosttypes.SubModuleName),
@@ -602,7 +641,7 @@ func New(
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
 	availableCapabilities := strings.Join(AllCapabilities(), ",")
-	app.WasmKeeper = wasmkeeper.NewKeeper(
+	wasmKeeper := wasmkeeper.NewKeeper(
 		appCodec,
 		keys[wasmtypes.StoreKey],
 		app.AccountKeeper,
@@ -621,6 +660,7 @@ func New(
 		availableCapabilities,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
+	app.WasmKeeper = &wasmKeeper
 
 	// Create evidence Keeper for to register the IBC light client misbehavior evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -670,15 +710,13 @@ func New(
 		app.AccountKeeper,
 		app.BankKeeper,
 	)
-	validatorrewardModule := validatorreward.NewAppModule(appCodec, app.ValidatorrewardKeeper, app.AccountKeeper, app.BankKeeper)
 
-	app.NftmintKeeper = *nftmintmodulekeeper.NewKeeper(
+	app.NftmintKeeper = *nftmintkeeper.NewKeeper(
 		appCodec,
-		keys[nftmintmoduletypes.StoreKey],
-		keys[nftmintmoduletypes.MemStoreKey],
+		keys[nftminttypes.StoreKey],
+		keys[nftminttypes.MemStoreKey],
 		app.NFTKeeper,
 	)
-	nftmintModule := nftmintmodule.NewAppModule(appCodec, app.NftmintKeeper, app.AccountKeeper, app.BankKeeper)
 
 	app.NFTTransferKeeper = nfttransferkeeper.NewKeeper(
 		appCodec,
@@ -691,7 +729,18 @@ func New(
 		nftutil.NewKeeper(appCodec, app.NFTKeeper),
 		scopedNFTTransferKeeper,
 	)
-	nfttransferModule := nfttransfer.NewAppModule(app.NFTTransferKeeper)
+
+	app.TokenfactoryKeeper = *tokenfactorykeeper.NewKeeper(
+		appCodec,
+		keys[tokenfactorytypes.StoreKey],
+		keys[tokenfactorytypes.MemStoreKey],
+		MaccPerms,
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.WasmKeeper,
+		app.DistrKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -714,6 +763,20 @@ func New(
 	// Create transfer ibc Stack
 	var transferIBCModule ibcporttypes.IBCModule
 	transferIBCModule = transfer.NewIBCModule(app.TransferKeeper)
+	ics20WasmHooks := ibchooks.NewWasmHooks(&app.IBCHooksKeeper, app.WasmKeeper, AccountAddressPrefix)
+	hooksICS4Wrapper := ibchooks.NewICS4Middleware(
+		app.IBCKeeper.ChannelKeeper,
+		ics20WasmHooks,
+	)
+	transferIBCModule = ibchooks.NewIBCMiddleware(transferIBCModule, &hooksICS4Wrapper)
+	transferIBCModule = packetforward.NewIBCMiddleware(
+		transferIBCModule,
+		app.PacketForwardKeeper,
+		0, // retries on timeout
+		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp, // forward timeout
+		packetforwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,  // refund timeout
+	)
+	// ibcfee must come after PFM since PFM does not understand IncentivizedAcknowlegements (ICS29)
 	transferIBCModule = ibcfee.NewIBCMiddleware(transferIBCModule, app.IBCFeeKeeper)
 
 	// Create wasm ibc Stack
@@ -778,9 +841,11 @@ func New(
 		upgrade.NewAppModule(app.UpgradeKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
-		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
+		wasm.NewAppModule(appCodec, app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
 		ibc.NewAppModule(app.IBCKeeper),
+		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
+		ibchooks.NewAppModule(app.AccountKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
@@ -789,9 +854,10 @@ func New(
 		feemarket.NewAppModule(app.FeeMarketKeeper, feeMarketSs),
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper, evmSs),
 
-		validatorrewardModule,
-		nftmintModule,
-		nfttransferModule,
+		validatorreward.NewAppModule(appCodec, app.ValidatorrewardKeeper, app.AccountKeeper, app.BankKeeper),
+		nftmint.NewAppModule(appCodec, app.NftmintKeeper, app.AccountKeeper, app.BankKeeper),
+		nfttransfer.NewAppModule(app.NFTTransferKeeper),
+		tokenfactory.NewAppModule(app.TokenfactoryKeeper, app.AccountKeeper, app.BankKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
@@ -821,6 +887,7 @@ func New(
 		ibcexported.ModuleName,
 		icatypes.ModuleName,
 		genutiltypes.ModuleName,
+		packetforwardtypes.ModuleName,
 		authz.ModuleName,
 		feegrant.ModuleName,
 		nft.ModuleName,
@@ -828,9 +895,11 @@ func New(
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		ibcfeetypes.ModuleName,
+		ibchookstypes.ModuleName,
 		wasmtypes.ModuleName,
-		nftmintmoduletypes.ModuleName,
+		nftminttypes.ModuleName,
 		nfttransfertypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -843,6 +912,7 @@ func New(
 		ibctransfertypes.ModuleName,
 		ibcexported.ModuleName,
 		icatypes.ModuleName,
+		packetforwardtypes.ModuleName,
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
@@ -858,10 +928,12 @@ func New(
 		upgradetypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		ibcfeetypes.ModuleName,
+		ibchookstypes.ModuleName,
 		wasmtypes.ModuleName,
 		validatorrewardtypes.ModuleName,
-		nftmintmoduletypes.ModuleName,
+		nftminttypes.ModuleName,
 		nfttransfertypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -880,6 +952,7 @@ func New(
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
 		govtypes.ModuleName,
+		packetforwardtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibcexported.ModuleName,
 		// evm module denomination is used by the feemarket module, in AnteHandle
@@ -899,11 +972,13 @@ func New(
 		consensusparamtypes.ModuleName,
 		crisistypes.ModuleName,
 		ibcfeetypes.ModuleName,
+		ibchookstypes.ModuleName,
 		// wasm must after ibc transfer
 		wasmtypes.ModuleName,
 		validatorrewardtypes.ModuleName,
-		nftmintmoduletypes.ModuleName,
+		nftminttypes.ModuleName,
 		nfttransfertypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -964,7 +1039,7 @@ func New(
 	// see cmd/wasmd/root.go: 206 - 214 approx
 	if manager := app.SnapshotManager(); manager != nil {
 		err := manager.RegisterExtensions(
-			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.WasmKeeper),
+			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), app.WasmKeeper),
 		)
 		if err != nil {
 			panic(fmt.Errorf("failed to register snapshot extension: %s", err))
@@ -1015,7 +1090,7 @@ func (app *App) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64, wa
 
 		WasmConfig:        &wasmConfig,
 		TXCounterStoreKey: txCounterStoreKey,
-		WasmKeeper:        &app.WasmKeeper,
+		WasmKeeper:        app.WasmKeeper,
 	})
 	if err != nil {
 		panic(err)
@@ -1070,7 +1145,7 @@ func (app *App) LoadHeight(height int64) error {
 // ModuleAccountAddrs returns all the app's module account addresses.
 func (app *App) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
-	for acc := range maccPerms {
+	for acc := range MaccPerms {
 		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
 	}
 
@@ -1190,18 +1265,20 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(stakingtypes.ModuleName)
 	paramsKeeper.Subspace(distrtypes.ModuleName)
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
-	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable()) //nolint:staticcheck
+	//nolint:staticcheck
+	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
+	paramsKeeper.Subspace(packetforwardtypes.ModuleName).WithKeyTable(packetforwardtypes.ParamKeyTable())
 	paramsKeeper.Subspace(ibcexported.ModuleName)
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	// ethermint subspaces
-	paramsKeeper.Subspace(evmtypes.ModuleName).WithKeyTable(evmtypes.ParamKeyTable()) //nolint: staticcheck
+	paramsKeeper.Subspace(evmtypes.ModuleName).WithKeyTable(evmtypes.ParamKeyTable()) //nolint:staticcheck
 	paramsKeeper.Subspace(feemarkettypes.ModuleName).WithKeyTable(feemarkettypes.ParamKeyTable())
 
 	paramsKeeper.Subspace(validatorrewardtypes.ModuleName)
-	paramsKeeper.Subspace(nftmintmoduletypes.ModuleName)
+	paramsKeeper.Subspace(nftminttypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
@@ -1236,6 +1313,16 @@ func (app *App) setupUpgradeHandlers() {
 		v2_0_1.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v3_0_0_rc_0.UpgradeName,
+		v3_0_0_rc_0.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v3_0_0.UpgradeName,
+		v3_0_0.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1256,11 +1343,15 @@ func (app *App) setupUpgradeHandlers() {
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{
 				ibcfeetypes.StoreKey,
-				nftmintmoduletypes.StoreKey,
+				nftminttypes.StoreKey,
 				nfttransfertypes.StoreKey,
 			},
 		}
 	case v2_0_1.UpgradeName:
+	case v3_0_0_rc_0.UpgradeName:
+		storeUpgrades = v3_0_0_rc_0.CreateStoreUpgrade()
+	case v3_0_0.UpgradeName:
+		storeUpgrades = v3_0_0.CreateStoreUpgrade()
 	}
 
 	if storeUpgrades != nil {

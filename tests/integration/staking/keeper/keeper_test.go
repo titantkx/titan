@@ -30,19 +30,19 @@ type IntegrationTestSuite struct {
 	msgServer   types.MsgServer
 }
 
-func (suite *IntegrationTestSuite) SetupTest() {
-	suite.app, suite.genAddr = app.Setup(suite.T(), false)
-	ctx := suite.app.BaseApp.NewContext(false, tmproto.Header{})
+func (s *IntegrationTestSuite) SetupTest() {
+	s.app, s.genAddr = app.Setup(s.T(), false)
+	ctx := s.app.BaseApp.NewContext(false, tmproto.Header{})
 
-	querier := sdkstakingkeeper.Querier{Keeper: suite.app.StakingKeeper.Keeper}
+	querier := sdkstakingkeeper.Querier{Keeper: s.app.StakingKeeper.Keeper}
 
-	queryHelper := baseapp.NewQueryServerTestHelper(ctx, suite.app.InterfaceRegistry())
+	queryHelper := baseapp.NewQueryServerTestHelper(ctx, s.app.InterfaceRegistry())
 	types.RegisterQueryServer(queryHelper, querier)
 	queryClient := types.NewQueryClient(queryHelper)
 
-	suite.msgServer = sdkstakingkeeper.NewMsgServerImpl(suite.app.StakingKeeper.Keeper)
+	s.msgServer = sdkstakingkeeper.NewMsgServerImpl(s.app.StakingKeeper.Keeper)
 
-	addrs, _, validators := createValidators(suite.T(), ctx, suite.app, suite.genAddr, []int64{9, 8, 7})
+	addrs, _, validators := createValidators(s.T(), ctx, s.app, s.genAddr, []int64{9, 8, 7})
 
 	header := tmproto.Header{
 		ChainID: "HelloChain",
@@ -53,11 +53,11 @@ func (suite *IntegrationTestSuite) SetupTest() {
 	// have its order changed
 	sortedVals := make([]types.Validator, len(validators))
 	copy(sortedVals, validators)
-	hi := types.NewHistoricalInfo(header, sortedVals, suite.app.StakingKeeper.PowerReduction(ctx))
-	suite.app.StakingKeeper.SetHistoricalInfo(ctx, 5, &hi)
+	hi := types.NewHistoricalInfo(header, sortedVals, s.app.StakingKeeper.PowerReduction(ctx))
+	s.app.StakingKeeper.SetHistoricalInfo(ctx, 5, &hi)
 
-	suite.ctx, suite.queryClient = ctx, queryClient
-	suite.addrs, suite.vals = addrs, validators
+	s.ctx, s.queryClient = ctx, queryClient
+	s.addrs, s.vals = addrs, validators
 }
 
 // NewValidator is a testing helper method to create validators in tests

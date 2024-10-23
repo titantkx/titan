@@ -42,6 +42,7 @@ type KeeperTestSuite struct {
 }
 
 func (s *KeeperTestSuite) SetupTest() {
+	require := s.Require()
 	key := sdk.NewKVStoreKey(stakingtypes.StoreKey)
 	testCtx := testutil.DefaultContextWithDB(s.T(), key, sdk.NewTransientStoreKey("transient_test"))
 	ctx := testCtx.Ctx.WithBlockHeader(tmproto.Header{Time: tmtime.Now()})
@@ -62,7 +63,8 @@ func (s *KeeperTestSuite) SetupTest() {
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	keeper.SetDistributionKeeper(distKeeper)
-	keeper.SetParams(ctx, stakingtypes.DefaultParams())
+	err := keeper.SetParams(ctx, stakingtypes.DefaultParams())
+	require.NoError(err)
 
 	s.ctx = ctx
 	s.stakingKeeper = keeper
@@ -83,7 +85,8 @@ func (s *KeeperTestSuite) TestParams() {
 	expParams := stakingtypes.DefaultParams()
 	expParams.MaxValidators = 555
 	expParams.MaxEntries = 111
-	keeper.SetParams(ctx, expParams)
+	err := keeper.SetParams(ctx, expParams)
+	require.NoError(err)
 	resParams := keeper.GetParams(ctx)
 	require.True(expParams.Equal(resParams))
 }

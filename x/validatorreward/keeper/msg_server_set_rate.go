@@ -20,7 +20,9 @@ func (k msgServer) SetRate(goCtx context.Context, msg *types.MsgSetRate) (*types
 		return nil, types.ErrForbidden.Wrapf("not allowed to set rate")
 	}
 
-	k.Keeper.SetRate(ctx, msg.Rate)
+	if err := k.Keeper.SetRate(ctx, msg.Rate); err != nil {
+		return nil, err
+	}
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(

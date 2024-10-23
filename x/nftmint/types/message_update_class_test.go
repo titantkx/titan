@@ -16,7 +16,7 @@ func TestMsgUpdateClass_ValidateBasic(t *testing.T) {
 		{
 			name: "valid msg",
 			msg: MsgUpdateClass{
-				Creator: sample.AccAddress(),
+				Creator: sample.AccAddress().String(),
 				Id:      sample.ClassId(),
 			},
 		},
@@ -31,7 +31,7 @@ func TestMsgUpdateClass_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid class id",
 			msg: MsgUpdateClass{
-				Creator: sample.AccAddress(),
+				Creator: sample.AccAddress().String(),
 				Id:      "invalid_class_id",
 			},
 			err: ErrInvalidClassId,

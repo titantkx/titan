@@ -26,7 +26,8 @@ func msgUpdateClass(creator string, id string) *types.MsgUpdateClass {
 	}
 }
 
-func mustUpdateClass(t testing.TB, ms types.MsgServer, ctx context.Context, ctrl *gomock.Controller, nftKeeper *testutil.MockNFTKeeper, updater string, classId string) {
+//nolint:revive // ctx at third position .
+func mustUpdateClass(t testing.TB, ms types.MsgServer, ctx context.Context, _ *gomock.Controller, nftKeeper *testutil.MockNFTKeeper, updater string, classId string) {
 	nftKeeper.EXPECT().UpdateClass(ctx, gomock.Any()).Return(nil)
 
 	resp, err := ms.UpdateClass(ctx, msgUpdateClass(updater, classId))

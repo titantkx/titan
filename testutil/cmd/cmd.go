@@ -135,6 +135,7 @@ func ExecWrite(w io.Writer, name string, args ...string) (*os.ProcessState, erro
 			if err != nil {
 				panic(err)
 			}
+			//nolint:errcheck	// accept some lost output
 			w.Write(line)
 			if !isPrefix {
 				fmt.Fprintln(w)
@@ -151,6 +152,7 @@ func ExecWrite(w io.Writer, name string, args ...string) (*os.ProcessState, erro
 			if err != nil {
 				panic(err)
 			}
+			//nolint:errcheck // accept some lost output
 			w.Write(line)
 			if !isPrefix {
 				fmt.Fprintln(w)
@@ -165,5 +167,5 @@ func ExecWrite(w io.Writer, name string, args ...string) (*os.ProcessState, erro
 func MustExecWrite(t testutil.TestingT, w io.Writer, name string, args ...string) {
 	state, err := ExecWrite(w, name, args...)
 	require.NoError(t, err)
-	require.Equal(t, 0, state.ExitCode(), state.String())
+	require.Equal(t, 0, state.ExitCode(), name, args, state.String())
 }

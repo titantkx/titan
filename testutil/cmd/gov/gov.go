@@ -12,17 +12,28 @@ import (
 )
 
 const (
-	PROPOSAL_STATUS_PASSED         = "PROPOSAL_STATUS_PASSED"
-	PROPOSAL_STATUS_REJECTED       = "PROPOSAL_STATUS_REJECTED"
+	//nolint:revive
+	PROPOSAL_STATUS_PASSED = "PROPOSAL_STATUS_PASSED"
+	//nolint:revive
+	PROPOSAL_STATUS_REJECTED = "PROPOSAL_STATUS_REJECTED"
+	//nolint:revive
+	PROPOSAL_STATUS_FAILED = "PROPOSAL_STATUS_FAILED"
+	//nolint:revive
 	PROPOSAL_STATUS_DEPOSIT_PERIOD = "PROPOSAL_STATUS_DEPOSIT_PERIOD"
+	//nolint:revive
 	PROPOSAL_STATUS_DEPOSIT_FAILED = "PROPOSAL_STATUS_DEPOSIT_FAILED"
-	PROPOSAL_STATUS_VOTING_PERIOD  = "PROPOSAL_STATUS_VOTING_PERIOD"
+	//nolint:revive
+	PROPOSAL_STATUS_VOTING_PERIOD = "PROPOSAL_STATUS_VOTING_PERIOD"
 )
 
 const (
-	VOTE_OPTION_YES          = "Yes"
-	VOTE_OPTION_NO           = "No"
-	VOTE_OPTION_ABSTAIN      = "Abstain"
+	//nolint:revive
+	VOTE_OPTION_YES = "Yes"
+	//nolint:revive
+	VOTE_OPTION_NO = "No"
+	//nolint:revive
+	VOTE_OPTION_ABSTAIN = "Abstain"
+	//nolint:revive
 	VOTE_OPTION_NO_WITH_VETO = "NoWithVeto"
 )
 
@@ -154,6 +165,23 @@ type SoftwareUpgradePlan struct {
 	Name   string       `json:"name"`
 	Height testutil.Int `json:"height"`
 	Info   string       `json:"info"`
+}
+
+type MsgNftCreateClass struct {
+	Type        string `json:"@type"`
+	Creator     string `json:"creator,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Symbol      string `json:"symbol,omitempty"`
+	Description string `json:"description,omitempty"`
+	Uri         string `json:"uri,omitempty"`
+	UriHash     string `json:"uri_hash,omitempty"`
+	Data        string `json:"data,omitempty"`
+}
+
+type MsgValidatorRewardSetRate struct {
+	Type      string `json:"@type"`
+	Authority string `json:"authority,omitempty"`
+	Rate      string `json:"rate"`
 }
 
 func MustSubmitProposal(t testutil.TestingT, from string, proposal ProposalMsg) string {

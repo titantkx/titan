@@ -12,12 +12,6 @@ import (
 	"github.com/titantkx/titan/utils"
 )
 
-const (
-	BOND_STATUS_BONDED    = "BOND_STATUS_BONDED"
-	BOND_STATUS_UNBONDED  = "BOND_STATUS_UNBONDED"
-	BOND_STATUS_UNBONDING = "BOND_STATUS_UNBONDING"
-)
-
 type Validator struct {
 	OperatorAddress   string                   `json:"operator_address"`
 	ConsensusPubkey   testutil.SinglePublicKey `json:"consensus_pubkey"`
@@ -39,6 +33,7 @@ type CommissionRates struct {
 	MaxChangeRate testutil.Float `json:"max_change_rate"`
 }
 
+//nolint:revive
 type StakingParams struct {
 	BondDenom               string            `json:"bond_denom"`
 	HistoricalEntries       int64             `json:"historical_entries"`

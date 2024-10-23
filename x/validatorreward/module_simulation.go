@@ -1,6 +1,8 @@
 package validatorreward
 
 import (
+	"encoding/json"
+	"fmt"
 	"math/rand"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -23,14 +25,17 @@ var (
 )
 
 const (
+	//nolint:gosec // this is not credentials
 	opWeightMsgSetRate = "op_weight_msg_set_rate"
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgSetRate int = 100
 
+	//nolint:gosec // this is not credentials
 	opWeightMsgSetAuthority = "op_weight_msg_set_authority"
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgSetAuthority int = 100
 
+	//nolint:gosec // this is not credentials
 	opWeightMsgFundRewardPool = "op_weight_msg_fund_reward_pool"
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgFundRewardPool int = 100
@@ -40,14 +45,19 @@ const (
 
 // GenerateGenesisState creates a randomized GenState of the module.
 func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
-	accs := make([]string, len(simState.Accounts))
-	for i, acc := range simState.Accounts {
-		accs[i] = acc.Address.String()
-	}
+	rate := simtypes.RandomDecAmount(simState.Rand, types.MaxRate)
+	authority, _ := simtypes.RandomAcc(simState.Rand, simState.Accounts)
+
 	validatorrewardGenesis := types.GenesisState{
-		Params: types.DefaultParams(),
+		Params: types.NewParams(rate, authority.Address.String()),
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
+
+	bz, err := json.MarshalIndent(&validatorrewardGenesis.Params, "", " ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Selected randomly generated validatorreward parameters:\n%s\n", bz)
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&validatorrewardGenesis)
 }
 
@@ -55,7 +65,7 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
 
 // ProposalContents doesn't return any content functions for governance proposals.
-func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent {
+func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent { //nolint:staticcheck
 	return nil
 }
 
@@ -102,12 +112,12 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 }
 
 // ProposalMsgs returns msgs used for governance proposals for simulations.
-func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+func (am AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedProposalMsg {
 	return []simtypes.WeightedProposalMsg{
 		simulation.NewWeightedProposalMsg(
 			opWeightMsgSetRate,
 			defaultWeightMsgSetRate,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+			func(_ *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
 				validatorrewardsimulation.SimulateMsgSetRate(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
@@ -115,7 +125,7 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 		simulation.NewWeightedProposalMsg(
 			opWeightMsgSetAuthority,
 			defaultWeightMsgSetAuthority,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+			func(_ *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
 				validatorrewardsimulation.SimulateMsgSetAuthority(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
@@ -123,7 +133,7 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 		simulation.NewWeightedProposalMsg(
 			opWeightMsgFundRewardPool,
 			defaultWeightMsgFundRewardPool,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+			func(_ *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
 				validatorrewardsimulation.SimulateMsgFundRewardPool(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
