@@ -49,6 +49,9 @@ func StartChain(t testutil.TestingT, w io.Writer, dcFile string) (ready chan str
 				break
 			}
 			require.NoError(t, err)
+			if !isRunning {
+				fmt.Println(string(line))
+			}
 			//nolint:errcheck	// accept the error
 			w.Write(line)
 			if !isPrefix {
