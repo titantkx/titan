@@ -23,8 +23,8 @@ func ClassId() string {
 	return strconv.FormatUint(mathrand.Uint64(), 10)
 }
 
-func Number(min int, max int) int {
-	return mathrand.Intn(max-min+1) + min
+func Number(minValue int, maxValue int) int {
+	return mathrand.Intn(maxValue-minValue+1) + minValue
 }
 
 func Name() string {
