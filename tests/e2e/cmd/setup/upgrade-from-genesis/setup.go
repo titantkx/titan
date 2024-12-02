@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	UpgradeName     = "v3_0_0_rc_0"
+	UpgradeName     = "v3_0_0"
 	GenesisFileName = "genesis_mainnet_zero.json"
 )
 
