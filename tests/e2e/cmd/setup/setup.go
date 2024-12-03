@@ -81,18 +81,6 @@ func StartChainAndListenForUpgrade(t testutil.TestingT, w io.Writer, dcFile stri
 	needUpgrade := false
 
 	go func() {
-		// after `needUpgrade` = true, wait for 5 seconds then send upgrade signal to `upgradeCh`
-		for {
-			time.Sleep(1 * time.Second)
-			if needUpgrade {
-				time.Sleep(15 * time.Second)
-				upgradeCh <- struct{}{}
-				break
-			}
-		}
-	}()
-
-	go func() {
 		r := bufio.NewReader(s)
 
 		for {
@@ -108,9 +96,12 @@ func StartChainAndListenForUpgrade(t testutil.TestingT, w io.Writer, dcFile stri
 			}
 			if !needUpgrade && strings.Contains(string(line), `UPGRADE "`+upgradeName+`" NEEDED`) {
 				needUpgrade = true
-			}
-			if needUpgrade {
-				fmt.Println(string(line))
+				go func() {
+					// wait for 15 seconds before sending the upgrade signal
+					// to make sure all node already go to need upgrade state
+					time.Sleep(15 * time.Second)
+					upgradeCh <- struct{}{}
+				}()
 			}
 		}
 	}()
