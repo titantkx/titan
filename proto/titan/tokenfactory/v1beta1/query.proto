@@ -1,0 +1,64 @@
+syntax = "proto3";
+package titan.tokenfactory.v1beta1;
+
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "titan/tokenfactory/v1beta1/authority_metadata.proto";
+import "titan/tokenfactory/v1beta1/params.proto";
+
+option go_package = "github.com/titantkx/titan/x/tokenfactory/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Params defines a gRPC query method that returns the tokenfactory module's
+  // parameters.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/titan/tokenfactory/v1beta1/params";
+  }
+
+  // DenomAuthorityMetadata defines a gRPC query method for fetching
+  // DenomAuthorityMetadata for a particular denom.
+  rpc DenomAuthorityMetadata(QueryDenomAuthorityMetadataRequest) returns (QueryDenomAuthorityMetadataResponse) {
+    option (google.api.http).get = "/titan/tokenfactory/v1beta1/denoms/{denom}/authority_metadata";
+  }
+
+  // DenomsFromCreator defines a gRPC query method for fetching all
+  // denominations created by a specific admin/creator.
+  rpc DenomsFromCreator(QueryDenomsFromCreatorRequest) returns (QueryDenomsFromCreatorResponse) {
+    option (google.api.http).get = "/titan/tokenfactory/v1beta1/denoms_from_creator/{creator}";
+  }
+}
+
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params defines the parameters of the module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryDenomAuthorityMetadataRequest is request type for the
+// Query/DenomAuthorityMetadata RPC method.
+message QueryDenomAuthorityMetadataRequest {
+  string denom = 1;
+}
+
+// QueryDenomAuthorityMetadataResponse is response type for the
+// Query/DenomAuthorityMetadata RPC method.
+message QueryDenomAuthorityMetadataResponse {
+  DenomAuthorityMetadata authority_metadata = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryDenomsFromCreatorRequest is request type for the
+// Query/DenomsFromCreator RPC method.
+message QueryDenomsFromCreatorRequest {
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// QueryDenomsFromCreatorResponse is response type for the
+// Query/DenomsFromCreator RPC method.
+message QueryDenomsFromCreatorResponse {
+  repeated string denoms = 1;
+}

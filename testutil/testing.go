@@ -12,37 +12,37 @@ type TestingT interface {
 	Cleanup(f func())
 }
 
-type mockTest struct {
+type MockTest struct {
 	w             io.Writer
 	cleanupFunc   func()
 	cleanupCalled bool
 }
 
-func NewMockTest(w io.Writer) *mockTest {
-	return &mockTest{w: w}
+func NewMockTest(w io.Writer) *MockTest {
+	return &MockTest{w: w}
 }
 
-func (t *mockTest) Errorf(format string, args ...any) {
+func (t *MockTest) Errorf(format string, args ...any) {
 	_, file, line, _ := runtime.Caller(1)
 	fmt.Fprintf(t.w, "    %s:%d: ", file, line)
 	fmt.Fprintf(t.w, format, args...)
 	fmt.Fprintln(t.w)
 }
 
-func (t *mockTest) FailNow() {
+func (t *MockTest) FailNow() {
 	t.doCleanup()
 	runtime.Goexit()
 }
 
-func (t *mockTest) Cleanup(f func()) {
+func (t *MockTest) Cleanup(f func()) {
 	t.cleanupFunc = f
 }
 
-func (t *mockTest) Finish() {
+func (t *MockTest) Finish() {
 	t.doCleanup()
 }
 
-func (t *mockTest) doCleanup() {
+func (t *MockTest) doCleanup() {
 	if !t.cleanupCalled && t.cleanupFunc != nil {
 		t.cleanupFunc()
 		t.cleanupCalled = true

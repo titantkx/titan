@@ -12,11 +12,18 @@ import (
 	"github.com/titantkx/titan/testutil/cmd/keys"
 )
 
-const UpgradeName = "v2_0_1"
+const (
+	UpgradeName     = "v3_0_0"
+	GenesisFileName = "genesis_mainnet_zero.json"
+)
 
 func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	t := testutil.NewMockTest(os.Stderr)
 	defer t.Finish()
+	testutil.HandleOSInterrupt(func() {
+		setup.StopChain(t, logger, "docker-compose-genesis.yml")
+		setup.StopChain(t, logger, "docker-compose-local.yml")
+	})
 
 	testutil.Chdir(t, "setup/upgrade-from-genesis")
 	testutil.MkdirAll(t, "tmp", os.ModePerm)
@@ -24,7 +31,7 @@ func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	cmd.MustInit(t, homeDir)
 
 	// Check if genesis.json exists
-	f, err := os.Open("genesis.json")
+	f, err := os.Open(GenesisFileName)
 	if err != nil {
 		panic("Cannot open genesis.json: " + err.Error())
 	}
@@ -34,12 +41,12 @@ func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	setup.Install(t, logger, rootDir)
 
 	fmt.Println("Building image...")
-	setup.BuildImage(t, logger, rootDir, "latest")
+	setup.BuildImage(t, logger, rootDir, "local")
 
 	setup.StopChain(t, logger, "docker-compose-genesis.yml") // Stop any running instance
 
 	fmt.Println("Initializing blockchain...")
-	cmd.MustExecWrite(t, logger, "sh", "init.sh")
+	cmd.MustExecWrite(t, logger, "sh", "init.sh", GenesisFileName)
 
 	fmt.Println("Starting blockchain...")
 	ready, upgrade, done := setup.StartChainAndListenForUpgrade(t, logger, "docker-compose-genesis.yml", UpgradeName)
@@ -61,7 +68,7 @@ func Setup(m *testing.M, rootDir string, logger io.Writer) {
 
 	fmt.Println("Restarting blockchain...")
 	setup.StopChain(t, logger, "docker-compose-genesis.yml")
-	ready, done = setup.StartChain(t, logger, "docker-compose-latest.yml")
+	ready, done = setup.StartChain(t, logger, "docker-compose-local.yml")
 
 	select {
 	case <-ready:
@@ -70,7 +77,10 @@ func Setup(m *testing.M, rootDir string, logger io.Writer) {
 		panic("Blockchain is stopped before ready")
 	}
 
-	setup.StopChain(t, logger, "docker-compose-latest.yml")
+	code := m.Run()
 
-	os.Exit(0)
+	setup.StopChain(t, logger, "docker-compose-local.yml")
+
+	//nolint:gocritic // We need to exit with the code
+	os.Exit(code)
 }

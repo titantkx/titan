@@ -61,8 +61,9 @@ func TestShowSystemInfo(t *testing.T) {
 				var resp types.QuerySystemInfoResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 				require.NotNil(t, resp.SystemInfo)
+				obj := tc.obj
 				require.Equal(t,
-					nullify.Fill(&tc.obj),
+					nullify.Fill(&obj),
 					nullify.Fill(&resp.SystemInfo),
 				)
 			}

@@ -20,7 +20,7 @@ func TestMsgServer_SetAuthority(t *testing.T) {
 	require.NoError(t, err)
 	zeroAddrStr := zeroAddr.String()
 
-	newAddrStr := sample.AccAddress()
+	newAddrStr := sample.AccAddress().String()
 
 	// Set up test cases
 	testCases := []struct {
@@ -45,7 +45,7 @@ func TestMsgServer_SetAuthority(t *testing.T) {
 		},
 		{
 			name:         "Invalid authority address",
-			authority:    sample.AccAddress(),
+			authority:    sample.AccAddress().String(),
 			newAuthority: newAddrStr,
 			expect: func(ms types.MsgServer, ctx sdk.Context, k *keeper.Keeper, authority string, newAuthority string) {
 				oldAuthority := k.GetAuthority(ctx)
@@ -96,7 +96,7 @@ func TestMsgServer_SetAuthority(t *testing.T) {
 	for _, tc := range testCases {
 		ms, ctx, k := setupMsgServer(t)
 
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.name, func(_ *testing.T) {
 			tc.expect(ms, ctx, k, tc.authority, tc.newAuthority)
 		})
 	}

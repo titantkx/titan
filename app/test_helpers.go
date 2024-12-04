@@ -13,10 +13,7 @@ import (
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
-	"github.com/stretchr/testify/require"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -25,7 +22,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/snapshots"
 	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
 	pruningtypes "github.com/cosmos/cosmos-sdk/store/pruning/types"
-	"github.com/cosmos/cosmos-sdk/testutil"
+	sdktestutil "github.com/cosmos/cosmos-sdk/testutil"
 	"github.com/cosmos/cosmos-sdk/testutil/mock"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdksimtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
@@ -34,9 +31,11 @@ import (
 	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 	"github.com/titantkx/ethermint/crypto/ethsecp256k1"
-
 	"github.com/titantkx/titan/app/params"
+	"github.com/titantkx/titan/testutil"
 	"github.com/titantkx/titan/utils"
 )
 
@@ -154,13 +153,17 @@ func Setup(t *testing.T, isCheckTx bool) (*App, sdk.AccAddress) {
 	genAcc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
 		Address: genAcc.GetAddress().String(),
-		Coins:   sdk.NewCoins(sdk.NewCoin(utils.BaseDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18)))),
+		Coins: sdk.NewCoins(
+			sdk.NewCoin(utils.BaseDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18))),
+			sdk.NewCoin(testutil.SecondaryDenom, sdk.NewInt(1e8).Mul(sdk.NewInt(1e18))),
+		),
 	}
-	app := SetupWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{genAcc}, balance)
+	app := SetupWithGenesisValSet(t, isCheckTx, valSet, []authtypes.GenesisAccount{genAcc}, balance)
 
 	return app, genAcc.GetAddress()
 }
 
+//nolint:unused
 func setTxSignature(t *testing.T, builder client.TxBuilder, nonce uint64) {
 	privKey := secp256k1.GenPrivKeyFromSecret([]byte("test"))
 	pubKey := privKey.PubKey()
@@ -185,7 +188,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 	utils.RegisterDenoms()
 
 	snapshotTimeout := 1 * time.Minute
-	snapshotStore, err := snapshots.NewStore(dbm.NewMemDB(), testutil.GetTempDir(t))
+	snapshotStore, err := snapshots.NewStore(dbm.NewMemDB(), sdktestutil.GetTempDir(t))
 	require.NoError(t, err)
 
 	app, genesisState, _ := setup(true, 5,
@@ -215,7 +218,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 	// r := rand.New(rand.NewSource(3920758213583))
 	// keyCounter := 0
 
-	for height := int64(1); height <= int64(cfg.blocks); height++ {
+	for height := uint64(1); height <= cfg.blocks; height++ {
 		currentBlockHeight := app.LastBlockHeight() + 1
 		app.Logger().Debug("Creating block", "height", currentBlockHeight)
 
@@ -227,43 +230,43 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 			NextValidatorsHash: valSet.Hash(),
 		}})
 
-		for txNum := 0; txNum < cfg.blockTxs; txNum++ {
-			// msgs := []sdk.Msg{}
-			// for msgNum := 0; msgNum < 100; msgNum++ {
-			// 	key := []byte(fmt.Sprintf("%v", keyCounter))
-			// 	value := make([]byte, 10000)
+		// for txNum := 0; txNum < cfg.blockTxs; txNum++ {
+		// msgs := []sdk.Msg{}
+		// for msgNum := 0; msgNum < 100; msgNum++ {
+		// 	key := []byte(fmt.Sprintf("%v", keyCounter))
+		// 	value := make([]byte, 10000)
 
-			// 	_, err := r.Read(value)
-			// 	require.NoError(t, err)
+		// 	_, err := r.Read(value)
+		// 	require.NoError(t, err)
 
-			// 	msgs = append(msgs, &baseapptestutil.MsgKeyValue{Key: key, Value: value})
-			// 	keyCounter++
-			// }
+		// 	msgs = append(msgs, &baseapptestutil.MsgKeyValue{Key: key, Value: value})
+		// 	keyCounter++
+		// }
 
-			// builder := encodingConfig.TxConfig.NewTxBuilder()
-			// builder.SetMsgs(msgs...)
-			// setTxSignature(t, builder, 0)
+		// builder := encodingConfig.TxConfig.NewTxBuilder()
+		// builder.SetMsgs(msgs...)
+		// setTxSignature(t, builder, 0)
 
-			// txBytes, err := encodingConfig.TxConfig.TxEncoder()(builder.GetTx())
-			// require.NoError(t, err)
+		// txBytes, err := encodingConfig.TxConfig.TxEncoder()(builder.GetTx())
+		// require.NoError(t, err)
 
-			// resp := app.DeliverTx(abci.RequestDeliverTx{Tx: txBytes})
-			// require.True(t, resp.IsOK(), "%v", resp.String())
-		}
+		// resp := app.DeliverTx(abci.RequestDeliverTx{Tx: txBytes})
+		// require.True(t, resp.IsOK(), "%v", resp.String())
+		// }
 
 		app.EndBlock(abci.RequestEndBlock{Height: currentBlockHeight})
 
 		app.Commit()
 
 		// wait for snapshot to be taken, since it happens asynchronously
-		if cfg.snapshotInterval > 0 && uint64(height)%cfg.snapshotInterval == 0 {
+		if cfg.snapshotInterval > 0 && height%cfg.snapshotInterval == 0 {
 			start := time.Now()
 			for {
 				if time.Since(start) > snapshotTimeout {
 					t.Errorf("timed out waiting for snapshot after %v", snapshotTimeout)
 				}
 
-				snapshot, err := snapshotStore.Get(uint64(height), snapshottypes.CurrentFormat)
+				snapshot, err := snapshotStore.Get(height, snapshottypes.CurrentFormat)
 				require.NoError(t, err)
 
 				if snapshot != nil {
@@ -286,7 +289,7 @@ func SetupWithSnapshot(t *testing.T, cfg SnapshotsConfig,
 // that also act as delegators. For simplicity, each validator is bonded with a delegation
 // of one consensus engine unit in the default token of the simapp from first genesis
 // account. A Nop logger is set in SimApp.
-func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) *App {
+func SetupWithGenesisValSet(t *testing.T, isCheckTx bool, valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) *App {
 	t.Helper()
 
 	app, genesisState, _ := setup(true, 5, baseapp.SetChainID(DefaultChainID))
@@ -296,25 +299,27 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 	require.NoError(t, err)
 
-	// init chain will set the validator set and initialize the genesis accounts
-	app.InitChain(
-		abci.RequestInitChain{
-			ChainId:         DefaultChainID,
-			Validators:      []abci.ValidatorUpdate{},
-			ConsensusParams: sdksimtestutil.DefaultConsensusParams,
-			AppStateBytes:   stateBytes,
-		},
-	)
+	if !isCheckTx {
+		// init chain will set the validator set and initialize the genesis accounts
+		app.InitChain(
+			abci.RequestInitChain{
+				ChainId:         DefaultChainID,
+				Validators:      []abci.ValidatorUpdate{},
+				ConsensusParams: sdksimtestutil.DefaultConsensusParams,
+				AppStateBytes:   stateBytes,
+			},
+		)
 
-	// commit genesis changes
-	app.Commit()
-	app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
-		ChainID:            DefaultChainID,
-		Height:             app.LastBlockHeight() + 1,
-		AppHash:            app.LastCommitID().Hash,
-		ValidatorsHash:     valSet.Hash(),
-		NextValidatorsHash: valSet.Hash(),
-	}})
+		// commit genesis changes
+		app.Commit()
+		app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
+			ChainID:            DefaultChainID,
+			Height:             app.LastBlockHeight() + 1,
+			AppHash:            app.LastCommitID().Hash,
+			ValidatorsHash:     valSet.Hash(),
+			NextValidatorsHash: valSet.Hash(),
+		}})
+	}
 
 	return app
 }
@@ -372,9 +377,9 @@ func NewTestNetworkFixture() network.TestFixture {
 			0,
 			MakeEncodingConfig(),
 			sdksimtestutil.NewAppOptionsWithFlagHome(val.GetCtx().Config.RootDir),
-			bam.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
-			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
-			bam.SetChainID(val.GetCtx().Viper.GetString(flags.FlagChainID)),
+			baseapp.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
+			baseapp.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
+			baseapp.SetChainID(val.GetCtx().Viper.GetString(flags.FlagChainID)),
 		)
 	}
 
@@ -420,4 +425,38 @@ func PrintExported(exportedApp servertypes.ExportedApp) {
 	}
 	genDocBytes, _ := tmjson.MarshalIndent(exportedGenDoc, "", "  ")
 	fmt.Println("exportedGenDoc", string(genDocBytes))
+}
+
+type KeeperTestHelper struct {
+	suite.Suite
+}
+
+func (s *KeeperTestHelper) SkipIfWSL() {
+	SkipIfWSL(s.T())
+}
+
+// SkipIfWSL skips tests if running on WSL
+// This is a workaround to enable quickly running full unit test suite locally
+// on WSL without failures. The failures are stemming from trying to upload
+// wasm code. An OS permissioning issue.
+func SkipIfWSL(t *testing.T) {
+	t.Helper()
+	skip := os.Getenv("SKIP_WASM_WSL_TESTS")
+	if skip == "true" {
+		t.Skip("Skipping Wasm tests")
+	}
+}
+
+// AssertEventEmitted asserts that ctx's event manager has emitted the given number of events
+// of the given type.
+func (s *KeeperTestHelper) AssertEventEmitted(ctx sdk.Context, eventTypeExpected string, numEventsExpected int) {
+	allEvents := ctx.EventManager().Events()
+	// filter out other events
+	actualEvents := make([]sdk.Event, 0)
+	for _, event := range allEvents {
+		if event.Type == eventTypeExpected {
+			actualEvents = append(actualEvents, event)
+		}
+	}
+	s.Require().Equal(numEventsExpected, len(actualEvents))
 }

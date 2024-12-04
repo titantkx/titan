@@ -4,11 +4,16 @@ import (
 	"sync"
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
+
 	"github.com/titantkx/titan/testutil"
 	"github.com/titantkx/titan/testutil/cmd/feemarket"
 	"github.com/titantkx/titan/testutil/cmd/gov"
 	"github.com/titantkx/titan/testutil/cmd/keys"
+	"github.com/titantkx/titan/testutil/cmd/nft"
+	"github.com/titantkx/titan/testutil/sample"
+
 	"github.com/titantkx/titan/testutil/cmd/staking"
 	"github.com/titantkx/titan/utils"
 )
@@ -58,7 +63,7 @@ func TestSubmitProposals(t *testing.T) {
 		Deposits       []Deposit
 		Votes          []Vote
 		ExpectedStatus string
-		CallbackFunc   func() // CallbackFunc will be called after the proposal is finished
+		CallbackFunc   func(string, []interface{}) // CallbackFunc will be called after the proposal is finished
 	}{
 		// PROPOSAL_STATUS_PASSED
 		{
@@ -187,7 +192,7 @@ func TestSubmitProposals(t *testing.T) {
 				{voter2, gov.VOTE_OPTION_YES},
 			},
 			gov.PROPOSAL_STATUS_PASSED,
-			func() {
+			func(_ string, _ []interface{}) {
 				minGasPrice := feemarket.MustGetParams(t).MinGasPrice
 				require.Equal(t, "0", minGasPrice.String())
 			},
@@ -214,7 +219,7 @@ func TestSubmitProposals(t *testing.T) {
 				{voter2, gov.VOTE_OPTION_YES},
 			},
 			gov.PROPOSAL_STATUS_PASSED,
-			func() {
+			func(_ string, _ []interface{}) {
 				minGasPrice := feemarket.MustGetParams(t).MinGasPrice
 				require.Equal(t, originalFeeMarketParams.MinGasPrice.String(), minGasPrice.String())
 			},
@@ -307,6 +312,65 @@ func TestSubmitProposals(t *testing.T) {
 			gov.PROPOSAL_STATUS_DEPOSIT_FAILED,
 			nil,
 		},
+		{
+			"TestSubmitNftCreateClassProposalPassed",
+			voter1,
+			gov.ProposalMsg{
+				Title:    "TestSubmitNftCreateClassProposalPassed",
+				Summary:  "TestSubmitNftCreateClassProposalPassed",
+				Metadata: "TestSubmitNftCreateClassProposalPassed",
+				Deposit:  "250" + utils.DisplayDenom,
+				Messages: []any{
+					gov.MsgNftCreateClass{
+						Type:        "/titan.nftmint.MsgCreateClass",
+						Creator:     "titan10d07y265gmmuvt4z0w9aw880jnsr700jste397",
+						Name:        sample.Word(),
+						Symbol:      sample.Word(),
+						Description: sample.Paragraph(),
+						Uri:         sample.URL(),
+						UriHash:     sample.Hash(),
+						Data:        sample.JSON(),
+					},
+				},
+			},
+			nil,
+			[]Vote{
+				{voter1, gov.VOTE_OPTION_YES},
+				{voter2, gov.VOTE_OPTION_YES},
+			},
+			gov.PROPOSAL_STATUS_PASSED,
+			func(_ string, msgs []interface{}) {
+				msg, ok := msgs[0].(gov.MsgNftCreateClass)
+				require.True(t, ok)
+				latestClass := nft.MustGetLatestClass(t)
+
+				require.Equal(t, msg.Name, latestClass.Name)
+			},
+		},
+		{
+			"TestSubmitValidatorRewardSetRateProposalPassed",
+			voter1,
+			gov.ProposalMsg{
+				Title:    "TestSubmitValidatorRewardSetRateProposalPassed",
+				Summary:  "TestSubmitValidatorRewardSetRateProposalPassed",
+				Metadata: "TestSubmitValidatorRewardSetRateProposalPassed",
+				Deposit:  "250" + utils.DisplayDenom,
+				Messages: []any{
+					gov.MsgValidatorRewardSetRate{
+						Type:      "/titan.validatorreward.MsgSetRate",
+						Authority: "titan10d07y265gmmuvt4z0w9aw880jnsr700jste397",
+						Rate:      sdk.NewDecWithPrec(1, 1).String(),
+					},
+				},
+			},
+			nil,
+			[]Vote{
+				{voter1, gov.VOTE_OPTION_YES},
+				{voter2, gov.VOTE_OPTION_YES},
+			},
+			gov.PROPOSAL_STATUS_FAILED, // because Authority (gov module) is not allowed to set rate
+			nil,
+		},
 	}
 
 	for i := range tests {
@@ -332,7 +396,7 @@ func testSubmitProposal(
 	deposits []Deposit,
 	votes []Vote,
 	expectedStatus string,
-	callbackFunc func(),
+	callbackFunc func(string, []interface{}),
 ) {
 	proposalId := gov.MustSubmitProposal(t, proposer, proposalMsg)
 
@@ -376,6 +440,6 @@ func testSubmitProposal(
 	require.Equal(t, expectedStatus, proposal.Status)
 
 	if callbackFunc != nil {
-		callbackFunc()
+		callbackFunc(proposalId, proposalMsg.Messages)
 	}
 }

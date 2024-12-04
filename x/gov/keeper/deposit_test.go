@@ -36,6 +36,7 @@ func TestDeposits(t *testing.T) {
 	require.True(t, sdk.NewCoins(proposal.TotalDeposit...).IsEqual(sdk.NewCoins()))
 
 	// Check no deposits at beginning
+	//nolint:ineffassign
 	deposit, found := govKeeper.GetDeposit(ctx, proposalID, TestAddrs[1])
 	require.False(t, found)
 	proposal, ok := govKeeper.GetProposal(ctx, proposalID)
@@ -191,6 +192,14 @@ func TestValidateInitialDeposit(t *testing.T) {
 			minInitialDepositPercent: 0,
 			initialDeposit:           sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(baseDepositTestAmount*baseDepositTestPercent/100))),
 		},
+		"0 initial percent, with zero amount of another token: success": {
+			minDeposit:               sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(baseDepositTestAmount))),
+			minInitialDepositPercent: 0,
+			initialDeposit: []sdk.Coin{
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(baseDepositTestAmount*baseDepositTestPercent/100)),
+				sdk.NewCoin("test", sdk.NewInt(0)),
+			},
+		},
 	}
 
 	for name, tc := range testcases {
@@ -201,7 +210,9 @@ func TestValidateInitialDeposit(t *testing.T) {
 			params.MinDeposit = tc.minDeposit
 			params.MinInitialDepositRatio = sdk.NewDec(tc.minInitialDepositPercent).Quo(sdk.NewDec(100)).String()
 
-			govKeeper.SetParams(ctx, params)
+			if err := govKeeper.SetParams(ctx, params); err != nil {
+				require.NoError(t, err)
+			}
 
 			err := govKeeper.ValidateInitialDeposit(ctx, tc.initialDeposit)
 

@@ -13,18 +13,18 @@ import (
 )
 
 // AccAddress returns a sample account address
-func AccAddress() string {
+func AccAddress() sdk.AccAddress {
 	pk := ed25519.GenPrivKey().PubKey()
 	addr := pk.Address()
-	return sdk.AccAddress(addr).String()
+	return sdk.AccAddress(addr)
 }
 
 func ClassId() string {
 	return strconv.FormatUint(mathrand.Uint64(), 10)
 }
 
-func Number(min int, max int) int {
-	return mathrand.Intn(max-min+1) + min
+func Number(minValue int, maxValue int) int {
+	return mathrand.Intn(maxValue-minValue+1) + minValue
 }
 
 func Name() string {

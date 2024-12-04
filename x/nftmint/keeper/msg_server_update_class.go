@@ -36,7 +36,9 @@ func (k msgServer) UpdateClass(goCtx context.Context, msg *types.MsgUpdateClass)
 		return nil, types.WrapInternalError(err)
 	}
 
-	ctx.EventManager().EmitTypedEvent(&types.EventUpdateClass{Id: msg.Id})
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventUpdateClass{Id: msg.Id}); err != nil {
+		return nil, types.WrapInternalError(err)
+	}
 
 	return &types.MsgUpdateClassResponse{}, nil
 }

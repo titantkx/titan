@@ -45,10 +45,13 @@ func (k msgServer) CreateClass(goCtx context.Context, msg *types.MsgCreateClass)
 	systemInfo.NextClassId++
 	k.Keeper.SetSystemInfo(ctx, systemInfo)
 
-	ctx.EventManager().EmitTypedEvent(&types.EventCreateClass{
+	err := ctx.EventManager().EmitTypedEvent(&types.EventCreateClass{
 		Id:    classId,
 		Owner: msg.Creator,
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	return &types.MsgCreateClassResponse{Id: classId}, nil
 }

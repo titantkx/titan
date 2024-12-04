@@ -9,7 +9,6 @@ import (
 
 	"github.com/titantkx/titan/testutil"
 	"github.com/titantkx/titan/testutil/cmd"
-	"github.com/titantkx/titan/testutil/cmd/tx"
 	txcmd "github.com/titantkx/titan/testutil/cmd/tx"
 )
 
@@ -34,9 +33,9 @@ func MustSend(t testutil.TestingT, from string, to string, amount string) txcmd.
 	return tx
 }
 
-func MustMultiSend(t testutil.TestingT, from string, amount string, to ...string) tx.TxResponse {
+func MustMultiSend(t testutil.TestingT, from string, amount string, to ...string) txcmd.TxResponse {
 	fromBalBefore := MustGetBalance(t, from, utils.BaseDenom, 0)
-	var toBalBefore []testutil.Int
+	toBalBefore := make([]testutil.Int, 0, len(to)) // Pre-allocate toBalBefore with a capacity equal to the length of 'to'
 	for i := range to {
 		toBalBefore = append(toBalBefore, MustGetBalance(t, to[i], utils.BaseDenom, 0))
 	}
@@ -50,7 +49,7 @@ func MustMultiSend(t testutil.TestingT, from string, amount string, to ...string
 	tx := txcmd.MustExecTx(t, ctx, args...)
 
 	fromBalAfter := MustGetBalance(t, from, utils.BaseDenom, 0)
-	var toBalAfter []testutil.Int
+	toBalAfter := make([]testutil.Int, 0, len(to)) // Pre-allocate toBalAfter with a capacity equal to the length of 'to'
 	for i := range to {
 		toBalAfter = append(toBalAfter, MustGetBalance(t, to[i], utils.BaseDenom, 0))
 	}
