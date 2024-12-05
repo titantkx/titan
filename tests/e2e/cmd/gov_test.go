@@ -224,6 +224,41 @@ func TestSubmitProposals(t *testing.T) {
 				require.Equal(t, originalFeeMarketParams.MinGasPrice.String(), minGasPrice.String())
 			},
 		},
+		{
+			"TestSubmitNftCreateClassProposalPassed",
+			voter1,
+			gov.ProposalMsg{
+				Title:    "TestSubmitNftCreateClassProposalPassed",
+				Summary:  "TestSubmitNftCreateClassProposalPassed",
+				Metadata: "TestSubmitNftCreateClassProposalPassed",
+				Deposit:  "250" + utils.DisplayDenom,
+				Messages: []any{
+					gov.MsgNftCreateClass{
+						Type:        "/titan.nftmint.MsgCreateClass",
+						Creator:     "titan10d07y265gmmuvt4z0w9aw880jnsr700jste397",
+						Name:        sample.Word(),
+						Symbol:      sample.Word(),
+						Description: sample.Paragraph(),
+						Uri:         sample.URL(),
+						UriHash:     sample.Hash(),
+						Data:        sample.JSON(),
+					},
+				},
+			},
+			nil,
+			[]Vote{
+				{voter1, gov.VOTE_OPTION_YES},
+				{voter2, gov.VOTE_OPTION_YES},
+			},
+			gov.PROPOSAL_STATUS_PASSED,
+			func(_ string, msgs []interface{}) {
+				msg, ok := msgs[0].(gov.MsgNftCreateClass)
+				require.True(t, ok)
+				latestClass := nft.MustGetLatestClass(t)
+
+				require.Equal(t, msg.Name, latestClass.Name)
+			},
+		},
 		// PROPOSAL_STATUS_REJECTED
 		{
 			"TestSubmitTextProposalOneYesTwoNoRejected",
@@ -312,48 +347,14 @@ func TestSubmitProposals(t *testing.T) {
 			gov.PROPOSAL_STATUS_DEPOSIT_FAILED,
 			nil,
 		},
+		// PROPOSAL_STATUS_FAILED
 		{
-			"TestSubmitNftCreateClassProposalPassed",
+			"TestSubmitValidatorRewardSetRateProposalFailed",
 			voter1,
 			gov.ProposalMsg{
-				Title:    "TestSubmitNftCreateClassProposalPassed",
-				Summary:  "TestSubmitNftCreateClassProposalPassed",
-				Metadata: "TestSubmitNftCreateClassProposalPassed",
-				Deposit:  "250" + utils.DisplayDenom,
-				Messages: []any{
-					gov.MsgNftCreateClass{
-						Type:        "/titan.nftmint.MsgCreateClass",
-						Creator:     "titan10d07y265gmmuvt4z0w9aw880jnsr700jste397",
-						Name:        sample.Word(),
-						Symbol:      sample.Word(),
-						Description: sample.Paragraph(),
-						Uri:         sample.URL(),
-						UriHash:     sample.Hash(),
-						Data:        sample.JSON(),
-					},
-				},
-			},
-			nil,
-			[]Vote{
-				{voter1, gov.VOTE_OPTION_YES},
-				{voter2, gov.VOTE_OPTION_YES},
-			},
-			gov.PROPOSAL_STATUS_PASSED,
-			func(_ string, msgs []interface{}) {
-				msg, ok := msgs[0].(gov.MsgNftCreateClass)
-				require.True(t, ok)
-				latestClass := nft.MustGetLatestClass(t)
-
-				require.Equal(t, msg.Name, latestClass.Name)
-			},
-		},
-		{
-			"TestSubmitValidatorRewardSetRateProposalPassed",
-			voter1,
-			gov.ProposalMsg{
-				Title:    "TestSubmitValidatorRewardSetRateProposalPassed",
-				Summary:  "TestSubmitValidatorRewardSetRateProposalPassed",
-				Metadata: "TestSubmitValidatorRewardSetRateProposalPassed",
+				Title:    "TestSubmitValidatorRewardSetRateProposalFailed",
+				Summary:  "TestSubmitValidatorRewardSetRateProposalFailed",
+				Metadata: "TestSubmitValidatorRewardSetRateProposalFailed",
 				Deposit:  "250" + utils.DisplayDenom,
 				Messages: []any{
 					gov.MsgValidatorRewardSetRate{
