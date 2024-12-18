@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package titan.farming;
+
+import "gogoproto/gogo.proto";
+import "titan/farming/distribution_info.proto";
+import "titan/farming/farm.proto";
+import "titan/farming/params.proto";
+import "titan/farming/reward.proto";
+import "titan/farming/staking_info.proto";
+
+option go_package = "github.com/titantkx/titan/x/farming/types";
+
+// GenesisState defines the farming module's genesis state.
+message GenesisState {
+  Params               params            = 1 [(gogoproto.nullable) = false];
+  repeated Farm        farm_list         = 2 [(gogoproto.nullable) = false];
+  repeated StakingInfo staking_info_list = 3 [(gogoproto.nullable) = false];
+  DistributionInfo     distribution_info = 4;
+  repeated Reward      reward_list       = 5 [(gogoproto.nullable) = false];
+}

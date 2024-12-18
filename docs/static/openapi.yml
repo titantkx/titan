@@ -57229,6 +57229,707 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
+  /titantkx/titan/farming/distribution_info:
+    get:
+      summary: DistributionInfo queries the distribution info.
+      operationId: TitanFarmingDistributionInfo
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              distribution_info:
+                type: object
+                properties:
+                  last_distribution_time:
+                    type: string
+                    format: date-time
+                description: DistributionInfo defines the reward distribution info.
+            description: >-
+              QueryDistributionInfoResponse is response type for the
+              Query/DistributionInfo RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /titantkx/titan/farming/farm:
+    get:
+      summary: FarmAll queries all farms.
+      operationId: TitanFarmingFarmAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              farm:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    token:
+                      type: string
+                    rewards:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          sender:
+                            type: string
+                          amount:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                denom:
+                                  type: string
+                                amount:
+                                  type: string
+                              description: >-
+                                Coin defines a token with a denomination and an
+                                amount.
+
+
+                                NOTE: The amount field is an Int which
+                                implements the custom method
+
+                                signatures required by gogoproto.
+                          end_time:
+                            type: string
+                            format: date-time
+                          start_time:
+                            type: string
+                            format: date-time
+                        description: FarmReward defines the farming rewards.
+                  description: Farm defines the farming rewards for a token.
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+            description: >-
+              QueryFarmAllResponse is response type for the Query/AllFarm RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /titantkx/titan/farming/farm/{token}:
+    get:
+      summary: Farm queries a farm.
+      operationId: TitanFarmingFarm
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              farm:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  rewards:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        sender:
+                          type: string
+                        amount:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              denom:
+                                type: string
+                              amount:
+                                type: string
+                            description: >-
+                              Coin defines a token with a denomination and an
+                              amount.
+
+
+                              NOTE: The amount field is an Int which implements
+                              the custom method
+
+                              signatures required by gogoproto.
+                        end_time:
+                          type: string
+                          format: date-time
+                        start_time:
+                          type: string
+                          format: date-time
+                      description: FarmReward defines the farming rewards.
+                description: Farm defines the farming rewards for a token.
+            description: QueryFarmResponse is response type for the Query/Farm RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: token
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /titantkx/titan/farming/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: TitanFarmingParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /titantkx/titan/farming/reward:
+    get:
+      summary: Reward queries all farming rewards.
+      operationId: TitanFarmingRewardAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              reward:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    farmer:
+                      type: string
+                    amount:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          denom:
+                            type: string
+                          amount:
+                            type: string
+                        description: >-
+                          Coin defines a token with a denomination and an
+                          amount.
+
+
+                          NOTE: The amount field is an Int which implements the
+                          custom method
+
+                          signatures required by gogoproto.
+                  description: Reward defines the farming rewards of the farmer.
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+            description: >-
+              QueryRewardAllResponse is response type for the Query/AllReward
+              RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /titantkx/titan/farming/reward/{farmer}:
+    get:
+      summary: Reward queries farming rewards of a farmer.
+      operationId: TitanFarmingReward
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              reward:
+                type: object
+                properties:
+                  farmer:
+                    type: string
+                  amount:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                description: Reward defines the farming rewards of the farmer.
+            description: >-
+              QueryRewardResponse is response type for the Query/Reward RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: farmer
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /titantkx/titan/farming/staking_info/{token}:
+    get:
+      summary: StakingInfoAll queries all staking info of a token.
+      operationId: TitanFarmingStakingInfoAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              staking_info:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    token:
+                      type: string
+                    staker:
+                      type: string
+                    amount:
+                      type: string
+                  description: >-
+                    StakingInfo defines the staking info of a staker for a
+                    token.
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+            description: >-
+              QueryStakingInfoAllResponse is response type for the
+              Query/AllStakingInfo RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: token
+          in: path
+          required: true
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /titantkx/titan/farming/staking_info/{token}/{staker}:
+    get:
+      summary: StakingInfo queries the staking info of a staker for a token.
+      operationId: TitanFarmingStakingInfo
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              staking_info:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  staker:
+                    type: string
+                  amount:
+                    type: string
+                description: StakingInfo defines the staking info of a staker for a token.
+            description: >-
+              QueryStakingInfoResponse is response type for the
+              Query/StakingInfo RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: token
+          in: path
+          required: true
+          type: string
+        - name: staker
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
   /titantkx/titan/nftmint/minting_info:
     get:
       summary: MintingInfos queries a list of minting info.
@@ -57490,6 +58191,181 @@ paths:
               Query/QuerySystemInfo
 
               RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /titan/tokenfactory/v1beta1/denoms/{denom}/authority_metadata:
+    get:
+      summary: |-
+        DenomAuthorityMetadata defines a gRPC query method for fetching
+        DenomAuthorityMetadata for a particular denom.
+      operationId: TitanTokenfactoryV1Beta1DenomAuthorityMetadata
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              authority_metadata:
+                type: object
+                properties:
+                  admin:
+                    type: string
+                    title: Can be empty for no admin, or a valid titan address
+                description: >-
+                  DenomAuthorityMetadata specifies metadata for addresses that
+                  have specific
+
+                  capabilities over a token factory denom. Right now there is
+                  only one Admin
+
+                  permission, but is planned to be extended to the future.
+            description: |-
+              QueryDenomAuthorityMetadataResponse is response type for the
+              Query/DenomAuthorityMetadata RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: denom
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /titan/tokenfactory/v1beta1/denoms_from_creator/{creator}:
+    get:
+      summary: |-
+        DenomsFromCreator defines a gRPC query method for fetching all
+        denominations created by a specific admin/creator.
+      operationId: TitanTokenfactoryV1Beta1DenomsFromCreator
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              denoms:
+                type: array
+                items:
+                  type: string
+            description: |-
+              QueryDenomsFromCreatorResponse is response type for the
+              Query/DenomsFromCreator RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: creator
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /titan/tokenfactory/v1beta1/params:
+    get:
+      summary: >-
+        Params defines a gRPC query method that returns the tokenfactory
+        module's
+
+        parameters.
+      operationId: TitanTokenfactoryV1Beta1Params
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params defines the parameters of the module.
+                type: object
+                properties:
+                  denom_creation_fee:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    description: >-
+                      DenomCreationFee defines the fee to be charged on the
+                      creation of a new
+
+                      denom. The fee is drawn from the MsgCreateDenom's sender
+                      account, and
+
+                      transferred to the community pool.
+                  denom_creation_gas_consume:
+                    type: string
+                    format: uint64
+                    description: >-
+                      DenomCreationGasConsume defines the gas cost for creating
+                      a new denom.
+
+                      This is intended as a spam deterrence mechanism.
+
+
+                      See: https://github.com/CosmWasm/token-factory/issues/11
+            description: >-
+              QueryParamsResponse is the response type for the Query/Params RPC
+              method.
         default:
           description: An unexpected error response.
           schema:
@@ -89222,6 +90098,395 @@ definitions:
           fee_percentage:
             type: string
     description: QueryParamsResponse is the response type for the Query/Params RPC method.
+  titan.farming.DistributionInfo:
+    type: object
+    properties:
+      last_distribution_time:
+        type: string
+        format: date-time
+    description: DistributionInfo defines the reward distribution info.
+  titan.farming.Farm:
+    type: object
+    properties:
+      token:
+        type: string
+      rewards:
+        type: array
+        items:
+          type: object
+          properties:
+            sender:
+              type: string
+            amount:
+              type: array
+              items:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+            end_time:
+              type: string
+              format: date-time
+            start_time:
+              type: string
+              format: date-time
+          description: FarmReward defines the farming rewards.
+    description: Farm defines the farming rewards for a token.
+  titan.farming.FarmReward:
+    type: object
+    properties:
+      sender:
+        type: string
+      amount:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+      end_time:
+        type: string
+        format: date-time
+      start_time:
+        type: string
+        format: date-time
+    description: FarmReward defines the farming rewards.
+  titan.farming.MsgAddRewardResponse:
+    type: object
+    description: MsgAddRewardResponse defines the Msg/AddReward response type.
+  titan.farming.MsgHarvestResponse:
+    type: object
+    description: MsgHarvestResponse defines the Msg/Harvest response type.
+  titan.farming.MsgStakeResponse:
+    type: object
+    description: MsgStakeResponse defines the Msg/Stake response type.
+  titan.farming.MsgUnstakeResponse:
+    type: object
+    description: MsgUnstakeResponse defines the Msg/Unstake response type.
+  titan.farming.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  titan.farming.QueryDistributionInfoResponse:
+    type: object
+    properties:
+      distribution_info:
+        type: object
+        properties:
+          last_distribution_time:
+            type: string
+            format: date-time
+        description: DistributionInfo defines the reward distribution info.
+    description: >-
+      QueryDistributionInfoResponse is response type for the
+      Query/DistributionInfo RPC method.
+  titan.farming.QueryFarmAllResponse:
+    type: object
+    properties:
+      farm:
+        type: array
+        items:
+          type: object
+          properties:
+            token:
+              type: string
+            rewards:
+              type: array
+              items:
+                type: object
+                properties:
+                  sender:
+                    type: string
+                  amount:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                  end_time:
+                    type: string
+                    format: date-time
+                  start_time:
+                    type: string
+                    format: date-time
+                description: FarmReward defines the farming rewards.
+          description: Farm defines the farming rewards for a token.
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            description: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently. It will be empty if
+              there are no more results.
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+    description: QueryFarmAllResponse is response type for the Query/AllFarm RPC method.
+  titan.farming.QueryFarmResponse:
+    type: object
+    properties:
+      farm:
+        type: object
+        properties:
+          token:
+            type: string
+          rewards:
+            type: array
+            items:
+              type: object
+              properties:
+                sender:
+                  type: string
+                amount:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+                end_time:
+                  type: string
+                  format: date-time
+                start_time:
+                  type: string
+                  format: date-time
+              description: FarmReward defines the farming rewards.
+        description: Farm defines the farming rewards for a token.
+    description: QueryFarmResponse is response type for the Query/Farm RPC method.
+  titan.farming.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
+  titan.farming.QueryRewardAllResponse:
+    type: object
+    properties:
+      reward:
+        type: array
+        items:
+          type: object
+          properties:
+            farmer:
+              type: string
+            amount:
+              type: array
+              items:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+          description: Reward defines the farming rewards of the farmer.
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            description: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently. It will be empty if
+              there are no more results.
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+    description: >-
+      QueryRewardAllResponse is response type for the Query/AllReward RPC
+      method.
+  titan.farming.QueryRewardResponse:
+    type: object
+    properties:
+      reward:
+        type: object
+        properties:
+          farmer:
+            type: string
+          amount:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+        description: Reward defines the farming rewards of the farmer.
+    description: QueryRewardResponse is response type for the Query/Reward RPC method.
+  titan.farming.QueryStakingInfoAllResponse:
+    type: object
+    properties:
+      staking_info:
+        type: array
+        items:
+          type: object
+          properties:
+            token:
+              type: string
+            staker:
+              type: string
+            amount:
+              type: string
+          description: StakingInfo defines the staking info of a staker for a token.
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            description: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently. It will be empty if
+              there are no more results.
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+    description: >-
+      QueryStakingInfoAllResponse is response type for the Query/AllStakingInfo
+      RPC method.
+  titan.farming.QueryStakingInfoResponse:
+    type: object
+    properties:
+      staking_info:
+        type: object
+        properties:
+          token:
+            type: string
+          staker:
+            type: string
+          amount:
+            type: string
+        description: StakingInfo defines the staking info of a staker for a token.
+    description: >-
+      QueryStakingInfoResponse is response type for the Query/StakingInfo RPC
+      method.
+  titan.farming.Reward:
+    type: object
+    properties:
+      farmer:
+        type: string
+      amount:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+    description: Reward defines the farming rewards of the farmer.
+  titan.farming.StakingInfo:
+    type: object
+    properties:
+      token:
+        type: string
+      staker:
+        type: string
+      amount:
+        type: string
+    description: StakingInfo defines the staking info of a staker for a token.
   titan.nftmint.MintingInfo:
     type: object
     properties:
@@ -89372,6 +90637,144 @@ definitions:
           next_class_id is the unique identifier of the next class that will be
           created.
     description: SystemInfo defines the system info of this module.
+  titan.tokenfactory.v1beta1.DenomAuthorityMetadata:
+    type: object
+    properties:
+      admin:
+        type: string
+        title: Can be empty for no admin, or a valid titan address
+    description: |-
+      DenomAuthorityMetadata specifies metadata for addresses that have specific
+      capabilities over a token factory denom. Right now there is only one Admin
+      permission, but is planned to be extended to the future.
+  titan.tokenfactory.v1beta1.MsgBurnResponse:
+    type: object
+    description: MsgMintResponse defines the Msg/Burn response type.
+  titan.tokenfactory.v1beta1.MsgChangeAdminResponse:
+    type: object
+    description: MsgMintResponse defines the Msg/ChangeAdmin response type.
+  titan.tokenfactory.v1beta1.MsgCreateDenomResponse:
+    type: object
+    properties:
+      new_token_denom:
+        type: string
+    description: MsgMintResponse defines the Msg/CreateDenom response type.
+  titan.tokenfactory.v1beta1.MsgMintResponse:
+    type: object
+    description: MsgMintResponse defines the Msg/Mint response type.
+  titan.tokenfactory.v1beta1.MsgSetDenomMetadataResponse:
+    type: object
+    description: MsgMintResponse defines the Msg/SetDenomMetadata response type.
+  titan.tokenfactory.v1beta1.MsgUpdateParamsResponse:
+    type: object
+    description: MsgUpdateParamsResponse defines the Msg/UpdateParams response type.
+  titan.tokenfactory.v1beta1.Params:
+    type: object
+    properties:
+      denom_creation_fee:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        description: >-
+          DenomCreationFee defines the fee to be charged on the creation of a
+          new
+
+          denom. The fee is drawn from the MsgCreateDenom's sender account, and
+
+          transferred to the community pool.
+      denom_creation_gas_consume:
+        type: string
+        format: uint64
+        description: |-
+          DenomCreationGasConsume defines the gas cost for creating a new denom.
+          This is intended as a spam deterrence mechanism.
+
+          See: https://github.com/CosmWasm/token-factory/issues/11
+    description: Params defines the parameters for the tokenfactory module.
+  titan.tokenfactory.v1beta1.QueryDenomAuthorityMetadataResponse:
+    type: object
+    properties:
+      authority_metadata:
+        type: object
+        properties:
+          admin:
+            type: string
+            title: Can be empty for no admin, or a valid titan address
+        description: >-
+          DenomAuthorityMetadata specifies metadata for addresses that have
+          specific
+
+          capabilities over a token factory denom. Right now there is only one
+          Admin
+
+          permission, but is planned to be extended to the future.
+    description: |-
+      QueryDenomAuthorityMetadataResponse is response type for the
+      Query/DenomAuthorityMetadata RPC method.
+  titan.tokenfactory.v1beta1.QueryDenomsFromCreatorResponse:
+    type: object
+    properties:
+      denoms:
+        type: array
+        items:
+          type: string
+    description: |-
+      QueryDenomsFromCreatorResponse is response type for the
+      Query/DenomsFromCreator RPC method.
+  titan.tokenfactory.v1beta1.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params defines the parameters of the module.
+        type: object
+        properties:
+          denom_creation_fee:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            description: >-
+              DenomCreationFee defines the fee to be charged on the creation of
+              a new
+
+              denom. The fee is drawn from the MsgCreateDenom's sender account,
+              and
+
+              transferred to the community pool.
+          denom_creation_gas_consume:
+            type: string
+            format: uint64
+            description: >-
+              DenomCreationGasConsume defines the gas cost for creating a new
+              denom.
+
+              This is intended as a spam deterrence mechanism.
+
+
+              See: https://github.com/CosmWasm/token-factory/issues/11
+    description: QueryParamsResponse is the response type for the Query/Params RPC method.
   titan.validatorreward.MsgFundRewardPoolResponse:
     type: object
     description: MsgFundRewardPoolResponse defines the Msg/FundRewardPool response type.
