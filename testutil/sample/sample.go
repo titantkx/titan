@@ -23,10 +23,6 @@ func ClassId() string {
 	return strconv.FormatUint(mathrand.Uint64(), 10)
 }
 
-func Number(min int, max int) int {
-	return mathrand.Intn(max-min+1) + min
-}
-
 func Name() string {
 	return faker.Name()
 }
