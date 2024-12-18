@@ -167,6 +167,10 @@ import (
 	tokenfactorykeeper "github.com/titantkx/titan/x/tokenfactory/keeper"
 	tokenfactorytypes "github.com/titantkx/titan/x/tokenfactory/types"
 
+	"github.com/titantkx/titan/x/farming"
+	farmingkeeper "github.com/titantkx/titan/x/farming/keeper"
+	farmingtypes "github.com/titantkx/titan/x/farming/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/titantkx/titan/app/params"
@@ -241,6 +245,7 @@ var (
 		nftmint.AppModuleBasic{},
 		nfttransfer.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
+		farming.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -262,6 +267,7 @@ var (
 		nftminttypes.ModuleName:                           nil,
 		nfttransfertypes.ModuleName:                       nil,
 		tokenfactorytypes.ModuleName:                      {authtypes.Minter, authtypes.Burner},
+		farmingtypes.ModuleName:                           nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -342,6 +348,8 @@ type App struct {
 	NFTTransferKeeper nfttransferkeeper.Keeper
 
 	TokenfactoryKeeper tokenfactorykeeper.Keeper
+
+	FarmingKeeper farmingkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -407,6 +415,7 @@ func New(
 		nftminttypes.StoreKey,
 		nfttransfertypes.StoreKey,
 		tokenfactorytypes.StoreKey,
+		farmingtypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
@@ -742,6 +751,14 @@ func New(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
+	app.FarmingKeeper = *farmingkeeper.NewKeeper(
+		appCodec,
+		keys[farmingtypes.StoreKey],
+		keys[farmingtypes.MemStoreKey],
+		app.GetSubspace(farmingtypes.ModuleName),
+		app.BankKeeper,
+	)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	/**** IBC Routing ****/
@@ -858,6 +875,7 @@ func New(
 		nftmint.NewAppModule(appCodec, app.NftmintKeeper, app.AccountKeeper, app.BankKeeper),
 		nfttransfer.NewAppModule(app.NFTTransferKeeper),
 		tokenfactory.NewAppModule(app.TokenfactoryKeeper, app.AccountKeeper, app.BankKeeper),
+		farming.NewAppModule(appCodec, app.FarmingKeeper, app.AccountKeeper, app.BankKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
@@ -900,6 +918,7 @@ func New(
 		nftminttypes.ModuleName,
 		nfttransfertypes.ModuleName,
 		tokenfactorytypes.ModuleName,
+		farmingtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -934,6 +953,7 @@ func New(
 		nftminttypes.ModuleName,
 		nfttransfertypes.ModuleName,
 		tokenfactorytypes.ModuleName,
+		farmingtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -979,6 +999,7 @@ func New(
 		nftminttypes.ModuleName,
 		nfttransfertypes.ModuleName,
 		tokenfactorytypes.ModuleName,
+		farmingtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -1279,6 +1300,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 
 	paramsKeeper.Subspace(validatorrewardtypes.ModuleName)
 	paramsKeeper.Subspace(nftminttypes.ModuleName)
+	paramsKeeper.Subspace(farmingtypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
