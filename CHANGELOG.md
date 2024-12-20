@@ -38,6 +38,10 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+### Features
+
+- (farming) Add farming module
+
 ### Bug Fixes
 
 - (tokenfactory) Implement LegacyMsg
