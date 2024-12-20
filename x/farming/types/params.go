@@ -5,6 +5,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const defaultAddRewardGas = 10_000_000
+
 var _ paramtypes.ParamSet = (*Params)(nil)
 
 // ParamKeyTable the param key table for launch module
@@ -19,7 +21,9 @@ func NewParams() Params {
 
 // DefaultParams returns a default set of parameters
 func DefaultParams() Params {
-	return NewParams()
+	return Params{
+		AddRewardGas: defaultAddRewardGas,
+	}
 }
 
 // ParamSetPairs get the params.ParamSet

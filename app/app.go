@@ -755,7 +755,6 @@ func New(
 		appCodec,
 		keys[farmingtypes.StoreKey],
 		keys[farmingtypes.MemStoreKey],
-		app.GetSubspace(farmingtypes.ModuleName),
 		app.BankKeeper,
 	)
 

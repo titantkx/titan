@@ -14,6 +14,8 @@ const (
 	MemStoreKey = "mem_farming"
 )
 
+var ParamsKey = []byte("Params")
+
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }

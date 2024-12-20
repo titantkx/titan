@@ -8,4 +8,7 @@ option go_package = "github.com/titantkx/titan/x/farming/types";
 // Params defines the parameters for the module.
 message Params {
   option (gogoproto.goproto_stringer) = false;
+
+  // Gas fee for adding farming rewards to prevent spam.
+  uint64 add_reward_gas = 1;
 }

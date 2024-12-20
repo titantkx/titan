@@ -11,6 +11,12 @@ import (
 func (k msgServer) AddReward(goCtx context.Context, msg *types.MsgAddReward) (*types.MsgAddRewardResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	params := k.GetParams(ctx)
+
+	if params.AddRewardGas > 0 {
+		ctx.GasMeter().ConsumeGas(params.AddRewardGas, "add reward")
+	}
+
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sdk.MustAccAddressFromBech32(msg.Sender), types.ModuleName, msg.Amount); err != nil {
 		return nil, err
 	}
