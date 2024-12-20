@@ -12,9 +12,12 @@ import (
 	"github.com/titantkx/titan/testutil/cmd/keys"
 )
 
-const UpgradeName = "v3_0_0_rc_0"
+const (
+	UpgradeName     = "v3_0_0"
+	GenesisFileName = "genesis_mainnet_zero.json"
+)
 
-func Setup(_ *testing.M, rootDir string, logger io.Writer) {
+func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	t := testutil.NewMockTest(os.Stderr)
 	defer t.Finish()
 	testutil.HandleOSInterrupt(func() {
@@ -28,7 +31,7 @@ func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 	cmd.MustInit(t, homeDir)
 
 	// Check if genesis.json exists
-	f, err := os.Open("genesis.json")
+	f, err := os.Open(GenesisFileName)
 	if err != nil {
 		panic("Cannot open genesis.json: " + err.Error())
 	}
@@ -43,7 +46,7 @@ func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 	setup.StopChain(t, logger, "docker-compose-genesis.yml") // Stop any running instance
 
 	fmt.Println("Initializing blockchain...")
-	cmd.MustExecWrite(t, logger, "sh", "init.sh")
+	cmd.MustExecWrite(t, logger, "sh", "init.sh", GenesisFileName)
 
 	fmt.Println("Starting blockchain...")
 	ready, upgrade, done := setup.StartChainAndListenForUpgrade(t, logger, "docker-compose-genesis.yml", UpgradeName)
@@ -74,8 +77,10 @@ func Setup(_ *testing.M, rootDir string, logger io.Writer) {
 		panic("Blockchain is stopped before ready")
 	}
 
+	code := m.Run()
+
 	setup.StopChain(t, logger, "docker-compose-local.yml")
 
-	//nolint:gocritic // Using os.Exit(0) here is necessary to terminate the test
-	os.Exit(0)
+	//nolint:gocritic // We need to exit with the code
+	os.Exit(code)
 }

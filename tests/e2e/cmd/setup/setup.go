@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"github.com/titantkx/titan/testutil"
@@ -74,10 +75,11 @@ func StartChainAndListenForUpgrade(t testutil.TestingT, w io.Writer, dcFile stri
 	s := testutil.NewStreamer()
 
 	readyCh, doneCh := StartChain(t, s, dcFile)
+	needUpgrade := false
 
 	go func() {
-		needUpgrade := false
 		r := bufio.NewReader(s)
+
 		for {
 			line, isPrefix, err := r.ReadLine()
 			if err == io.EOF {
@@ -91,7 +93,12 @@ func StartChainAndListenForUpgrade(t testutil.TestingT, w io.Writer, dcFile stri
 			}
 			if !needUpgrade && strings.Contains(string(line), `UPGRADE "`+upgradeName+`" NEEDED`) {
 				needUpgrade = true
-				upgradeCh <- struct{}{}
+				go func() {
+					// wait for 15 seconds before sending the upgrade signal
+					// to make sure all node already go to need upgrade state
+					time.Sleep(15 * time.Second)
+					upgradeCh <- struct{}{}
+				}()
 			}
 		}
 	}()

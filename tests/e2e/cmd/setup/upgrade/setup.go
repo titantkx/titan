@@ -12,7 +12,7 @@ import (
 	"github.com/titantkx/titan/testutil/cmd/keys"
 )
 
-const UpgradeName = "v3_0_0_rc_0"
+const UpgradeName = "v3_0_0"
 
 func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	t := testutil.NewMockTest(os.Stderr)
