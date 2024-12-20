@@ -35,3 +35,8 @@ func (m MsgUpdateParams) GetSigners() []sdk.AccAddress {
 	sender, _ := sdk.AccAddressFromBech32(m.Authority)
 	return []sdk.AccAddress{sender}
 }
+
+func (m MsgUpdateParams) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(&m)
+	return sdk.MustSortJSON(bz)
+}
