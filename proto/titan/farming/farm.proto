@@ -1,0 +1,29 @@
+syntax = "proto3";
+package titan.farming;
+
+import "amino/amino.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/titantkx/titan/x/farming/types";
+
+// Farm defines the farming rewards for a token.
+message Farm {
+  string              token   = 1;
+  repeated FarmReward rewards = 2;
+}
+
+// FarmReward defines the farming rewards.
+message FarmReward {
+  string   sender                          = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  repeated cosmos.base.v1beta1.Coin amount = 2 [
+    (gogoproto.nullable)     = false,
+    (amino.dont_omitempty)   = true,
+    (amino.encoding)         = "legacy_coins",
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  google.protobuf.Timestamp end_time   = 3 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp start_time = 4 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+}

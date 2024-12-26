@@ -1,0 +1,12 @@
+syntax = "proto3";
+package titan.farming;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/titantkx/titan/x/farming/types";
+
+// DistributionInfo defines the reward distribution info.
+message DistributionInfo {
+  google.protobuf.Timestamp last_distribution_time = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+}

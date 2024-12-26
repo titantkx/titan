@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package titan.farming;
+
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "titan/farming/distribution_info.proto";
+import "titan/farming/farm.proto";
+import "titan/farming/params.proto";
+import "titan/farming/reward.proto";
+import "titan/farming/staking_info.proto";
+
+option go_package = "github.com/titantkx/titan/x/farming/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/titantkx/titan/farming/params";
+  }
+
+  // Farm queries a farm.
+  rpc Farm(QueryFarmRequest) returns (QueryFarmResponse) {
+    option (google.api.http).get = "/titantkx/titan/farming/farm/{token}";
+  }
+
+  // FarmAll queries all farms.
+  rpc FarmAll(QueryFarmAllRequest) returns (QueryFarmAllResponse) {
+    option (google.api.http).get = "/titantkx/titan/farming/farm";
+  }
+
+  // StakingInfo queries the staking info of a staker for a token.
+  rpc StakingInfo(QueryStakingInfoRequest) returns (QueryStakingInfoResponse) {
+    option (google.api.http).get = "/titantkx/titan/farming/staking_info/{token}/{staker}";
+  }
+
+  // StakingInfoAll queries all staking info of a token.
+  rpc StakingInfoAll(QueryStakingInfoAllRequest) returns (QueryStakingInfoAllResponse) {
+    option (google.api.http).get = "/titantkx/titan/farming/staking_info/{token}";
+  }
+
+  // DistributionInfo queries the distribution info.
+  rpc DistributionInfo(QueryDistributionInfoRequest) returns (QueryDistributionInfoResponse) {
+    option (google.api.http).get = "/titantkx/titan/farming/distribution_info";
+  }
+
+  // Reward queries farming rewards of a farmer.
+  rpc Reward(QueryRewardRequest) returns (QueryRewardResponse) {
+    option (google.api.http).get = "/titantkx/titan/farming/reward/{farmer}";
+  }
+
+  // Reward queries all farming rewards.
+  rpc RewardAll(QueryRewardAllRequest) returns (QueryRewardAllResponse) {
+    option (google.api.http).get = "/titantkx/titan/farming/reward";
+  }
+}
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryFarmRequest is request type for the Query/Farm RPC method.
+message QueryFarmRequest {
+  string token = 1;
+}
+
+// QueryFarmResponse is response type for the Query/Farm RPC method.
+message QueryFarmResponse {
+  Farm farm = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryFarmAllRequest is request type for the Query/AllFarm RPC method.
+message QueryFarmAllRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryFarmAllResponse is response type for the Query/AllFarm RPC method.
+message QueryFarmAllResponse {
+  repeated Farm                          farm       = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryStakingInfoRequest is request type for the Query/StakingInfo RPC method.
+message QueryStakingInfoRequest {
+  string token  = 1;
+  string staker = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// QueryStakingInfoResponse is response type for the Query/StakingInfo RPC method.
+message QueryStakingInfoResponse {
+  StakingInfo staking_info = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryStakingInfoAllRequest is request type for the Query/AllStakingInfo RPC method.
+message QueryStakingInfoAllRequest {
+  string                                token      = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryStakingInfoAllResponse is response type for the Query/AllStakingInfo RPC method.
+message QueryStakingInfoAllResponse {
+  repeated StakingInfo                   staking_info = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination   = 2;
+}
+
+// QueryDistributionInfoRequest is request type for the Query/DistributionInfo RPC method.
+message QueryDistributionInfoRequest {}
+
+// QueryDistributionInfoResponse is response type for the Query/DistributionInfo RPC method.
+message QueryDistributionInfoResponse {
+  DistributionInfo distribution_info = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryRewardRequest is request type for the Query/Reward RPC method.
+message QueryRewardRequest {
+  string farmer = 1;
+}
+
+// QueryRewardResponse is response type for the Query/Reward RPC method.
+message QueryRewardResponse {
+  Reward reward = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryRewardAllRequest is request type for the Query/AllReward RPC method.
+message QueryRewardAllRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryRewardAllResponse is response type for the Query/AllReward RPC method.
+message QueryRewardAllResponse {
+  repeated Reward                        reward     = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

@@ -1,0 +1,20 @@
+syntax = "proto3";
+package titan.farming;
+
+import "amino/amino.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/titantkx/titan/x/farming/types";
+
+// StakingInfo defines the staking info of a staker for a token.
+message StakingInfo {
+  string token  = 1;
+  string staker = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string amount = 3 [
+    (cosmos_proto.scalar)  = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable)   = false,
+    (amino.dont_omitempty) = true
+  ];
+}

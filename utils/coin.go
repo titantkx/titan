@@ -21,3 +21,19 @@ func CWCoinFromSDKCoin(in sdk.Coin) wasmvmtypes.Coin {
 		Amount: in.Amount.String(),
 	}
 }
+
+func NewCoin(coinStr string) sdk.Coin {
+	coin, err := sdk.ParseCoinNormalized(coinStr)
+	if err != nil {
+		panic(err)
+	}
+	return coin
+}
+
+func NewCoins(coinStr string) sdk.Coins {
+	coins, err := sdk.ParseCoinsNormalized(coinStr)
+	if err != nil {
+		panic(err)
+	}
+	return coins
+}
