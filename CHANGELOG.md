@@ -38,6 +38,20 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+### Bug Fixes
+
+- (app) Correct init AccountKeeper with address prefix "titan" instead of "cosmos".
+
+## [v3.0.0](https://github.com/titantkx/titan/releases/tag/v3.0.0)
+
+### Improvements
+
+- (deps) upgrade cosmos-sdk to v0.47.6-titan.8
+
+### Miscellaneous
+
+- Fix upgrade test
+
 ## [v3.0.0-rc.0](https://github.com/titantkx/titan/releases/tag/v3.0.0-rc.0)
 
 ### State Machine Breaking
