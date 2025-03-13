@@ -457,7 +457,7 @@ func New(
 		keys[authtypes.StoreKey],
 		ethermint.ProtoAccount,
 		MaccPerms,
-		sdk.Bech32PrefixAccAddr,
+		AccountAddressPrefix,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
