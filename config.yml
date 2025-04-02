@@ -45,11 +45,11 @@ validators:
       create_empty_blocks_interval: 30s
       timeout_propose: 2s
       timeout_propose_delta: 0.3s
-      timeout_prevote: 0.5s
+      timeout_prevote: 2s
       timeout_prevote_delta: 0.3s
-      timeout_precommit: 0.5s
+      timeout_precommit: 2s
       timeout_precommit_delta: 0.3s
-      timeout_commit: 0.5s
+      timeout_commit: 2s
     rpc:
       timeout_broadcast_tx_commit: 10s
     tx_index:
