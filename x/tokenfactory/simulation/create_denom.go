@@ -4,6 +4,8 @@ import (
 	"math/rand"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -40,7 +42,7 @@ func SimulateMsgCreateDenom(
 			R:               r,
 			App:             app,
 			TxGen:           moduletestutil.MakeTestEncodingConfig().TxConfig,
-			Cdc:             nil,
+			Cdc:             codec.NewProtoCodec(codectypes.NewInterfaceRegistry()),
 			Msg:             msg,
 			MsgType:         msg.Type(),
 			Context:         ctx,
