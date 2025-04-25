@@ -38,6 +38,11 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+### State Machine Breaking
+
+- Upgrade ibc go to v7.10.0
+- Upgrade cosmos sdk to v0.47.17
+
 ### Bug Fixes
 
 - (app) Correct init AccountKeeper with address prefix "titan" instead of "cosmos".
