@@ -3,7 +3,7 @@ FROM golang:1.22-alpine as builder
 ARG TARGETOS TARGETARCH
 RUN echo "Building for $TARGETOS/$TARGETARCH"
 
-ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev file build-base binutils
+ENV PACKAGES="curl make git libc-dev bash gcc linux-headers eudev-dev file build-base binutils"
 RUN apk add --no-cache $PACKAGES
 
 ENV GOCACHE=/root/.cache/go-build
@@ -20,11 +20,11 @@ RUN sha256sum /lib/libwasmvmstatic_darwin.a | grep e45a274264963969305ab9b38a992
 
 # Copy the library you want to the final location that will be found by the linker flag `-lwasmvm_muslc`
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
-        ARCH="x86_64"; \
+    ARCH="x86_64"; \
     elif [ "$TARGETARCH" = "arm64" ]; then \
-        ARCH="aarch64"; \
+    ARCH="aarch64"; \
     else \
-        echo "Unsupported architecture: $TARGETARCH"  ; exit 1; \
+    echo "Unsupported architecture: $TARGETARCH"  ; exit 1; \
     fi && \
     cp "/lib/libwasmvm_muslc.$ARCH.a" "/lib/libwasmvm.$ARCH.a"
 
