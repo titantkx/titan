@@ -9,6 +9,7 @@ import (
 	"github.com/titantkx/titan/tests/e2e/cmd/setup"
 	"github.com/titantkx/titan/testutil"
 	"github.com/titantkx/titan/testutil/cmd"
+	"github.com/titantkx/titan/testutil/cmd/keys"
 )
 
 const (
@@ -47,39 +48,39 @@ func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	fmt.Println("Initializing blockchain...")
 	cmd.MustExecWrite(t, logger, "sh", "init.sh", GenesisFileName)
 
-	// fmt.Println("Starting blockchain...")
-	// ready, upgrade, done := setup.StartChainAndListenForUpgrade(t, logger, "docker-compose-genesis.yml", UpgradeName)
+	fmt.Println("Starting blockchain...")
+	ready, upgrade, done := setup.StartChainAndListenForUpgrade(t, logger, "docker-compose-genesis.yml", UpgradeName)
 
-	// select {
-	// case <-ready:
-	// 	fmt.Println("Started blockchain")
-	// case <-done:
-	// 	panic("Blockchain is stopped before ready")
-	// }
+	select {
+	case <-ready:
+		fmt.Println("Started blockchain")
+	case <-done:
+		panic("Blockchain is stopped before ready")
+	}
 
-	// fmt.Println("Upgrading blockchain...")
-	// val1 := keys.MustShowAddress(t, "val1")
-	// val2 := keys.MustShowAddress(t, "val2")
-	// setup.UpgradeChain(t, UpgradeName, val1, val2)
+	fmt.Println("Upgrading blockchain...")
+	val1 := keys.MustShowAddress(t, "val1")
+	val2 := keys.MustShowAddress(t, "val2")
+	setup.UpgradeChain(t, UpgradeName, val1, val2)
 
-	// <-upgrade
-	// fmt.Println("Ready to upgrade blockchain")
+	<-upgrade
+	fmt.Println("Ready to upgrade blockchain")
 
-	// fmt.Println("Restarting blockchain...")
-	// setup.StopChain(t, logger, "docker-compose-genesis.yml")
-	// ready, done = setup.StartChain(t, logger, "docker-compose-local.yml")
+	fmt.Println("Restarting blockchain...")
+	setup.StopChain(t, logger, "docker-compose-genesis.yml")
+	ready, done = setup.StartChain(t, logger, "docker-compose-local.yml")
 
-	// select {
-	// case <-ready:
-	// 	fmt.Println("Restarted blockchain")
-	// case <-done:
-	// 	panic("Blockchain is stopped before ready")
-	// }
+	select {
+	case <-ready:
+		fmt.Println("Restarted blockchain")
+	case <-done:
+		panic("Blockchain is stopped before ready")
+	}
 
-	// code := m.Run()
+	code := m.Run()
 
-	// setup.StopChain(t, logger, "docker-compose-local.yml")
+	setup.StopChain(t, logger, "docker-compose-local.yml")
 
 	//nolint:gocritic // We need to exit with the code
-	os.Exit(0)
+	os.Exit(code)
 }
