@@ -6,7 +6,7 @@ toolchain go1.22.6
 
 require (
 	cosmossdk.io/math v1.4.0
-	github.com/cosmos/cosmos-sdk v0.47.13
+	github.com/cosmos/cosmos-sdk v0.47.17
 	github.com/cosmos/ibc-apps/modules/ibc-hooks/v7 v7.0.0-20240522065513-ed0e92f61cfa
 	github.com/cosmos/ibc-go/v7 v7.10.0
 	github.com/strangelove-ventures/interchaintest/v7 v7.0.1-0.20240510223205-7272afc780da
