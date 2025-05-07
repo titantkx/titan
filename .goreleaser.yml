@@ -113,9 +113,9 @@ archives:
       - titand-linux-amd64
       - titand-linux-arm64
     files:      
-      - src: LICENSE*      
-      - src: README*      
-      - src: CHANGELOG*
+      - src: LICENSE.md      
+      - src: README.md      
+      - src: CHANGELOG.md
       - src: "tmp/lib/*.so"
         dst: lib
         strip_parent: true
