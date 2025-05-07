@@ -40,10 +40,11 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 ### State Machine Breaking
 
-- Upgrade ibc go to v7.10.0
-- Upgrade cosmos sdk to v0.47.17
-- Upgrade wasmd to v0.46.0
-- Upgrade wasmvm to v1.5.9
+- Upgrade `ibc go` to `v7.10.0`
+- Upgrade `cosmos sdk` to `v0.47.17`
+- Upgrade `wasmd` to `v0.46.0`
+- Upgrade `wasmvm` to `v1.5.9`
+- Upgrade `packet-forward-middleware` to `v7.2.1`
 
 ### Bug Fixes
 
