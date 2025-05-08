@@ -2,6 +2,24 @@
 
 set -e
 
+# Install nvm if not present
+export NVM_DIR="$HOME/.nvm"
+if [ ! -d "$NVM_DIR" ]; then
+    echo "Installing NVM..."
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+    # Source NVM immediately after installation
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+else
+    # Source NVM if it exists
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+fi
+
+# Set Node.js version to 18
+echo "Setting Node.js version to 18..."
+nvm use 18 || nvm install 18
+
 export GOPATH=~/go
 export PATH=$PATH:$GOPATH/bin
 
@@ -9,7 +27,7 @@ make install
 
 cd tests/e2e/solidity
 
-if command -v yarn &> /dev/null; then
+if command -v yarn &>/dev/null; then
     yarn install
 else
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
