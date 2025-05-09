@@ -19,6 +19,9 @@ fi
 # Set Node.js version to 18
 echo "Setting Node.js version to 18..."
 nvm use 18 || nvm install 18
+npm install -g yarn
+
+node -v
 
 export GOPATH=~/go
 export PATH=$PATH:$GOPATH/bin
