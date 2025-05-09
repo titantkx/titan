@@ -4,8 +4,8 @@
   "author": "Aragon Association <contact@aragon.org>",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "test-ganache": "yarn buidler test --network ganache",
-    "test-titan": "yarn buidler test --network titan"
+    "test-ganache": "NODE_OPTIONS=--dns-result-order=ipv4first yarn buidler test --network ganache --show-stack-traces",
+    "test-titan": "NODE_OPTIONS=--dns-result-order=ipv4first yarn buidler test --network titan --show-stack-traces"
   },
   "devDependencies": {
     "@aragon/contract-helpers-test": "^0.1.0",

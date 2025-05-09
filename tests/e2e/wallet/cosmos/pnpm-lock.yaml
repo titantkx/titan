@@ -64,20 +64,20 @@ importers:
         specifier: ^0.12.48
         version: 0.12.53
       '@titan-cosmjs/amino':
-        specifier: ^0.32.2
-        version: 0.32.2
+        specifier: ^0.32.14
+        version: 0.32.14
       '@titan-cosmjs/math':
-        specifier: ^0.32.2
-        version: 0.32.2
+        specifier: ^0.32.14
+        version: 0.32.14
       '@titan-cosmjs/proto-signing':
-        specifier: ^0.32.2
-        version: 0.32.2
+        specifier: ^0.32.14
+        version: 0.32.14
       '@titan-cosmjs/stargate':
-        specifier: ^0.32.2
-        version: 0.32.2
+        specifier: ^0.32.14
+        version: 0.32.14
       '@titan-cosmjs/tendermint-rpc':
-        specifier: ^0.32.2
-        version: 0.32.2
+        specifier: ^0.32.14
+        version: 0.32.14
       react-app-rewired:
         specifier: ^2.2.1
         version: 2.2.1(react-scripts@5.0.1)
@@ -2888,6 +2888,7 @@ packages:
 
   /@confio/ics23@0.6.8:
     resolution: {integrity: sha512-wB6uo+3A50m0sW/EWcU64xpV/8wShZ6bMTa7pF8eYsTrSkQA7oLUIJcs/wb8g4y2Oyq701BaGiO6n/ak5WXO1w==}
+    deprecated: Unmaintained. The codebase for this package was moved to https://github.com/cosmos/ics23 but then the JS implementation was removed in https://github.com/cosmos/ics23/pull/353. Please consult the maintainers of https://github.com/cosmos for further assistance.
     dependencies:
       '@noble/hashes': 1.3.3
       protobufjs: 6.11.4
@@ -3101,6 +3102,7 @@ packages:
   /@humanwhocodes/config-array@0.11.13:
     resolution: {integrity: sha512-JSBDMiDKSzQVngfRjOdFXgFfklaXI4K9nLF49Auh21lmBWRLIK3+xTErTWD4KU54pb6coM6ESE7Awz/FNU3zgQ==}
     engines: {node: '>=10.10.0'}
+    deprecated: Use @eslint/config-array instead
     dependencies:
       '@humanwhocodes/object-schema': 2.0.1
       debug: 4.3.4
@@ -3129,6 +3131,7 @@ packages:
 
   /@humanwhocodes/object-schema@2.0.1:
     resolution: {integrity: sha512-dvuCeX5fC9dXgJn9t+X5atfmgQAzUOWqS1254Gh0m6i8wKd10ebXkfNKiRK+1GWi/yTvvLDHpoxLr0xxxeslWw==}
+    deprecated: Use @eslint/object-schema instead
 
   /@istanbuljs/load-nyc-config@1.1.0:
     resolution: {integrity: sha512-VjeHSlIzpv/NyD3N0YuHfXOPDIixcA1q2ZV98wsMqcYlPmv2n3Yb2lYP9XMElnaFVXg5A7YLTeLu6V84uQDjmQ==}
@@ -3851,63 +3854,63 @@ packages:
       '@testing-library/dom': 9.3.3
     dev: false
 
-  /@titan-cosmjs/amino@0.32.2:
-    resolution: {integrity: sha512-5ohB523u68YcuXg8EKQxYOQ/rLIF67LaJ+k9/aD1NcqE84nHijtFukBr5xRB3RBpaeYErSSPRKDurL8cgYxVLw==}
+  /@titan-cosmjs/amino@0.32.14:
+    resolution: {integrity: sha512-0dIC0hY/mI01E3CKuyqvTyFzeiyhztoVwgLgzQbzMX3Xb7JPCAvG11n4apZeBIDn/UUCLs4nIFFc8Tg0u6g+Gg==}
     dependencies:
-      '@cosmjs/crypto': /@titan-cosmjs/crypto@0.32.2
-      '@cosmjs/encoding': /@titan-cosmjs/encoding@0.32.2
-      '@cosmjs/math': /@titan-cosmjs/math@0.32.2
-      '@cosmjs/utils': /@titan-cosmjs/utils@0.32.2
+      '@cosmjs/crypto': /@titan-cosmjs/crypto@0.32.14
+      '@cosmjs/encoding': /@titan-cosmjs/encoding@0.32.14
+      '@cosmjs/math': /@titan-cosmjs/math@0.32.14
+      '@cosmjs/utils': /@titan-cosmjs/utils@0.32.14
     dev: true
 
-  /@titan-cosmjs/crypto@0.32.2:
-    resolution: {integrity: sha512-otdY5MJAF7xIa/YfQYAYBmKVPeYgly4Xq8Twvof8gjSUV9cIh7h2LlBi9m17YnLvOh7MPqGWD7x4SuYXx4txvQ==}
+  /@titan-cosmjs/crypto@0.32.14:
+    resolution: {integrity: sha512-BQH7tNMjZcB4pEfXVztKSaQ18oKoj2Kjra9JXoj88Wthc4z8FgqGibXOp4DiLNE/n68xFyjYuySygQoQxYrLAQ==}
     dependencies:
-      '@cosmjs/encoding': /@titan-cosmjs/encoding@0.32.2
-      '@cosmjs/math': /@titan-cosmjs/math@0.32.2
-      '@cosmjs/utils': /@titan-cosmjs/utils@0.32.2
+      '@cosmjs/encoding': /@titan-cosmjs/encoding@0.32.14
+      '@cosmjs/math': /@titan-cosmjs/math@0.32.14
+      '@cosmjs/utils': /@titan-cosmjs/utils@0.32.14
       '@noble/hashes': 1.3.3
       bn.js: 5.2.1
-      elliptic: 6.5.4
+      elliptic: 6.6.1
       libsodium-wrappers-sumo: 0.7.13
     dev: true
 
-  /@titan-cosmjs/encoding@0.32.2:
-    resolution: {integrity: sha512-fsW0D1Gx6SH1MEgFrnu9kk0wN7h58pQx5H5fSDf8K0lPTxY9bF2XMulIEorJ4n2YY+BPtMLB5qrE85WyZuWHww==}
+  /@titan-cosmjs/encoding@0.32.14:
+    resolution: {integrity: sha512-2qLyp5PtZF8CxcLj/DybirrcHjJtfEl9Aqea7H0NObj0o6KM0V0yJLHHjeWnk3/OYHaxRC/6SJjnmKLQ9PRLuA==}
     dependencies:
       base64-js: 1.5.1
       bech32: 1.1.4
       readonly-date: 1.0.0
     dev: true
 
-  /@titan-cosmjs/json-rpc@0.32.2:
-    resolution: {integrity: sha512-3fdW9tDnZVNqbs1La6gZyFvrPy6OGvKCh+kxaD/nXmJCiPmgQG3pDIOk87rlS08XuEN4NMGN0jr9MSMq3gfbbw==}
+  /@titan-cosmjs/json-rpc@0.32.14:
+    resolution: {integrity: sha512-SN70K2E6IT8ZomtshRGPESM0NQLhM/5Gkyn8CO2x2EVjO3VBwhtooU29szPDcQ9KKyP64VHebU6uF6Vrs27eeA==}
     dependencies:
-      '@cosmjs/stream': /@titan-cosmjs/stream@0.32.2
+      '@cosmjs/stream': /@titan-cosmjs/stream@0.32.14
       xstream: 11.14.0
     dev: true
 
-  /@titan-cosmjs/math@0.32.2:
-    resolution: {integrity: sha512-YtvrP6fIqkgFN77KmwAt3ukFQCuoAMIGSM95yssr186AMd8htaQpR2zxLkPqKx4PHpvheFGJVJwBF13WP/ERKA==}
+  /@titan-cosmjs/math@0.32.14:
+    resolution: {integrity: sha512-/zf8euoNNHX7VEG60fi+VVmj4Msg5OH4FiqI1Fu5cX+JQa/QGlMXiSNzveCExq6xs6+Zij91ZJIW8l6lfvh6Pw==}
     dependencies:
       bn.js: 5.2.1
     dev: true
 
-  /@titan-cosmjs/proto-signing@0.32.2:
-    resolution: {integrity: sha512-Q/oJMap5qpTQtadMT3zqWcnikUHw9LFpkKTm8aDwnWLQrJl4I/ZK2g1u5UXHIsBH1jY1z8UK6DMbVwGkwNtFpA==}
+  /@titan-cosmjs/proto-signing@0.32.14:
+    resolution: {integrity: sha512-IiHqTCgJAWHCC5mjQKsTo43WpAYsvK7INhxlgvwJXEhUCJiXknwK3/80+82KRcfQnXsGzwc2U6YQKl1H9jAkBA==}
     dependencies:
-      '@cosmjs/amino': /@titan-cosmjs/amino@0.32.2
-      '@cosmjs/crypto': /@titan-cosmjs/crypto@0.32.2
-      '@cosmjs/encoding': /@titan-cosmjs/encoding@0.32.2
-      '@cosmjs/math': /@titan-cosmjs/math@0.32.2
-      '@cosmjs/utils': /@titan-cosmjs/utils@0.32.2
-      cosmjs-types: /titan-cosmjs-types@0.9.0
+      '@cosmjs/amino': /@titan-cosmjs/amino@0.32.14
+      '@cosmjs/crypto': /@titan-cosmjs/crypto@0.32.14
+      '@cosmjs/encoding': /@titan-cosmjs/encoding@0.32.14
+      '@cosmjs/math': /@titan-cosmjs/math@0.32.14
+      '@cosmjs/utils': /@titan-cosmjs/utils@0.32.14
+      cosmjs-types: /titan-cosmjs-types@0.10.0
     dev: true
 
-  /@titan-cosmjs/socket@0.32.2:
-    resolution: {integrity: sha512-2r4JdzulWG/CLQcawsUk8FmPbpCRhPEnyakUeqyr3K/GKCe8niZvS+aQ+7yf4HtQrmdKhVqTNqNUipKZ3waHbw==}
+  /@titan-cosmjs/socket@0.32.14:
+    resolution: {integrity: sha512-Tbk+CAHLXNYopD+2e3S052pdVpRjt+PfdBS4gD9d/hKRd5GLwp76vG0RxzPIhf+EG8Y6UGtLo9U0Ks/IqE5zBw==}
     dependencies:
-      '@cosmjs/stream': /@titan-cosmjs/stream@0.32.2
+      '@cosmjs/stream': /@titan-cosmjs/stream@0.32.14
       isomorphic-ws: 4.0.1(ws@7.5.9)
       ws: 7.5.9
       xstream: 11.14.0
@@ -3916,18 +3919,18 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@titan-cosmjs/stargate@0.32.2:
-    resolution: {integrity: sha512-Eb5BpfvXBwBrYnvFdE+soiQlPR0g4euIBCMarRdfzvwJiuo0MWcqPg4Z5IxROkiGF5KhTtxti2s9y0XXZilGVA==}
+  /@titan-cosmjs/stargate@0.32.14:
+    resolution: {integrity: sha512-pJ8CzgA3Mv5uXlWtdgxyJFsshmt+maq+kELa3gR5nKJNEiDp0JYyJNzFNJFEH70TFM7ssx6IWiMg9LZSjbmHkQ==}
     dependencies:
       '@confio/ics23': 0.6.8
-      '@cosmjs/amino': /@titan-cosmjs/amino@0.32.2
-      '@cosmjs/encoding': /@titan-cosmjs/encoding@0.32.2
-      '@cosmjs/math': /@titan-cosmjs/math@0.32.2
-      '@cosmjs/proto-signing': /@titan-cosmjs/proto-signing@0.32.2
-      '@cosmjs/stream': /@titan-cosmjs/stream@0.32.2
-      '@cosmjs/tendermint-rpc': /@titan-cosmjs/tendermint-rpc@0.32.2
-      '@cosmjs/utils': /@titan-cosmjs/utils@0.32.2
-      cosmjs-types: /titan-cosmjs-types@0.9.0
+      '@cosmjs/amino': /@titan-cosmjs/amino@0.32.14
+      '@cosmjs/encoding': /@titan-cosmjs/encoding@0.32.14
+      '@cosmjs/math': /@titan-cosmjs/math@0.32.14
+      '@cosmjs/proto-signing': /@titan-cosmjs/proto-signing@0.32.14
+      '@cosmjs/stream': /@titan-cosmjs/stream@0.32.14
+      '@cosmjs/tendermint-rpc': /@titan-cosmjs/tendermint-rpc@0.32.14
+      '@cosmjs/utils': /@titan-cosmjs/utils@0.32.14
+      cosmjs-types: /titan-cosmjs-types@0.10.0
       xstream: 11.14.0
     transitivePeerDependencies:
       - bufferutil
@@ -3935,22 +3938,22 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@titan-cosmjs/stream@0.32.2:
-    resolution: {integrity: sha512-WWkz/TiDni9aOqu+IDmA5BPt1xOL9hkhxBfCJ8kWHMkooC/EeiSjuG+APzngKx5+9r/zEHsZPiiWXCGmxZjNVg==}
+  /@titan-cosmjs/stream@0.32.14:
+    resolution: {integrity: sha512-EIs16GbaSEAcu9WPBQjR21ZUA4L6zSf+pHdV8XU6jYQly/wk3aFc3w/w2dSCObaH10zASVm5hjUcdmybggr27g==}
     dependencies:
       xstream: 11.14.0
     dev: true
 
-  /@titan-cosmjs/tendermint-rpc@0.32.2:
-    resolution: {integrity: sha512-XK4S2lfj4dMI1nTpYForHz+WwsUN/yVxh2gSR4XrkXXpxv7YS1rPTOgYtCns3UoeW5ReI/NeqM38rTlDp0wc2w==}
+  /@titan-cosmjs/tendermint-rpc@0.32.14:
+    resolution: {integrity: sha512-E1a8Y9uJTVUOBk6gFmodl8oEMZAVs1XEiHbx4u+Im+LNfzUJOQiHeGdDqOx596KEhqbapwWECoMpVFwRQtwDqA==}
     dependencies:
-      '@cosmjs/crypto': /@titan-cosmjs/crypto@0.32.2
-      '@cosmjs/encoding': /@titan-cosmjs/encoding@0.32.2
-      '@cosmjs/json-rpc': /@titan-cosmjs/json-rpc@0.32.2
-      '@cosmjs/math': /@titan-cosmjs/math@0.32.2
-      '@cosmjs/socket': /@titan-cosmjs/socket@0.32.2
-      '@cosmjs/stream': /@titan-cosmjs/stream@0.32.2
-      '@cosmjs/utils': /@titan-cosmjs/utils@0.32.2
+      '@cosmjs/crypto': /@titan-cosmjs/crypto@0.32.14
+      '@cosmjs/encoding': /@titan-cosmjs/encoding@0.32.14
+      '@cosmjs/json-rpc': /@titan-cosmjs/json-rpc@0.32.14
+      '@cosmjs/math': /@titan-cosmjs/math@0.32.14
+      '@cosmjs/socket': /@titan-cosmjs/socket@0.32.14
+      '@cosmjs/stream': /@titan-cosmjs/stream@0.32.14
+      '@cosmjs/utils': /@titan-cosmjs/utils@0.32.14
       axios: 1.6.2
       readonly-date: 1.0.0
       xstream: 11.14.0
@@ -3960,8 +3963,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@titan-cosmjs/utils@0.32.2:
-    resolution: {integrity: sha512-vglzydFGC6KUh1c4kBzVX6So5FlJH2A4zDg3hrNRl9EQvD7ssvgW/lcEJPfrfTtrN/mTwo4Vrk47SGKX0QGXqQ==}
+  /@titan-cosmjs/utils@0.32.14:
+    resolution: {integrity: sha512-5E+l4h9NJZDz9y3wP4AQ/xLRLxOV9qksLttio/+u558hbFtf3Ajsdv5SJ1Q2VQkei/JsOnUdkyNoioD3OsMPsA==}
     dev: true
 
   /@tootallnate/once@1.1.2:
@@ -6346,6 +6349,19 @@ packages:
       inherits: 2.0.4
       minimalistic-assert: 1.0.1
       minimalistic-crypto-utils: 1.0.1
+    dev: false
+
+  /elliptic@6.6.1:
+    resolution: {integrity: sha512-RaddvvMatK2LJHqFJ+YA4WysVN5Ita9E35botqIYspQ4TkRAlCicdzKOjlyv/1Za5RyTNn7di//eEV0uTAfe3g==}
+    dependencies:
+      bn.js: 4.12.0
+      brorand: 1.1.0
+      hash.js: 1.1.7
+      hmac-drbg: 1.0.1
+      inherits: 2.0.4
+      minimalistic-assert: 1.0.1
+      minimalistic-crypto-utils: 1.0.1
+    dev: true
 
   /emittery@0.10.2:
     resolution: {integrity: sha512-aITqOwnLanpHLNXZJENbOgjUBeHocD+xsSJmNrjovKBW5HbSpW3d1pEls7GFQPUWXiwG9+0P4GtHfEqC/4M0Iw==}
@@ -6994,6 +7010,7 @@ packages:
   /eslint@8.56.0:
     resolution: {integrity: sha512-Go19xM6T9puCOWntie1/P997aXxFsOi37JIHRWI514Hc6ZnaHGKY9xFhrU65RT6CcBEzZoGG1e6Nq+DT04ZtZQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.56.0)
@@ -12128,6 +12145,10 @@ packages:
   /tiny-warning@1.0.3:
     resolution: {integrity: sha512-lBN9zLN/oAf68o3zNXYrdCt1kP8WsiGW8Oo2ka41b2IM5JL/S1CTyX1rW0mb/zSuJun0ZUrDxx4sqvYS2FWzPA==}
     dev: false
+
+  /titan-cosmjs-types@0.10.0:
+    resolution: {integrity: sha512-WMDBfbHYtOYaMLhXzudmwfK37NOaaFqz+tlJjFPtyiFEVPJfkcqWRIUS/RcCc/8ofCk1dgsfs0o6Ew9WKNvltw==}
+    dev: true
 
   /titan-cosmjs-types@0.9.0:
     resolution: {integrity: sha512-m1ARapiUtHfLANhuQ+cNoiSZ3vG9CiNNyTYVCGn+h9Mn3Kh/cHur9kLXLnyXyjqzQmlI5aWuX8ny+lL1R3keng==}

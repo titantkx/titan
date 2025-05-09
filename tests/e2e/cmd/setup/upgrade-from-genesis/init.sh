@@ -74,7 +74,8 @@ del(.app_state.ibc.connection_genesis.connections[] | select(.client_id == \"09-
 .app_state.slashing.params.min_signed_per_window = \"0.500000000000000000\" 
 "
 
-echo "$(jq "$config" tmp/val1/.titand/config/genesis.json)" >tmp/val1/.titand/config/genesis.json
+jq -j "$config" tmp/val1/.titand/config/genesis.json >tmp/val1/.titand/config/genesis_tmp.json
+cp -rf tmp/val1/.titand/config/genesis_tmp.json tmp/val1/.titand/config/genesis.json
 
 # Add faucet account
 docker compose -f docker-compose-genesis.yml run --rm -i val1 keys add faucet
@@ -88,7 +89,8 @@ val1=$(docker compose -f docker-compose-genesis.yml run --rm -i val1 keys show v
 # Add balance to val1
 docker compose -f docker-compose-genesis.yml run --rm -i val1 add-genesis-account $val1 1000000tkx
 # re delete bank supply
-echo "$(jq ".app_state.bank.supply = []" tmp/val1/.titand/config/genesis.json)" >tmp/val1/.titand/config/genesis.json
+jq -j ".app_state.bank.supply = []" tmp/val1/.titand/config/genesis.json >tmp/val1/.titand/config/genesis_tmp.json
+cp -rf tmp/val1/.titand/config/genesis_tmp.json tmp/val1/.titand/config/genesis.json
 # val1 stakes tkx
 docker compose -f docker-compose-genesis.yml run --rm -i val1 gentx val1 100000tkx --min-self-delegation 5000000000000000000
 
@@ -103,7 +105,9 @@ val2=$(docker compose -f docker-compose-genesis.yml run --rm -i val2 keys show v
 # Add balance to val2
 docker compose -f docker-compose-genesis.yml run --rm -i val2 add-genesis-account $val2 1000000tkx
 # re delete bank supply
-echo "$(jq ".app_state.bank.supply = []" tmp/val2/.titand/config/genesis.json)" >tmp/val2/.titand/config/genesis.json
+jq -j ".app_state.bank.supply = []" tmp/val2/.titand/config/genesis.json >tmp/val2/.titand/config/genesis_tmp.json
+cp -rf tmp/val2/.titand/config/genesis_tmp.json tmp/val2/.titand/config/genesis.json
+
 # val2 stakes tkx
 docker compose -f docker-compose-genesis.yml run --rm -i val2 gentx val2 100000tkx --min-self-delegation 5000000000000000000
 

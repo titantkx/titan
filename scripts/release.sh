@@ -56,7 +56,8 @@ if [ "$dry_run" -eq 1 ]; then
     -v "$PROJECT_ROOT":/go/src/$PACKAGE_NAME \
     -v "$GOPATH"/pkg:/go/pkg \
     -w /go/src/$PACKAGE_NAME ghcr.io/goreleaser/goreleaser-cross:$GOLANG_CROSS_VERSION \
-    --clean --skip-validate --skip-publish --snapshot
+    --skip=validate,publish \
+    --clean --snapshot
 
 else
   # check file `.release-env` exists
@@ -93,7 +94,8 @@ else
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v "$PROJECT_ROOT":/go/src/$PACKAGE_NAME \
     -w /go/src/$PACKAGE_NAME ghcr.io/goreleaser/goreleaser-cross:${GOLANG_CROSS_VERSION} \
-    --clean --skip-validate
+    --skip=validate \
+    --clean
 
   # upload upgrade info to github
   "$SCRIPT_DIR/gen-upgrade-info.sh" "v$VERSION" --upload
