@@ -38,6 +38,10 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+### Miscellaneous
+
+- (solidity-test) Bypass failed unit test - evm does not return correct error message when initializing new contract
+
 ### State Machine Breaking
 
 - Upgrade `ibc go` to `v7.10.0`
