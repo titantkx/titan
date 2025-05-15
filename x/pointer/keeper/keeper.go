@@ -17,6 +17,8 @@ type (
 		storeKey storetypes.StoreKey
 		memKey   storetypes.StoreKey
 
+		accountKeeper types.AccountKeeper
+
 		// The address capable of executing a GOV message. Typically, this
 		// should be the x/gov module account.
 		authority string
@@ -27,13 +29,15 @@ func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeKey,
 	memKey storetypes.StoreKey,
+	accountKeeper types.AccountKeeper,
 	authority string,
 ) *Keeper {
 	return &Keeper{
-		cdc:       cdc,
-		storeKey:  storeKey,
-		memKey:    memKey,
-		authority: authority,
+		cdc:           cdc,
+		storeKey:      storeKey,
+		memKey:        memKey,
+		accountKeeper: accountKeeper,
+		authority:     authority,
 	}
 }
 

@@ -267,6 +267,7 @@ var (
 		nftminttypes.ModuleName:                           nil,
 		nfttransfertypes.ModuleName:                       nil,
 		tokenfactorytypes.ModuleName:                      {authtypes.Minter, authtypes.Burner},
+		pointermoduletypes.ModuleName:                     nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -531,7 +532,11 @@ func New(
 		tkeys[evmtypes.TransientKey],
 		authtypes.NewModuleAddress(govtypes.ModuleName),
 		app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.FeeMarketKeeper,
-		precompiles.GetCustomPrecompiles(), geth.NewEVM, tracer,
+		precompiles.GetCustomPrecompiles(
+			app.PointerKeeper,
+			app.BankKeeper,
+		),
+		geth.NewEVM, tracer,
 		evmSs,
 	)
 
@@ -755,6 +760,7 @@ func New(
 		appCodec,
 		keys[pointermoduletypes.StoreKey],
 		keys[pointermoduletypes.MemStoreKey],
+		app.AccountKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	pointerModule := pointermodule.NewAppModule(appCodec, app.PointerKeeper, app.AccountKeeper, app.BankKeeper)

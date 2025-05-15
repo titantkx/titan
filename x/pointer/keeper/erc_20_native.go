@@ -1,12 +1,17 @@
 package keeper
 
 import (
+	"math/big"
+
 	sdkerrors "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	errortypes "github.com/cosmos/cosmos-sdk/types/errors"
+	ethcommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/vm"
 	etherminttypes "github.com/titantkx/ethermint/types"
 
+	"github.com/titantkx/titan/x/pointer/artifacts"
 	"github.com/titantkx/titan/x/pointer/types"
 )
 
@@ -75,5 +80,58 @@ func (k Keeper) GetAllErc20Native(ctx sdk.Context) (list []types.Erc20Native) {
 		list = append(list, val)
 	}
 
+	return
+}
+
+func (k Keeper) DeployOrUpdateErc20NativePointer(
+	ctx sdk.Context,
+	evm *vm.EVM,
+	token string, metadata types.ERCMetadata,
+) (contractAddr ethcommon.Address, err error) {
+	pointerModuleAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
+	pointerModuleEthAddr := ethcommon.BytesToAddress(pointerModuleAddr)
+	pointerType := "erc20native"
+
+	var bin []byte
+	bin, err = artifacts.GetParsedABI(pointerType).Pack("", []interface{}{
+		token, metadata.Name, metadata.Symbol, metadata.Decimals,
+	})
+	if err != nil {
+		panic(err)
+	}
+	bin = append(artifacts.GetBin(pointerType), bin...)
+
+	erc20Native, found := k.GetErc20Native(ctx, token)
+
+	suppliedGas := ctx.GasMeter().Limit() - ctx.GasMeter().GasConsumedToLimit()
+	var remainingGas uint64
+
+	if found {
+		var ret []byte
+		// pointer contract already exited, update it code
+		contractAddr, err = types.GetErc20AddressFromString(erc20Native.Erc20Addr)
+		if err != nil {
+			return
+		}
+		ret, remainingGas, err = evm.GetDeploymentCode(vm.AccountRef(pointerModuleEthAddr), bin, suppliedGas, big.NewInt(0), contractAddr)
+		evm.StateDB.SetCode(contractAddr, ret)
+	} else {
+		// deploy new pointer contract
+		// @todo maybe need to override set nonce of EVM like ethermint did
+		_, contractAddr, remainingGas, err = evm.Create(vm.AccountRef(pointerModuleEthAddr), bin, suppliedGas, big.NewInt(0))
+	}
+	if err != nil {
+		return
+	}
+
+	ctx.GasMeter().ConsumeGas(suppliedGas-remainingGas, "erc20native contract deploy or update")
+	// set erc20native contract address
+	k.SetErc20Native(ctx, types.Erc20Native{
+		TokenDenom: token,
+		Erc20Addr:  contractAddr.Hex(),
+	})
+	ctx.EventManager().EmitEvent(sdk.NewEvent(
+		types.EventTypePointerRegistered, sdk.NewAttribute(types.AttributeKeyPointerType, pointerType),
+		sdk.NewAttribute(types.AttributeKeyPointerAddress, contractAddr.Hex()), sdk.NewAttribute(types.AttributeKeyPointee, token)))
 	return
 }

@@ -13,8 +13,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
+
 	"github.com/titantkx/titan/x/pointer/keeper"
+	pointertestutil "github.com/titantkx/titan/x/pointer/testutil"
 	"github.com/titantkx/titan/x/pointer/types"
 )
 
@@ -31,10 +34,14 @@ func PointerKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	registry := codectypes.NewInterfaceRegistry()
 	cdc := codec.NewProtoCodec(registry)
 
+	ctrl := gomock.NewController(t)
+	authKeeper := pointertestutil.NewMockAccountKeeper(ctrl)
+
 	k := keeper.NewKeeper(
 		cdc,
 		storeKey,
 		memStoreKey,
+		authKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 

@@ -6,15 +6,15 @@ import (
 	ethcommon "github.com/ethereum/go-ethereum/common"
 )
 
-func GetErc20AddressFromString(addrStr string) (*ethcommon.Address, error) {
+func GetErc20AddressFromString(addrStr string) (addr ethcommon.Address, err error) {
 	mixCaseAddr, err := ethcommon.NewMixedcaseAddressFromString(addrStr)
 	if err != nil {
-		return nil, err
+		return ethcommon.Address{}, err
 	}
 
 	if !mixCaseAddr.ValidChecksum() {
-		return nil, sdkerrors.Wrap(errortypes.ErrInvalidAddress, "invalid checksum for erc20 address")
+		return ethcommon.Address{}, sdkerrors.Wrap(errortypes.ErrInvalidAddress, "invalid checksum for erc20 address")
 	}
-	addr := mixCaseAddr.Address()
-	return &addr, nil
+	addr = mixCaseAddr.Address()
+	return
 }

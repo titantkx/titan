@@ -13,6 +13,8 @@ import (
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
 	pcommon "github.com/titantkx/ethermint/precompiles/common"
+
+	pointertypes "github.com/titantkx/titan/x/pointer/types"
 )
 
 const (
@@ -30,16 +32,18 @@ var f embed.FS
 var _ pcommon.PrecompileExecutor = &PrecompileExecutor{}
 
 type PrecompileExecutor struct {
-	bankKeeper BankKeeper
+	pointerKeeper PointerKeeper
+	bankKeeper    BankKeeper
 
 	AddNativePointerID []byte
 }
 
-func NewPrecompile(bankKeeper BankKeeper) *pcommon.Precompile {
+func NewPrecompile(pointerKeeper PointerKeeper, bankKeeper BankKeeper) *pcommon.Precompile {
 	abi := pcommon.MustGetABI(f, "abi.json")
 
 	p := &PrecompileExecutor{
-		bankKeeper: bankKeeper,
+		pointerKeeper: pointerKeeper,
+		bankKeeper:    bankKeeper,
 	}
 
 	for name, m := range abi.Methods {
@@ -58,10 +62,10 @@ func (p *PrecompileExecutor) RequiredGas(input []byte, method *ethabi.Method) ui
 
 func (p *PrecompileExecutor) Execute(
 	ctx sdk.Context,
-	stateDB vm.StateDB,
+	evm *vm.EVM,
 	method *ethabi.Method,
 	caller common.Address,
-	callingContract vm.ContractRef,
+	callingContract vm.ContractRef, //nolint:revive
 	args []interface{},
 	value *big.Int,
 	readOnly bool,
@@ -76,7 +80,7 @@ func (p *PrecompileExecutor) Execute(
 
 	switch method.Name {
 	case AddNativePointer:
-		return p.AddNative(ctx, method, caller, args, value)
+		return p.AddNative(ctx, evm, method, caller, args, value)
 	default:
 		return nil, fmt.Errorf("unknown method %s", method.Name)
 	}
@@ -84,8 +88,9 @@ func (p *PrecompileExecutor) Execute(
 
 func (p PrecompileExecutor) AddNative(
 	ctx sdk.Context,
+	evm *vm.EVM,
 	method *ethabi.Method,
-	caller common.Address,
+	caller common.Address, //nolint:revive
 	args []interface{},
 	value *big.Int,
 ) (ret []byte, err error) {
@@ -116,10 +121,14 @@ func (p PrecompileExecutor) AddNative(
 		}
 	}
 
-	// @todo call custom keeper to create pointer contract link to the native token
-	_ = name
-	_ = symbol
+	// call pointer keeper to create pointer contract link to the native token
+	contractAddr, err := p.pointerKeeper.DeployOrUpdateErc20NativePointer(ctx, evm, token, pointertypes.ERCMetadata{
+		Name: name, Symbol: symbol, Decimals: decimals,
+	})
+	if err != nil {
+		return nil, err
+	}
 
-	// ret, err = method.Outputs.Pack(contractAddr)
+	ret, err = method.Outputs.Pack(contractAddr)
 	return ret, err
 }
