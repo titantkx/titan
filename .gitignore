@@ -8,8 +8,7 @@
 *.pyc
 
 # private files
-private[.-]*
-private
+private*
 .release-env
 
 # Build
@@ -25,7 +24,6 @@ docs/run-node/04-rosetta.md
 dist
 tools-stamp
 buf-stamp
-artifacts
 release/
 vue/node_modules
 vue/dist
@@ -37,7 +35,6 @@ go.work
 go.work.sum
 
 # Data - ideally these don't exist
-
 
 # Testing
 coverage.out
