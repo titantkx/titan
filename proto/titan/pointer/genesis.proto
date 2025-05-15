@@ -1,0 +1,12 @@
+syntax = "proto3";
+package titan.pointer;
+
+import "gogoproto/gogo.proto";
+import "titan/pointer/params.proto";
+
+option go_package = "github.com/titantkx/titan/x/pointer/types";
+
+// GenesisState defines the pointer module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+}

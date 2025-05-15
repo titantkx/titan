@@ -1,0 +1,7 @@
+syntax = "proto3";
+package titan.pointer;
+
+option go_package = "github.com/titantkx/titan/x/pointer/types";
+
+// Msg defines the Msg service.
+service Msg {}
