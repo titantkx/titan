@@ -143,6 +143,7 @@ import (
 	"github.com/titantkx/titan/app/upgrades/v3_0_0"
 	v3_0_0_rc_0 "github.com/titantkx/titan/app/upgrades/v3_0_0/rc_0"
 	"github.com/titantkx/titan/docs"
+	"github.com/titantkx/titan/precompiles"
 	"github.com/titantkx/titan/utils"
 	nftutil "github.com/titantkx/titan/utils/nft"
 	distr "github.com/titantkx/titan/x/distribution"
@@ -523,7 +524,7 @@ func New(
 		tkeys[evmtypes.TransientKey],
 		authtypes.NewModuleAddress(govtypes.ModuleName),
 		app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.FeeMarketKeeper,
-		nil, geth.NewEVM, tracer,
+		precompiles.GetCustomPrecompiles(), geth.NewEVM, tracer,
 		evmSs,
 	)
 
