@@ -19,12 +19,34 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid:    true,
 		},
 		{
-			desc:     "valid genesis state",
+			desc: "valid genesis state",
 			genState: &types.GenesisState{
 
+				Erc20NativeList: []types.Erc20Native{
+					{
+						TokenDenom: "0",
+					},
+					{
+						TokenDenom: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
+		},
+		{
+			desc: "duplicated erc20Native",
+			genState: &types.GenesisState{
+				Erc20NativeList: []types.Erc20Native{
+					{
+						TokenDenom: "0",
+					},
+					{
+						TokenDenom: "0",
+					},
+				},
+			},
+			valid: false,
 		},
 		// this line is used by starport scaffolding # types/genesis/testcase
 	}

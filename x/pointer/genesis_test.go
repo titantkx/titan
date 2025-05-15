@@ -14,6 +14,14 @@ func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
 
+		Erc20NativeList: []types.Erc20Native{
+			{
+				TokenDenom: "0",
+			},
+			{
+				TokenDenom: "1",
+			},
+		},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -25,5 +33,6 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(&genesisState)
 	nullify.Fill(got)
 
+	require.ElementsMatch(t, genesisState.Erc20NativeList, got.Erc20NativeList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

@@ -1,12 +1,17 @@
 syntax = "proto3";
+
 package titan.pointer;
 
 import "gogoproto/gogo.proto";
 import "titan/pointer/params.proto";
+import "titan/pointer/erc_20_native.proto";
 
 option go_package = "github.com/titantkx/titan/x/pointer/types";
 
 // GenesisState defines the pointer module's genesis state.
 message GenesisState {
+  // params defines all the parameters of the module.
   Params params = 1 [(gogoproto.nullable) = false];
+  // erc20_native_list defines the erc20 => native token mapping.
+  repeated Erc20Native erc20_native_list = 2 [(gogoproto.nullable) = false];
 }

@@ -1,0 +1,12 @@
+syntax = "proto3";
+package titan.pointer;
+
+option go_package = "github.com/titantkx/titan/x/pointer/types";
+
+// Erc20Native defines the erc20 => native token mapping.
+message Erc20Native {
+  // token_denom is the native token denom.
+  string token_denom = 1;
+  // erc20_addr is the erc20 contract address that point to the native token.
+  string erc20_addr = 2;
+}

@@ -1,10 +1,12 @@
 syntax = "proto3";
+
 package titan.pointer;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "titan/pointer/params.proto";
+import "titan/pointer/erc_20_native.proto";
 
 option go_package = "github.com/titantkx/titan/x/pointer/types";
 
@@ -14,8 +16,16 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/titantkx/titan/pointer/params";
   }
-}
 
+  // Queries a Erc20Native by token_denom.
+  rpc Erc20Native(QueryErc20NativeRequest) returns (QueryErc20NativeResponse) {
+    option (google.api.http).get = "/titantkx/titan/pointer/erc_20_native/{token_denom}";
+  }
+  // Queries a list of Erc20Native items.
+  rpc Erc20NativeAll(QueryErc20NativeAllRequest) returns (QueryErc20NativeAllResponse) {
+    option (google.api.http).get = "/titantkx/titan/pointer/erc_20_native";
+  }
+}
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
 
@@ -23,4 +33,25 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryErc20NativeRequest is request type for the Query/Erc20Native RPC method.
+message QueryErc20NativeRequest {
+  string token_denom = 1;
+}
+
+// QueryErc20NativeResponse is response type for the Query/Erc20Native RPC method.
+message QueryErc20NativeResponse {
+  Erc20Native erc20_native = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryErc20NativeAllRequest is request type for the Query/Erc20NativeAll RPC method.
+message QueryErc20NativeAllRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryErc20NativeAllResponse is response type for the Query/Erc20NativeAll RPC method.
+message QueryErc20NativeAllResponse {
+  repeated Erc20Native                   erc20_native = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination   = 2;
 }
