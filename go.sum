@@ -209,8 +209,6 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/ChainSafe/go-schnorrkel v1.1.0 h1:rZ6EU+CZFCjB4sHUE1jIu8VDoB/wRKZxoe1tkcO71Wk=
 github.com/ChainSafe/go-schnorrkel v1.1.0/go.mod h1:ABkENxiP+cvjFiByMIZ9LYbRoNNLeBLiakC1XeTFxfE=
-github.com/CosmWasm/wasmd v0.46.0 h1:78kmiobbVE8JWBcM+ssxiFV2cS+4l9lmZQqPAQ0mA04=
-github.com/CosmWasm/wasmd v0.46.0/go.mod h1:BZFz+CFGdLNGomshb3IeccFyD4R+XbnS/mXpytOUyTA=
 github.com/CosmWasm/wasmvm v1.5.9 h1:EMSIsG4eAhgIZ6SQQs+ZWFT0ONnUjbH9FSdeBUnItoQ=
 github.com/CosmWasm/wasmvm v1.5.9/go.mod h1:2qaMB5ISmYXtpkJR2jy8xxx5Ti8sntOEf1cUgolb4QI=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
@@ -1097,6 +1095,8 @@ github.com/tidwall/sjson v1.2.5 h1:kLy8mja+1c9jlljvWTlSazM7cKDRfJuR/bOJhcY5NcY=
 github.com/tidwall/sjson v1.2.5/go.mod h1:Fvgq9kS/6ociJEDnK0Fk1cpYF4FIW6ZF7LAe+6jwd28=
 github.com/titantkx/cosmos-sdk v0.47.17-titan.2 h1:RvO594DH1IZH3ffPFvzyPwDoZffltLEOpqLVHWO06nA=
 github.com/titantkx/cosmos-sdk v0.47.17-titan.2/go.mod h1:6L16fRG0ZinyyYMclrVAGqTUyb5UGu/hlx5oZEI6NAY=
+github.com/titantkx/wasmd v0.46.0-titan.0 h1:oSxDnYuIIHhCAd0vnJMOjIKtBtS687wQ/IcLz2ILqGQ=
+github.com/titantkx/wasmd v0.46.0-titan.0/go.mod h1:BZFz+CFGdLNGomshb3IeccFyD4R+XbnS/mXpytOUyTA=
 github.com/tklauser/go-sysconf v0.3.12 h1:0QaGUFOdQaIVdPgfITYzaTegZvdCjmYO52cSFAEVmqU=
 github.com/tklauser/go-sysconf v0.3.12/go.mod h1:Ho14jnntGE1fpdOqQEEaiKRpvIavV0hSfmBq8nJbHYI=
 github.com/tklauser/numcpus v0.6.1 h1:ng9scYS7az0Bk4OZLvrNXNSAO2Pxr1XXRAPyjhIx+Fk=
