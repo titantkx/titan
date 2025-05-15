@@ -1,0 +1,5 @@
+{
+  "filter_paths": "contracts/mocks",
+  "detectors_to_exclude": "naming-convention,assembly,external-function,variable-scope",
+  "exclude_dependencies": true
+}
