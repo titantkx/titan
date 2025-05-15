@@ -53,6 +53,7 @@ Ref: https://keepachangelog.com/en/1.1.0/
 ### Bug Fixes
 
 - (app) Correct init AccountKeeper with address prefix "titan" instead of "cosmos".
+- (tokenfactory) Implement LegacyMsg
 
 ## [v3.0.0](https://github.com/titantkx/titan/releases/tag/v3.0.0)
 
