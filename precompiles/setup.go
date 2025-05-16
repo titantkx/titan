@@ -4,6 +4,7 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
 	"github.com/titantkx/ethermint/x/evm/vm"
+	"github.com/titantkx/titan/precompiles/bank"
 	"github.com/titantkx/titan/precompiles/pointer"
 	pointerkeeper "github.com/titantkx/titan/x/pointer/keeper"
 )
@@ -13,8 +14,10 @@ func GetCustomPrecompiles(
 	bankKeeper bankkeeper.Keeper,
 ) vm.PrecompiledContracts {
 	pointerP := pointer.NewPrecompile(pointerKeeper, bankKeeper)
+	bankP := bank.NewPrecompile(pointerKeeper, bankKeeper)
 
 	return vm.PrecompiledContracts{
 		pointerP.Address(): pointerP,
+		bankP.Address():    bankP,
 	}
 }
