@@ -74,12 +74,9 @@ func (p *PrecompileExecutor) Execute(
 	readOnly bool,
 	isFromDelegateCall bool,
 ) (ret []byte, err error) {
-	if readOnly {
-		return nil, errors.New("cannot call bank precompile from staticcall")
-	}
 	switch method.Name {
 	case SendMethod:
-		return p.send(ctx, evm, method, caller, args, value)
+		return p.send(ctx, evm, method, caller, args, value, readOnly)
 	case BalanceMethod:
 		return p.balance(ctx, evm, method, caller, args, value)
 	case AllBalancesMethod:
@@ -104,7 +101,12 @@ func (p PrecompileExecutor) send(
 	caller ethcommon.Address, //nolint:revive
 	args []interface{},
 	value *big.Int,
+	readOnly bool,
 ) ([]byte, error) {
+	if readOnly {
+		return nil, errors.New("cannot call send from staticcall")
+	}
+
 	if err := pcommon.ValidateNonPayable(value); err != nil {
 		return nil, err
 	}
