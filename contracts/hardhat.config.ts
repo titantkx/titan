@@ -13,17 +13,7 @@ import 'solidity-coverage';
 
 const MILLISECOND_PER_SECOND = 1000;
 
-const smartContractConfig = {
-  SMART_CONTRACT_NAME: 'NativeTokensERC20',
-  DENOM: 'ibc/abcdef',
-  NAME: 'a',
-  SYMBOL: 'A',
-  DECIMALS: 6,
-  CONSTRUCTOR_ARGUMENTS: ['DENOM', 'NAME', 'SYMBOL', 'DECIMALS'] as any[],
-};
-
 if (process.env.NODE_ENV === 'test') {
-  Object.assign(smartContractConfig, {});
 }
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -36,16 +26,9 @@ task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
   }
 });
 
-declare module 'hardhat/types/config' {
-  interface HardhatUserConfig {
-    smartContractConfig: typeof smartContractConfig;
-  }
-}
-
 const CONTRACT_LIST = ['NativeTokensERC20'];
 
 const config: HardhatUserConfig = {
-  smartContractConfig,
   solidity: {
     version: '0.8.16',
     settings: {

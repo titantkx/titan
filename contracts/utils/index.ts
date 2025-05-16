@@ -1,5 +1,4 @@
 import fs from 'fs';
-import { HardhatRuntimeEnvironment, HardhatUserConfig } from 'hardhat/types';
 import prompts from 'prompts';
 
 function writeDeployInfo(infos = {}) {
@@ -69,48 +68,10 @@ async function confirm(question: string) {
   }
 }
 
-function processSmartContractConfig(
-  smartContractConfig: HardhatUserConfig['smartContractConfig'],
-  hre: HardhatRuntimeEnvironment,
-  smartContractConfigOverwrite?: {
-    [P in keyof HardhatUserConfig['smartContractConfig']]?: HardhatUserConfig['smartContractConfig'][P];
-  }
-): HardhatUserConfig['smartContractConfig'] {
-  console.log('processSmartContractConfig :', hre.network.name);
-  const networkName = hre.network.name as keyof HardhatUserConfig['smartContractConfig'];
-  let config = { ...smartContractConfig };
-  if (hre.network.name && smartContractConfig[networkName]) {
-    config = {
-      ...smartContractConfig,
-      ...(smartContractConfig[networkName] as object),
-    };
-  }
-
-  config = {
-    ...config,
-    ...smartContractConfigOverwrite,
-  };
-
-  config.CONSTRUCTOR_ARGUMENTS = config.CONSTRUCTOR_ARGUMENTS.map(
-    (key: keyof HardhatUserConfig['smartContractConfig']) => config[key]
-  );
-
-  console.log('-----------------');
-  smartContractConfig.CONSTRUCTOR_ARGUMENTS.forEach((key: keyof HardhatUserConfig['smartContractConfig']) => {
-    console.log(key, config[key]);
-  });
-  console.log('-----------------');
-
-  console.log('CONSTRUCTOR_ARGUMENTS', config.CONSTRUCTOR_ARGUMENTS);
-
-  return config;
-}
-
 export default {
   writeDeployInfo,
   writeCSVData,
   writeGasStatisticInfos,
   writeGasStatisticCSVInfos,
   confirm,
-  processSmartContractConfig,
 };
