@@ -3,8 +3,6 @@ import { ethers } from 'hardhat';
 
 import pointerAbi from 'precompiles/pointer/abi.json';
 
-console.log('pointerAbi', pointerAbi);
-
 describe('Sample test', function () {
   var owner: SignerWithAddress, wallets: SignerWithAddress[];
 
