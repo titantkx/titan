@@ -18,11 +18,12 @@ import (
 )
 
 const (
-	PrecompileName   = "pointer"
-	AddNativePointer = "addNativePointer"
+	PrecompileName = "pointer"
+
+	AddNativePointerMethod = "addNativePointer"
 )
 
-const PointerAddress = "0x000000000000000000000000000000000000100b"
+const precompileContractAddress = "0x000000000000000000000000000000000000100b"
 
 // Embed abi json file to the executable binary. Needed when importing as dependency.
 //
@@ -34,8 +35,6 @@ var _ pcommon.PrecompileExecutor = &PrecompileExecutor{}
 type PrecompileExecutor struct {
 	pointerKeeper PointerKeeper
 	bankKeeper    BankKeeper
-
-	AddNativePointerID []byte
 }
 
 func NewPrecompile(pointerKeeper PointerKeeper, bankKeeper BankKeeper) *pcommon.Precompile {
@@ -46,14 +45,7 @@ func NewPrecompile(pointerKeeper PointerKeeper, bankKeeper BankKeeper) *pcommon.
 		bankKeeper:    bankKeeper,
 	}
 
-	for name, m := range abi.Methods {
-		switch name {
-		case AddNativePointer:
-			p.AddNativePointerID = m.ID
-		}
-	}
-
-	return pcommon.NewPrecompile(abi, ethcommon.HexToAddress(PointerAddress), p)
+	return pcommon.NewPrecompile(abi, ethcommon.HexToAddress(precompileContractAddress), p)
 }
 
 func (p *PrecompileExecutor) RequiredGas(input []byte, method *ethabi.Method) uint64 {
@@ -79,7 +71,7 @@ func (p *PrecompileExecutor) Execute(
 	}
 
 	switch method.Name {
-	case AddNativePointer:
+	case AddNativePointerMethod:
 		return p.AddNative(ctx, evm, method, caller, args, value)
 	default:
 		return nil, fmt.Errorf("unknown method %s", method.Name)
