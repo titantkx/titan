@@ -13,6 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	pcommon "github.com/titantkx/ethermint/precompiles/common"
 
+	utils "github.com/titantkx/titan/utils"
 	pointertypes "github.com/titantkx/titan/x/pointer/types"
 )
 
@@ -94,7 +95,10 @@ func (p PrecompileExecutor) AddNative(
 
 	token := args[0].(string)
 
-	// @todo should not allow to create pointer for base token (atkx)
+	// not allow to create pointer for base token (atkx)
+	if token == utils.BaseDenom {
+		return nil, fmt.Errorf("cannot create pointer for base token %s", utils.BaseDenom)
+	}
 
 	metadata, metadataExists := p.bankKeeper.GetDenomMetaData(ctx, token)
 	if !metadataExists {
