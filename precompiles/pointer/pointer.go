@@ -9,7 +9,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ethabi "github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/common"
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
 	pcommon "github.com/titantkx/ethermint/precompiles/common"
@@ -56,7 +55,7 @@ func (p *PrecompileExecutor) Execute(
 	ctx sdk.Context,
 	evm *vm.EVM,
 	method *ethabi.Method,
-	caller common.Address,
+	caller ethcommon.Address,
 	callingContract vm.ContractRef, //nolint:revive
 	args []interface{},
 	value *big.Int,
@@ -82,7 +81,7 @@ func (p PrecompileExecutor) AddNative(
 	ctx sdk.Context,
 	evm *vm.EVM,
 	method *ethabi.Method,
-	caller common.Address, //nolint:revive
+	caller ethcommon.Address, //nolint:revive
 	args []interface{},
 	value *big.Int,
 ) (ret []byte, err error) {
