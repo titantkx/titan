@@ -532,10 +532,7 @@ func New(
 		tkeys[evmtypes.TransientKey],
 		authtypes.NewModuleAddress(govtypes.ModuleName),
 		app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.FeeMarketKeeper,
-		precompiles.GetCustomPrecompiles(
-			app.PointerKeeper,
-			app.BankKeeper,
-		),
+		nil,
 		geth.NewEVM, tracer,
 		evmSs,
 	)
@@ -763,9 +760,14 @@ func New(
 		app.AccountKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	pointerModule := pointermodule.NewAppModule(appCodec, app.PointerKeeper, app.AccountKeeper, app.BankKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
+
+	// Config custom precompiles contracts
+	app.EvmKeeper.SetCustomPrecompiles(precompiles.GetCustomPrecompiles(
+		app.PointerKeeper,
+		app.BankKeeper,
+	))
 
 	/**** IBC Routing ****/
 
@@ -881,7 +883,7 @@ func New(
 		nftmint.NewAppModule(appCodec, app.NftmintKeeper, app.AccountKeeper, app.BankKeeper),
 		nfttransfer.NewAppModule(app.NFTTransferKeeper),
 		tokenfactory.NewAppModule(app.TokenfactoryKeeper, app.AccountKeeper, app.BankKeeper),
-		pointerModule,
+		pointermodule.NewAppModule(appCodec, app.PointerKeeper, app.AccountKeeper, app.BankKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them

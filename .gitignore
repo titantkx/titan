@@ -53,7 +53,9 @@ vagrant
 .idea
 *.iml
 .dir-locals.el
-.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
 
 # Graphviz
 dependency-graph.png

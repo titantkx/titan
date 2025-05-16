@@ -93,9 +93,10 @@ func (k Keeper) DeployOrUpdateErc20NativePointer(
 	pointerType := "erc20native"
 
 	var bin []byte
-	bin, err = artifacts.GetParsedABI(pointerType).Pack("", []interface{}{
+	args := []interface{}{
 		token, metadata.Name, metadata.Symbol, metadata.Decimals,
-	})
+	}
+	bin, err = artifacts.GetParsedABI(pointerType).Pack("", args...)
 	if err != nil {
 		panic(err)
 	}
