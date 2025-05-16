@@ -45,7 +45,7 @@ func PointerKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
+	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger()).WithGasMeter(sdk.NewGasMeter(1000000))
 
 	// Initialize params
 	k.SetParams(ctx, types.DefaultParams())
