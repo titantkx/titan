@@ -7,10 +7,13 @@
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "baseUrl": "../../../../../",
+    "baseUrl": ".",
     "paths": {
-      "@pre-contracts/*": [
-        "contracts/typechain-types"
+      "@contracts/*": [
+        "../../../../../contracts/typechain-types"
+      ],
+      "@precompiles/*": [
+        "../../../../../precompiles/*"
       ],
     }
   }

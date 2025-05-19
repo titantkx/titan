@@ -1,0 +1,95 @@
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { expect } from 'chai';
+import { ethers } from 'hardhat';
+
+import { NativeTokensERC20__factory } from '@contracts/factories/contracts/NativeTokensERC20__factory.ts';
+import pointerAbi from '@precompiles/pointer/abi.json';
+import utils from 'utils';
+
+describe('Register test', function () {
+  var owner: SignerWithAddress, wallets: SignerWithAddress[];
+
+  async function setup() {
+    [owner, ...wallets] = await ethers.getSigners();
+  }
+
+  before(async function () {
+    await setup();
+  });
+
+  it('Can register pointer contract', async function () {
+    // create factory token
+    const tokenDenom = 'test';
+    const tokenDecimals = 3;
+
+    const createTokenCmd = `titand tx tokenfactory create-denom ${tokenDenom}`;
+    try {
+      await utils.runTitandTx(ethers, createTokenCmd);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes('already exists')) {
+        console.log('Token already exists, skipping creation.');
+      } else {
+        throw e;
+      }
+    }
+
+    const tokenMetadata = {
+      description: '',
+      denom_units: [
+        {
+          denom: `factory/titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr/${tokenDenom}`,
+          exponent: 0,
+          aliases: [],
+        },
+        {
+          denom: tokenDenom,
+          exponent: tokenDecimals,
+          aliases: [],
+        },
+      ],
+      base: `factory/titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr/${tokenDenom}`,
+      display: tokenDenom,
+      name: tokenDenom,
+      symbol: tokenDenom.toUpperCase(),
+      uri: '',
+      uri_hash: '',
+    };
+    const setTokenDenomCmd = `titand tx tokenfactory set-denom-metadata ${JSON.stringify(
+      JSON.stringify(tokenMetadata)
+    )} `;
+
+    await utils.runTitandTx(ethers, setTokenDenomCmd);
+
+    /// deploy pointer contract
+    ///
+    ///
+    const pointerAddr = '0x000000000000000000000000000000000000100b';
+    const pointer = new ethers.Contract(pointerAddr, pointerAbi, owner);
+    const tx = await pointer.addNativePointer(`factory/titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr/${tokenDenom}`);
+    const receipt = await tx.wait();
+    console.log('Transaction hash:', tx.hash);
+    // check event
+    const event = receipt.events?.find((event: any) => event.event === 'PointerRegistered');
+    expect(event.args.pointerType).to.equal(0);
+    expect(event.args.token).to.equal(`factory/titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr/${tokenDenom}`);
+    const pointerContract = event.args.pointer;
+    expect(pointerContract).to.equal('0x88C14eC9481F259009c9e5a7bb7f621F4c590e21');
+
+    ///  Check pointer contract
+    ///
+    ///
+
+    // 0x88c14ec9481f259009c9e5a7bb7f621f4c590e21;
+    // 0x1C3a428274c8f06DfecE6dc03437214A78285898
+    const testERC20Addr = '0x88C14eC9481F259009c9e5a7bb7f621F4c590e21';
+    // const test2ERC20Addr = '0x1C3a428274c8f06DfecE6dc03437214A78285898';
+    const testERC20 = NativeTokensERC20__factory.connect(testERC20Addr, owner);
+    // const test2ERC20 = NativeTokensERC20__factory.connect(test2ERC20Addr, owner);
+    expect(await testERC20.name()).to.equal(tokenDenom);
+    expect(await testERC20.symbol()).to.equal(tokenDenom.toUpperCase());
+    expect(await testERC20.decimals()).to.equal(tokenDecimals);
+    expect(await testERC20.denom()).to.equal(`factory/titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr/${tokenDenom}`);
+    expect(await testERC20.totalSupply()).to.equal(0);
+    expect(await testERC20.balanceOf(owner.address)).to.equal(0);
+  });
+});
