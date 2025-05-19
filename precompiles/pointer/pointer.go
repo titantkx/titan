@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ethabi "github.com/ethereum/go-ethereum/accounts/abi"
@@ -114,7 +115,7 @@ func (p PrecompileExecutor) AddNative(
 		if denomUnit.Exponent > uint32(decimals) && denomUnit.Exponent <= math.MaxUint8 {
 			decimals = uint8(denomUnit.Exponent)
 			name = denomUnit.Denom
-			symbol = denomUnit.Denom
+			symbol = strings.ToUpper(denomUnit.Denom)
 			if len(denomUnit.Aliases) > 0 {
 				name = denomUnit.Aliases[0]
 			}
