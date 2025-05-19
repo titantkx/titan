@@ -18,5 +18,7 @@
 4. Generate the abi file
 
     ```shell
+    rm abi.json
     solc --abi [xxx].sol -o .
+    mv [xxx].abi abi.json
     ```

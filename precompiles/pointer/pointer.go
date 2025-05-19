@@ -33,6 +33,8 @@ var f embed.FS
 var _ pcommon.PrecompileExecutor = &PrecompileExecutor{}
 
 type PrecompileExecutor struct {
+	ethabi.ABI
+
 	pointerKeeper PointerKeeper
 	bankKeeper    BankKeeper
 }
@@ -41,6 +43,7 @@ func NewPrecompile(pointerKeeper PointerKeeper, bankKeeper BankKeeper) *pcommon.
 	abi := pcommon.MustGetABI(f, "abi.json")
 
 	p := &PrecompileExecutor{
+		ABI:           abi,
 		pointerKeeper: pointerKeeper,
 		bankKeeper:    bankKeeper,
 	}
@@ -122,6 +125,12 @@ func (p PrecompileExecutor) AddNative(
 	contractAddr, err := p.pointerKeeper.DeployOrUpdateErc20NativePointer(ctx, evm, token, pointertypes.ERCMetadata{
 		Name: name, Symbol: symbol, Decimals: decimals,
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	// emit event
+	err = p.emitPointerRegisteredEvent(ctx, evm, token, contractAddr)
 	if err != nil {
 		return nil, err
 	}
