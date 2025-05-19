@@ -81,7 +81,7 @@ func TestShowErc20Native(t *testing.T) {
 				require.ErrorIs(t, stat.Err(), tc.err)
 			} else {
 				require.NoError(t, err)
-				var resp types.QueryGetErc20NativeResponse
+				var resp types.QueryErc20NativeResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 				require.NotNil(t, resp.Erc20Native)
 				require.Equal(t,
@@ -118,7 +118,7 @@ func TestListErc20Native(t *testing.T) {
 			args := request(nil, uint64(i), uint64(step), false)
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListErc20Native(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllErc20NativeResponse
+			var resp types.QueryErc20NativeAllResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 			require.LessOrEqual(t, len(resp.Erc20Native), step)
 			require.Subset(t,
@@ -134,7 +134,7 @@ func TestListErc20Native(t *testing.T) {
 			args := request(next, 0, uint64(step), false)
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListErc20Native(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllErc20NativeResponse
+			var resp types.QueryErc20NativeAllResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 			require.LessOrEqual(t, len(resp.Erc20Native), step)
 			require.Subset(t,
@@ -148,7 +148,7 @@ func TestListErc20Native(t *testing.T) {
 		args := request(nil, 0, uint64(len(objs)), true)
 		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListErc20Native(), args)
 		require.NoError(t, err)
-		var resp types.QueryAllErc20NativeResponse
+		var resp types.QueryErc20NativeAllResponse
 		require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 		require.NoError(t, err)
 		require.Equal(t, len(objs), int(resp.Pagination.Total))

@@ -24,27 +24,27 @@ func TestErc20NativeQuerySingle(t *testing.T) {
 	msgs := createNErc20Native(t, keeper, ctx, 2)
 	tests := []struct {
 		desc     string
-		request  *types.QueryGetErc20NativeRequest
-		response *types.QueryGetErc20NativeResponse
+		request  *types.QueryErc20NativeRequest
+		response *types.QueryErc20NativeResponse
 		err      error
 	}{
 		{
 			desc: "First",
-			request: &types.QueryGetErc20NativeRequest{
+			request: &types.QueryErc20NativeRequest{
 				TokenDenom: msgs[0].TokenDenom,
 			},
-			response: &types.QueryGetErc20NativeResponse{Erc20Native: msgs[0]},
+			response: &types.QueryErc20NativeResponse{Erc20Native: msgs[0]},
 		},
 		{
 			desc: "Second",
-			request: &types.QueryGetErc20NativeRequest{
+			request: &types.QueryErc20NativeRequest{
 				TokenDenom: msgs[1].TokenDenom,
 			},
-			response: &types.QueryGetErc20NativeResponse{Erc20Native: msgs[1]},
+			response: &types.QueryErc20NativeResponse{Erc20Native: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
-			request: &types.QueryGetErc20NativeRequest{
+			request: &types.QueryErc20NativeRequest{
 				TokenDenom: strconv.Itoa(100000),
 			},
 			err: status.Error(codes.NotFound, "not found"),
@@ -75,8 +75,8 @@ func TestErc20NativeQueryPaginated(t *testing.T) {
 	wctx := sdk.WrapSDKContext(ctx)
 	msgs := createNErc20Native(t, keeper, ctx, 5)
 
-	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllErc20NativeRequest {
-		return &types.QueryAllErc20NativeRequest{
+	request := func(next []byte, offset, limit uint64, total bool) *types.QueryErc20NativeAllRequest {
+		return &types.QueryErc20NativeAllRequest{
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,

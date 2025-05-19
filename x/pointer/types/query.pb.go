@@ -113,22 +113,23 @@ func (m *QueryParamsResponse) GetParams() Params {
 	return Params{}
 }
 
-type QueryGetErc20NativeRequest struct {
+// QueryErc20NativeRequest is request type for the Query/Erc20Native RPC method.
+type QueryErc20NativeRequest struct {
 	TokenDenom string `protobuf:"bytes,1,opt,name=token_denom,json=tokenDenom,proto3" json:"token_denom,omitempty"`
 }
 
-func (m *QueryGetErc20NativeRequest) Reset()         { *m = QueryGetErc20NativeRequest{} }
-func (m *QueryGetErc20NativeRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetErc20NativeRequest) ProtoMessage()    {}
-func (*QueryGetErc20NativeRequest) Descriptor() ([]byte, []int) {
+func (m *QueryErc20NativeRequest) Reset()         { *m = QueryErc20NativeRequest{} }
+func (m *QueryErc20NativeRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryErc20NativeRequest) ProtoMessage()    {}
+func (*QueryErc20NativeRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6dcf0c34f5744e28, []int{2}
 }
-func (m *QueryGetErc20NativeRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryErc20NativeRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetErc20NativeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryErc20NativeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetErc20NativeRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryErc20NativeRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -138,41 +139,42 @@ func (m *QueryGetErc20NativeRequest) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *QueryGetErc20NativeRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetErc20NativeRequest.Merge(m, src)
+func (m *QueryErc20NativeRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryErc20NativeRequest.Merge(m, src)
 }
-func (m *QueryGetErc20NativeRequest) XXX_Size() int {
+func (m *QueryErc20NativeRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetErc20NativeRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetErc20NativeRequest.DiscardUnknown(m)
+func (m *QueryErc20NativeRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryErc20NativeRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetErc20NativeRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryErc20NativeRequest proto.InternalMessageInfo
 
-func (m *QueryGetErc20NativeRequest) GetTokenDenom() string {
+func (m *QueryErc20NativeRequest) GetTokenDenom() string {
 	if m != nil {
 		return m.TokenDenom
 	}
 	return ""
 }
 
-type QueryGetErc20NativeResponse struct {
+// QueryErc20NativeResponse is response type for the Query/Erc20Native RPC method.
+type QueryErc20NativeResponse struct {
 	Erc20Native Erc20Native `protobuf:"bytes,1,opt,name=erc20_native,json=erc20Native,proto3" json:"erc20_native"`
 }
 
-func (m *QueryGetErc20NativeResponse) Reset()         { *m = QueryGetErc20NativeResponse{} }
-func (m *QueryGetErc20NativeResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetErc20NativeResponse) ProtoMessage()    {}
-func (*QueryGetErc20NativeResponse) Descriptor() ([]byte, []int) {
+func (m *QueryErc20NativeResponse) Reset()         { *m = QueryErc20NativeResponse{} }
+func (m *QueryErc20NativeResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryErc20NativeResponse) ProtoMessage()    {}
+func (*QueryErc20NativeResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6dcf0c34f5744e28, []int{3}
 }
-func (m *QueryGetErc20NativeResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryErc20NativeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetErc20NativeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryErc20NativeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetErc20NativeResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryErc20NativeResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -182,41 +184,42 @@ func (m *QueryGetErc20NativeResponse) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *QueryGetErc20NativeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetErc20NativeResponse.Merge(m, src)
+func (m *QueryErc20NativeResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryErc20NativeResponse.Merge(m, src)
 }
-func (m *QueryGetErc20NativeResponse) XXX_Size() int {
+func (m *QueryErc20NativeResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetErc20NativeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetErc20NativeResponse.DiscardUnknown(m)
+func (m *QueryErc20NativeResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryErc20NativeResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetErc20NativeResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryErc20NativeResponse proto.InternalMessageInfo
 
-func (m *QueryGetErc20NativeResponse) GetErc20Native() Erc20Native {
+func (m *QueryErc20NativeResponse) GetErc20Native() Erc20Native {
 	if m != nil {
 		return m.Erc20Native
 	}
 	return Erc20Native{}
 }
 
-type QueryAllErc20NativeRequest struct {
+// QueryErc20NativeAllRequest is request type for the Query/Erc20NativeAll RPC method.
+type QueryErc20NativeAllRequest struct {
 	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryAllErc20NativeRequest) Reset()         { *m = QueryAllErc20NativeRequest{} }
-func (m *QueryAllErc20NativeRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryAllErc20NativeRequest) ProtoMessage()    {}
-func (*QueryAllErc20NativeRequest) Descriptor() ([]byte, []int) {
+func (m *QueryErc20NativeAllRequest) Reset()         { *m = QueryErc20NativeAllRequest{} }
+func (m *QueryErc20NativeAllRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryErc20NativeAllRequest) ProtoMessage()    {}
+func (*QueryErc20NativeAllRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6dcf0c34f5744e28, []int{4}
 }
-func (m *QueryAllErc20NativeRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryErc20NativeAllRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryAllErc20NativeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryErc20NativeAllRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryAllErc20NativeRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryErc20NativeAllRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -226,42 +229,43 @@ func (m *QueryAllErc20NativeRequest) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *QueryAllErc20NativeRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllErc20NativeRequest.Merge(m, src)
+func (m *QueryErc20NativeAllRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryErc20NativeAllRequest.Merge(m, src)
 }
-func (m *QueryAllErc20NativeRequest) XXX_Size() int {
+func (m *QueryErc20NativeAllRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryAllErc20NativeRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllErc20NativeRequest.DiscardUnknown(m)
+func (m *QueryErc20NativeAllRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryErc20NativeAllRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryAllErc20NativeRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryErc20NativeAllRequest proto.InternalMessageInfo
 
-func (m *QueryAllErc20NativeRequest) GetPagination() *query.PageRequest {
+func (m *QueryErc20NativeAllRequest) GetPagination() *query.PageRequest {
 	if m != nil {
 		return m.Pagination
 	}
 	return nil
 }
 
-type QueryAllErc20NativeResponse struct {
+// QueryErc20NativeAllResponse is response type for the Query/Erc20NativeAll RPC method.
+type QueryErc20NativeAllResponse struct {
 	Erc20Native []Erc20Native       `protobuf:"bytes,1,rep,name=erc20_native,json=erc20Native,proto3" json:"erc20_native"`
 	Pagination  *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryAllErc20NativeResponse) Reset()         { *m = QueryAllErc20NativeResponse{} }
-func (m *QueryAllErc20NativeResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryAllErc20NativeResponse) ProtoMessage()    {}
-func (*QueryAllErc20NativeResponse) Descriptor() ([]byte, []int) {
+func (m *QueryErc20NativeAllResponse) Reset()         { *m = QueryErc20NativeAllResponse{} }
+func (m *QueryErc20NativeAllResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryErc20NativeAllResponse) ProtoMessage()    {}
+func (*QueryErc20NativeAllResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6dcf0c34f5744e28, []int{5}
 }
-func (m *QueryAllErc20NativeResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryErc20NativeAllResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryAllErc20NativeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryErc20NativeAllResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryAllErc20NativeResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryErc20NativeAllResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -271,26 +275,26 @@ func (m *QueryAllErc20NativeResponse) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *QueryAllErc20NativeResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllErc20NativeResponse.Merge(m, src)
+func (m *QueryErc20NativeAllResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryErc20NativeAllResponse.Merge(m, src)
 }
-func (m *QueryAllErc20NativeResponse) XXX_Size() int {
+func (m *QueryErc20NativeAllResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryAllErc20NativeResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllErc20NativeResponse.DiscardUnknown(m)
+func (m *QueryErc20NativeAllResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryErc20NativeAllResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryAllErc20NativeResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryErc20NativeAllResponse proto.InternalMessageInfo
 
-func (m *QueryAllErc20NativeResponse) GetErc20Native() []Erc20Native {
+func (m *QueryErc20NativeAllResponse) GetErc20Native() []Erc20Native {
 	if m != nil {
 		return m.Erc20Native
 	}
 	return nil
 }
 
-func (m *QueryAllErc20NativeResponse) GetPagination() *query.PageResponse {
+func (m *QueryErc20NativeAllResponse) GetPagination() *query.PageResponse {
 	if m != nil {
 		return m.Pagination
 	}
@@ -300,49 +304,49 @@ func (m *QueryAllErc20NativeResponse) GetPagination() *query.PageResponse {
 func init() {
 	proto.RegisterType((*QueryParamsRequest)(nil), "titan.pointer.QueryParamsRequest")
 	proto.RegisterType((*QueryParamsResponse)(nil), "titan.pointer.QueryParamsResponse")
-	proto.RegisterType((*QueryGetErc20NativeRequest)(nil), "titan.pointer.QueryGetErc20NativeRequest")
-	proto.RegisterType((*QueryGetErc20NativeResponse)(nil), "titan.pointer.QueryGetErc20NativeResponse")
-	proto.RegisterType((*QueryAllErc20NativeRequest)(nil), "titan.pointer.QueryAllErc20NativeRequest")
-	proto.RegisterType((*QueryAllErc20NativeResponse)(nil), "titan.pointer.QueryAllErc20NativeResponse")
+	proto.RegisterType((*QueryErc20NativeRequest)(nil), "titan.pointer.QueryErc20NativeRequest")
+	proto.RegisterType((*QueryErc20NativeResponse)(nil), "titan.pointer.QueryErc20NativeResponse")
+	proto.RegisterType((*QueryErc20NativeAllRequest)(nil), "titan.pointer.QueryErc20NativeAllRequest")
+	proto.RegisterType((*QueryErc20NativeAllResponse)(nil), "titan.pointer.QueryErc20NativeAllResponse")
 }
 
 func init() { proto.RegisterFile("titan/pointer/query.proto", fileDescriptor_6dcf0c34f5744e28) }
 
 var fileDescriptor_6dcf0c34f5744e28 = []byte{
-	// 515 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x94, 0xc1, 0x6e, 0xd4, 0x30,
-	0x10, 0x86, 0x37, 0x2d, 0xac, 0x84, 0x17, 0x38, 0x98, 0x22, 0x41, 0x40, 0x69, 0x6b, 0xa1, 0x85,
-	0x56, 0xc8, 0x6e, 0x53, 0x4e, 0x48, 0x1c, 0xda, 0x02, 0x95, 0x38, 0xa0, 0xb2, 0x47, 0x2e, 0x2b,
-	0x67, 0x3b, 0x0a, 0x51, 0xb3, 0x76, 0x1a, 0x7b, 0x4b, 0x2b, 0xc4, 0x85, 0x27, 0x40, 0x42, 0xdc,
-	0xb9, 0xf3, 0x08, 0xbc, 0x40, 0x8f, 0x95, 0xb8, 0x70, 0x42, 0x68, 0x97, 0x07, 0x41, 0xb1, 0x5d,
-	0x9a, 0x2c, 0x2e, 0x94, 0x5b, 0x34, 0xf3, 0xcf, 0x3f, 0xdf, 0x64, 0x46, 0x46, 0x37, 0x75, 0xa6,
-	0xb9, 0x60, 0x85, 0xcc, 0x84, 0x86, 0x92, 0xed, 0x8d, 0xa0, 0x3c, 0xa4, 0x45, 0x29, 0xb5, 0xc4,
-	0x57, 0x4c, 0x8a, 0xba, 0x54, 0x38, 0x97, 0xca, 0x54, 0x9a, 0x0c, 0xab, 0xbe, 0xac, 0x28, 0xbc,
-	0x9d, 0x4a, 0x99, 0xe6, 0xc0, 0x78, 0x91, 0x31, 0x2e, 0x84, 0xd4, 0x5c, 0x67, 0x52, 0x28, 0x97,
-	0x5d, 0x1e, 0x48, 0x35, 0x94, 0x8a, 0x25, 0x5c, 0x81, 0xf5, 0x66, 0xfb, 0xab, 0x09, 0x68, 0xbe,
-	0xca, 0x0a, 0x9e, 0x66, 0xc2, 0x88, 0x9d, 0x36, 0x6c, 0x92, 0x14, 0xbc, 0xe4, 0xc3, 0x13, 0x9f,
-	0xc5, 0x66, 0x0e, 0xca, 0x41, 0x3f, 0x5e, 0xe9, 0x57, 0xe5, 0xfb, 0x60, 0x25, 0x64, 0x0e, 0xe1,
-	0x17, 0x55, 0x83, 0x6d, 0x53, 0xd7, 0x83, 0xbd, 0x11, 0x28, 0x4d, 0x9e, 0xa1, 0x6b, 0x8d, 0xa8,
-	0x2a, 0xa4, 0x50, 0x80, 0xd7, 0x50, 0xdb, 0xfa, 0xdf, 0x08, 0x16, 0x82, 0x7b, 0x9d, 0xf8, 0x3a,
-	0x6d, 0xcc, 0x4a, 0xad, 0x7c, 0xe3, 0xc2, 0xd1, 0xf7, 0xf9, 0x56, 0xcf, 0x49, 0xc9, 0x23, 0x14,
-	0x1a, 0xaf, 0x2d, 0xd0, 0x4f, 0xca, 0x41, 0xbc, 0xf2, 0xdc, 0xb4, 0x77, 0x9d, 0xf0, 0x3c, 0xea,
-	0x68, 0xb9, 0x0b, 0xa2, 0xbf, 0x03, 0x42, 0x0e, 0x8d, 0xef, 0xa5, 0x1e, 0x32, 0xa1, 0xc7, 0x55,
-	0x84, 0x24, 0xe8, 0x96, 0xb7, 0xdc, 0x21, 0x6d, 0xa2, 0xcb, 0x50, 0x85, 0xdd, 0x54, 0x0e, 0x2c,
-	0x9c, 0x02, 0xab, 0x55, 0x3a, 0xba, 0x0e, 0x9c, 0x86, 0xc8, 0x8e, 0x43, 0x5c, 0xcf, 0x73, 0x0f,
-	0xe2, 0x53, 0x84, 0x4e, 0xff, 0xba, 0x6b, 0xd0, 0xa5, 0x76, 0x45, 0xb4, 0x5a, 0x11, 0xb5, 0xeb,
-	0x77, 0x2b, 0xa2, 0xdb, 0x3c, 0x3d, 0xa9, 0xed, 0xd5, 0x2a, 0xc9, 0xe7, 0xc0, 0x8d, 0x32, 0xdd,
-	0xe6, 0xcc, 0x51, 0x66, 0xff, 0x7b, 0x14, 0xbc, 0xd5, 0x80, 0x9d, 0x31, 0xb0, 0x77, 0xff, 0x09,
-	0x6b, 0x09, 0xea, 0xb4, 0xf1, 0x97, 0x59, 0x74, 0xd1, 0xd0, 0xe2, 0xd7, 0xa8, 0x6d, 0x17, 0x8b,
-	0x17, 0xa7, 0x58, 0xfe, 0xbc, 0x9c, 0x90, 0xfc, 0x4d, 0x62, 0xdb, 0x90, 0xee, 0xbb, 0xaf, 0x3f,
-	0x3f, 0xcc, 0x2c, 0xe0, 0x88, 0x19, 0xad, 0xde, 0x3d, 0x60, 0xbe, 0x23, 0xc6, 0x9f, 0x02, 0xd4,
-	0xa9, 0x8d, 0x8b, 0x97, 0x7c, 0xde, 0xde, 0xb3, 0x0a, 0x97, 0xcf, 0x23, 0x75, 0x38, 0x0f, 0x0d,
-	0xce, 0x03, 0x1c, 0x9f, 0x85, 0x53, 0xdf, 0x0a, 0x7b, 0x53, 0x3b, 0xd7, 0xb7, 0xf8, 0x63, 0x80,
-	0xae, 0xd6, 0x3c, 0xd7, 0xf3, 0xdc, 0x4f, 0xe9, 0xbd, 0x2c, 0x3f, 0xa5, 0xff, 0x3a, 0xc8, 0x7d,
-	0x43, 0xd9, 0xc5, 0x77, 0xce, 0x43, 0xb9, 0xb1, 0x79, 0x34, 0x8e, 0x82, 0xe3, 0x71, 0x14, 0xfc,
-	0x18, 0x47, 0xc1, 0xfb, 0x49, 0xd4, 0x3a, 0x9e, 0x44, 0xad, 0x6f, 0x93, 0xa8, 0xf5, 0x72, 0x29,
-	0xcd, 0xf4, 0xab, 0x51, 0x42, 0x07, 0x72, 0x38, 0xed, 0x74, 0xf0, 0xdb, 0x4b, 0x1f, 0x16, 0xa0,
-	0x92, 0xb6, 0x79, 0x22, 0xd6, 0x7e, 0x05, 0x00, 0x00, 0xff, 0xff, 0xb8, 0xf1, 0xa5, 0xd6, 0xed,
-	0x04, 0x00, 0x00,
+	// 517 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x94, 0xcf, 0x6e, 0x13, 0x31,
+	0x10, 0xc6, 0xb3, 0x2d, 0x44, 0x62, 0x02, 0x1c, 0x4c, 0x11, 0xc5, 0xa0, 0x6d, 0x6b, 0x89, 0x84,
+	0x56, 0xc2, 0x6e, 0x13, 0x71, 0x81, 0x13, 0x2d, 0x7f, 0x24, 0x0e, 0xa8, 0xe4, 0xc8, 0x25, 0x72,
+	0x52, 0x6b, 0x59, 0x35, 0xb1, 0xb7, 0x6b, 0xa7, 0xb4, 0x42, 0x5c, 0x78, 0x02, 0x24, 0x24, 0x2e,
+	0x3c, 0x02, 0x0f, 0xc0, 0x2b, 0xf4, 0x58, 0x89, 0x0b, 0x27, 0x84, 0x12, 0x1e, 0x04, 0xad, 0xed,
+	0x90, 0xdd, 0x24, 0x25, 0xed, 0x6d, 0x35, 0xf3, 0xcd, 0x7c, 0xbf, 0xd9, 0x99, 0x5d, 0xb8, 0x6d,
+	0x62, 0xc3, 0x25, 0x4b, 0x54, 0x2c, 0x8d, 0x48, 0xd9, 0x41, 0x5f, 0xa4, 0xc7, 0x34, 0x49, 0x95,
+	0x51, 0xe8, 0x9a, 0x4d, 0x51, 0x9f, 0xc2, 0x4b, 0x91, 0x8a, 0x94, 0xcd, 0xb0, 0xec, 0xc9, 0x89,
+	0xf0, 0xdd, 0x48, 0xa9, 0xa8, 0x2b, 0x18, 0x4f, 0x62, 0xc6, 0xa5, 0x54, 0x86, 0x9b, 0x58, 0x49,
+	0xed, 0xb3, 0x1b, 0x1d, 0xa5, 0x7b, 0x4a, 0xb3, 0x36, 0xd7, 0xc2, 0xf5, 0x66, 0x87, 0x5b, 0x6d,
+	0x61, 0xf8, 0x16, 0x4b, 0x78, 0x14, 0x4b, 0x2b, 0xf6, 0x5a, 0x5c, 0x24, 0x49, 0x78, 0xca, 0x7b,
+	0xa3, 0x3e, 0x6b, 0xc5, 0x9c, 0x48, 0x3b, 0xad, 0xfa, 0x66, 0x2b, 0x2b, 0x3f, 0x14, 0x4e, 0x42,
+	0x96, 0x00, 0xbd, 0xce, 0x0c, 0x76, 0x6d, 0x5d, 0x53, 0x1c, 0xf4, 0x85, 0x36, 0xe4, 0x25, 0xdc,
+	0x28, 0x44, 0x75, 0xa2, 0xa4, 0x16, 0xa8, 0x01, 0x65, 0xd7, 0x7f, 0x39, 0x58, 0x0d, 0xee, 0x57,
+	0xea, 0x37, 0x69, 0x61, 0x56, 0xea, 0xe4, 0xdb, 0x97, 0x4e, 0x7e, 0xad, 0x94, 0x9a, 0x5e, 0x4a,
+	0x1e, 0xc1, 0x2d, 0xdb, 0xeb, 0x59, 0xda, 0xa9, 0x6f, 0xbe, 0xb2, 0xde, 0xde, 0x06, 0xad, 0x40,
+	0xc5, 0xa8, 0x7d, 0x21, 0x5b, 0x7b, 0x42, 0xaa, 0x9e, 0x6d, 0x7a, 0xa5, 0x09, 0x36, 0xf4, 0x34,
+	0x8b, 0x90, 0x16, 0x2c, 0x4f, 0xd7, 0x7a, 0x98, 0x1d, 0xb8, 0x2a, 0xb2, 0xb0, 0x9f, 0xc7, 0x23,
+	0xe1, 0x09, 0xa4, 0x5c, 0xa5, 0xe7, 0xaa, 0x88, 0x71, 0x88, 0xec, 0x01, 0x9e, 0x34, 0x78, 0xd2,
+	0xed, 0x8e, 0xf8, 0x9e, 0x03, 0x8c, 0xdf, 0xb7, 0x37, 0xa8, 0x52, 0xb7, 0x1c, 0x9a, 0x2d, 0x87,
+	0xba, 0xc5, 0xfb, 0xe5, 0xd0, 0x5d, 0x1e, 0x8d, 0x66, 0x6b, 0xe6, 0x2a, 0xc9, 0xb7, 0x00, 0xee,
+	0xcc, 0xb4, 0x39, 0x73, 0x94, 0xc5, 0x0b, 0x8f, 0x82, 0x5e, 0x14, 0x60, 0x17, 0x2c, 0x6c, 0x6d,
+	0x2e, 0xac, 0x23, 0xc8, 0xd3, 0xd6, 0xbf, 0x2f, 0xc2, 0x65, 0x4b, 0x8b, 0xde, 0x41, 0xd9, 0xad,
+	0x14, 0xad, 0x4d, 0xb0, 0x4c, 0xdf, 0x0c, 0x26, 0xff, 0x93, 0x38, 0x1b, 0x52, 0xfd, 0xf8, 0xe3,
+	0xcf, 0xe7, 0x85, 0x55, 0x14, 0x32, 0xab, 0x35, 0xfb, 0x47, 0x6c, 0xd6, 0xf9, 0xa2, 0xaf, 0x01,
+	0x54, 0x72, 0xe3, 0xa2, 0xea, 0xac, 0xde, 0xd3, 0x07, 0x85, 0x6b, 0x73, 0x75, 0x1e, 0xe4, 0xb1,
+	0x05, 0x79, 0x88, 0x1a, 0x67, 0x81, 0x14, 0xbe, 0x15, 0xf6, 0x3e, 0x77, 0xa6, 0x1f, 0xd0, 0x97,
+	0x00, 0xae, 0x17, 0x37, 0x89, 0xd6, 0xe7, 0x18, 0x8f, 0x8f, 0x0a, 0x6f, 0x9c, 0x47, 0xea, 0x31,
+	0x1f, 0x58, 0xcc, 0x1a, 0xba, 0x77, 0x2e, 0xcc, 0xed, 0x9d, 0x93, 0x41, 0x18, 0x9c, 0x0e, 0xc2,
+	0xe0, 0xf7, 0x20, 0x0c, 0x3e, 0x0d, 0xc3, 0xd2, 0xe9, 0x30, 0x2c, 0xfd, 0x1c, 0x86, 0xa5, 0x37,
+	0xeb, 0x51, 0x6c, 0xde, 0xf6, 0xdb, 0xb4, 0xa3, 0x7a, 0x93, 0xad, 0x8e, 0xfe, 0x35, 0x33, 0xc7,
+	0x89, 0xd0, 0xed, 0xb2, 0xfd, 0x31, 0x34, 0xfe, 0x06, 0x00, 0x00, 0xff, 0xff, 0x21, 0x89, 0x99,
+	0xef, 0xe3, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -359,9 +363,10 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	// Parameters queries the parameters of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
+	// Queries a Erc20Native by token_denom.
+	Erc20Native(ctx context.Context, in *QueryErc20NativeRequest, opts ...grpc.CallOption) (*QueryErc20NativeResponse, error)
 	// Queries a list of Erc20Native items.
-	Erc20Native(ctx context.Context, in *QueryGetErc20NativeRequest, opts ...grpc.CallOption) (*QueryGetErc20NativeResponse, error)
-	Erc20NativeAll(ctx context.Context, in *QueryAllErc20NativeRequest, opts ...grpc.CallOption) (*QueryAllErc20NativeResponse, error)
+	Erc20NativeAll(ctx context.Context, in *QueryErc20NativeAllRequest, opts ...grpc.CallOption) (*QueryErc20NativeAllResponse, error)
 }
 
 type queryClient struct {
@@ -381,8 +386,8 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 	return out, nil
 }
 
-func (c *queryClient) Erc20Native(ctx context.Context, in *QueryGetErc20NativeRequest, opts ...grpc.CallOption) (*QueryGetErc20NativeResponse, error) {
-	out := new(QueryGetErc20NativeResponse)
+func (c *queryClient) Erc20Native(ctx context.Context, in *QueryErc20NativeRequest, opts ...grpc.CallOption) (*QueryErc20NativeResponse, error) {
+	out := new(QueryErc20NativeResponse)
 	err := c.cc.Invoke(ctx, "/titan.pointer.Query/Erc20Native", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -390,8 +395,8 @@ func (c *queryClient) Erc20Native(ctx context.Context, in *QueryGetErc20NativeRe
 	return out, nil
 }
 
-func (c *queryClient) Erc20NativeAll(ctx context.Context, in *QueryAllErc20NativeRequest, opts ...grpc.CallOption) (*QueryAllErc20NativeResponse, error) {
-	out := new(QueryAllErc20NativeResponse)
+func (c *queryClient) Erc20NativeAll(ctx context.Context, in *QueryErc20NativeAllRequest, opts ...grpc.CallOption) (*QueryErc20NativeAllResponse, error) {
+	out := new(QueryErc20NativeAllResponse)
 	err := c.cc.Invoke(ctx, "/titan.pointer.Query/Erc20NativeAll", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -403,9 +408,10 @@ func (c *queryClient) Erc20NativeAll(ctx context.Context, in *QueryAllErc20Nativ
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
+	// Queries a Erc20Native by token_denom.
+	Erc20Native(context.Context, *QueryErc20NativeRequest) (*QueryErc20NativeResponse, error)
 	// Queries a list of Erc20Native items.
-	Erc20Native(context.Context, *QueryGetErc20NativeRequest) (*QueryGetErc20NativeResponse, error)
-	Erc20NativeAll(context.Context, *QueryAllErc20NativeRequest) (*QueryAllErc20NativeResponse, error)
+	Erc20NativeAll(context.Context, *QueryErc20NativeAllRequest) (*QueryErc20NativeAllResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -415,10 +421,10 @@ type UnimplementedQueryServer struct {
 func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsRequest) (*QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
 }
-func (*UnimplementedQueryServer) Erc20Native(ctx context.Context, req *QueryGetErc20NativeRequest) (*QueryGetErc20NativeResponse, error) {
+func (*UnimplementedQueryServer) Erc20Native(ctx context.Context, req *QueryErc20NativeRequest) (*QueryErc20NativeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Erc20Native not implemented")
 }
-func (*UnimplementedQueryServer) Erc20NativeAll(ctx context.Context, req *QueryAllErc20NativeRequest) (*QueryAllErc20NativeResponse, error) {
+func (*UnimplementedQueryServer) Erc20NativeAll(ctx context.Context, req *QueryErc20NativeAllRequest) (*QueryErc20NativeAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Erc20NativeAll not implemented")
 }
 
@@ -445,7 +451,7 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 }
 
 func _Query_Erc20Native_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetErc20NativeRequest)
+	in := new(QueryErc20NativeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -457,13 +463,13 @@ func _Query_Erc20Native_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: "/titan.pointer.Query/Erc20Native",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Erc20Native(ctx, req.(*QueryGetErc20NativeRequest))
+		return srv.(QueryServer).Erc20Native(ctx, req.(*QueryErc20NativeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_Erc20NativeAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryAllErc20NativeRequest)
+	in := new(QueryErc20NativeAllRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -475,7 +481,7 @@ func _Query_Erc20NativeAll_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: "/titan.pointer.Query/Erc20NativeAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Erc20NativeAll(ctx, req.(*QueryAllErc20NativeRequest))
+		return srv.(QueryServer).Erc20NativeAll(ctx, req.(*QueryErc20NativeAllRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -557,7 +563,7 @@ func (m *QueryParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetErc20NativeRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryErc20NativeRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -567,12 +573,12 @@ func (m *QueryGetErc20NativeRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetErc20NativeRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryErc20NativeRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetErc20NativeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryErc20NativeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -587,7 +593,7 @@ func (m *QueryGetErc20NativeRequest) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetErc20NativeResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryErc20NativeResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -597,12 +603,12 @@ func (m *QueryGetErc20NativeResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetErc20NativeResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryErc20NativeResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetErc20NativeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryErc20NativeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -620,7 +626,7 @@ func (m *QueryGetErc20NativeResponse) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryAllErc20NativeRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryErc20NativeAllRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -630,12 +636,12 @@ func (m *QueryAllErc20NativeRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryAllErc20NativeRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryErc20NativeAllRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryAllErc20NativeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryErc20NativeAllRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -655,7 +661,7 @@ func (m *QueryAllErc20NativeRequest) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryAllErc20NativeResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryErc20NativeAllResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -665,12 +671,12 @@ func (m *QueryAllErc20NativeResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryAllErc20NativeResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryErc20NativeAllResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryAllErc20NativeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryErc20NativeAllResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -735,7 +741,7 @@ func (m *QueryParamsResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetErc20NativeRequest) Size() (n int) {
+func (m *QueryErc20NativeRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -748,7 +754,7 @@ func (m *QueryGetErc20NativeRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetErc20NativeResponse) Size() (n int) {
+func (m *QueryErc20NativeResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -759,7 +765,7 @@ func (m *QueryGetErc20NativeResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryAllErc20NativeRequest) Size() (n int) {
+func (m *QueryErc20NativeAllRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -772,7 +778,7 @@ func (m *QueryAllErc20NativeRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryAllErc20NativeResponse) Size() (n int) {
+func (m *QueryErc20NativeAllResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -930,7 +936,7 @@ func (m *QueryParamsResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetErc20NativeRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryErc20NativeRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -953,10 +959,10 @@ func (m *QueryGetErc20NativeRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetErc20NativeRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryErc20NativeRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetErc20NativeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryErc20NativeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1012,7 +1018,7 @@ func (m *QueryGetErc20NativeRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetErc20NativeResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryErc20NativeResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1035,10 +1041,10 @@ func (m *QueryGetErc20NativeResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetErc20NativeResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryErc20NativeResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetErc20NativeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryErc20NativeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1095,7 +1101,7 @@ func (m *QueryGetErc20NativeResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryAllErc20NativeRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryErc20NativeAllRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1118,10 +1124,10 @@ func (m *QueryAllErc20NativeRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllErc20NativeRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryErc20NativeAllRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllErc20NativeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryErc20NativeAllRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1181,7 +1187,7 @@ func (m *QueryAllErc20NativeRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryAllErc20NativeResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryErc20NativeAllResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1204,10 +1210,10 @@ func (m *QueryAllErc20NativeResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllErc20NativeResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryErc20NativeAllResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllErc20NativeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryErc20NativeAllResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

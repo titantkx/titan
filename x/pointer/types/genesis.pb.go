@@ -25,7 +25,9 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // GenesisState defines the pointer module's genesis state.
 type GenesisState struct {
-	Params          Params        `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
+	// params defines all the parameters of the module.
+	Params Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
+	// erc20_native_list defines the erc20 => native token mapping.
 	Erc20NativeList []Erc20Native `protobuf:"bytes,2,rep,name=erc20_native_list,json=erc20NativeList,proto3" json:"erc20_native_list"`
 }
 

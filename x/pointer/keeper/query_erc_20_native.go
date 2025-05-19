@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) Erc20NativeAll(goCtx context.Context, req *types.QueryAllErc20NativeRequest) (*types.QueryAllErc20NativeResponse, error) {
+func (k Keeper) Erc20NativeAll(goCtx context.Context, req *types.QueryErc20NativeAllRequest) (*types.QueryErc20NativeAllResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -31,15 +31,14 @@ func (k Keeper) Erc20NativeAll(goCtx context.Context, req *types.QueryAllErc20Na
 		erc20Natives = append(erc20Natives, erc20Native)
 		return nil
 	})
-
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryAllErc20NativeResponse{Erc20Native: erc20Natives, Pagination: pageRes}, nil
+	return &types.QueryErc20NativeAllResponse{Erc20Native: erc20Natives, Pagination: pageRes}, nil
 }
 
-func (k Keeper) Erc20Native(goCtx context.Context, req *types.QueryGetErc20NativeRequest) (*types.QueryGetErc20NativeResponse, error) {
+func (k Keeper) Erc20Native(goCtx context.Context, req *types.QueryErc20NativeRequest) (*types.QueryErc20NativeResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -53,5 +52,5 @@ func (k Keeper) Erc20Native(goCtx context.Context, req *types.QueryGetErc20Nativ
 		return nil, status.Error(codes.NotFound, "not found")
 	}
 
-	return &types.QueryGetErc20NativeResponse{Erc20Native: val}, nil
+	return &types.QueryErc20NativeResponse{Erc20Native: val}, nil
 }

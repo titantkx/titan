@@ -52,7 +52,7 @@ func local_request_Query_Params_0(ctx context.Context, marshaler runtime.Marshal
 }
 
 func request_Query_Erc20Native_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetErc20NativeRequest
+	var protoReq QueryErc20NativeRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -79,7 +79,7 @@ func request_Query_Erc20Native_0(ctx context.Context, marshaler runtime.Marshale
 }
 
 func local_request_Query_Erc20Native_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetErc20NativeRequest
+	var protoReq QueryErc20NativeRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -110,7 +110,7 @@ var (
 )
 
 func request_Query_Erc20NativeAll_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryAllErc20NativeRequest
+	var protoReq QueryErc20NativeAllRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -126,7 +126,7 @@ func request_Query_Erc20NativeAll_0(ctx context.Context, marshaler runtime.Marsh
 }
 
 func local_request_Query_Erc20NativeAll_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryAllErc20NativeRequest
+	var protoReq QueryErc20NativeAllRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -323,9 +323,9 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 var (
 	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"titantkx", "titan", "pointer", "params"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_Erc20Native_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"titantkx", "titan", "pointer", "erc20_native", "token_denom"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Erc20Native_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"titantkx", "titan", "pointer", "erc_20_native", "token_denom"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_Erc20NativeAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"titantkx", "titan", "pointer", "erc20_native"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Erc20NativeAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"titantkx", "titan", "pointer", "erc_20_native"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

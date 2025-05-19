@@ -25,7 +25,7 @@ func CmdListErc20Native() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllErc20NativeRequest{
+			params := &types.QueryErc20NativeAllRequest{
 				Pagination: pageReq,
 			}
 
@@ -59,7 +59,7 @@ func CmdShowErc20Native() *cobra.Command {
 
 			argTokenDenom := args[0]
 
-			params := &types.QueryGetErc20NativeRequest{
+			params := &types.QueryErc20NativeRequest{
 				TokenDenom: argTokenDenom,
 			}
 
