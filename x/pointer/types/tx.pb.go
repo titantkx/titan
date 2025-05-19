@@ -28,12 +28,19 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// MsgAddERC20NativePointer defines the message structure for the AddERC20NativePointer gRPC service
+// method. It allows an account to add a new ERC20 native pointer.
 type MsgAddERC20NativePointer struct {
+	// The sender address of the message. Should be gov
 	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
-	Token     string `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
-	Name      string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Symbol    string `protobuf:"bytes,4,opt,name=symbol,proto3" json:"symbol,omitempty"`
-	Decimals  uint64 `protobuf:"varint,5,opt,name=decimals,proto3" json:"decimals,omitempty"`
+	// The token denom of cosmos native token
+	Token string `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	// The name of the ERC20 token
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	// The symbol of the ERC20 token. Should be uppercase
+	Symbol string `protobuf:"bytes,4,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	// The decimals of the ERC20 token. Should be 0-18
+	Decimals uint64 `protobuf:"varint,5,opt,name=decimals,proto3" json:"decimals,omitempty"`
 }
 
 func (m *MsgAddERC20NativePointer) Reset()         { *m = MsgAddERC20NativePointer{} }
@@ -104,6 +111,7 @@ func (m *MsgAddERC20NativePointer) GetDecimals() uint64 {
 	return 0
 }
 
+// MsgAddERC20NativePointerResponse defines the Msg/AddERC20NativePointer response type.
 type MsgAddERC20NativePointerResponse struct {
 }
 
@@ -183,6 +191,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	// AddERC20NativePointer defines a method to add a new ERC20 native pointer.
 	AddERC20NativePointer(ctx context.Context, in *MsgAddERC20NativePointer, opts ...grpc.CallOption) (*MsgAddERC20NativePointerResponse, error)
 }
 
@@ -205,6 +214,7 @@ func (c *msgClient) AddERC20NativePointer(ctx context.Context, in *MsgAddERC20Na
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	// AddERC20NativePointer defines a method to add a new ERC20 native pointer.
 	AddERC20NativePointer(context.Context, *MsgAddERC20NativePointer) (*MsgAddERC20NativePointerResponse, error)
 }
 

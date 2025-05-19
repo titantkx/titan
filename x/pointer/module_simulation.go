@@ -23,7 +23,11 @@ var (
 )
 
 const (
-// this line is used by starport scaffolding # simapp/module/const
+	opWeightMsgAddERC20NativePointer = "op_weight_msg_add_erc_20_native_pointer"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgAddERC20NativePointer int = 100
+
+	// this line is used by starport scaffolding # simapp/module/const
 )
 
 // GenerateGenesisState creates a randomized GenState of the module.
@@ -51,6 +55,17 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
 
+	var weightMsgAddERC20NativePointer int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgAddERC20NativePointer, &weightMsgAddERC20NativePointer, nil,
+		func(_ *rand.Rand) {
+			weightMsgAddERC20NativePointer = defaultWeightMsgAddERC20NativePointer
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgAddERC20NativePointer,
+		pointersimulation.SimulateMsgAddERC20NativePointer(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
 	// this line is used by starport scaffolding # simapp/module/operation
 
 	return operations
@@ -59,6 +74,14 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 // ProposalMsgs returns msgs used for governance proposals for simulations.
 func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
 	return []simtypes.WeightedProposalMsg{
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgAddERC20NativePointer,
+			defaultWeightMsgAddERC20NativePointer,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				pointersimulation.SimulateMsgAddERC20NativePointer(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
 		// this line is used by starport scaffolding # simapp/module/OpMsg
 	}
 }

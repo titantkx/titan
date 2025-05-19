@@ -57473,6 +57473,7 @@ paths:
         - Query
   /titantkx/titan/pointer/erc_20_native:
     get:
+      summary: Queries a list of Erc20Native items.
       operationId: TitanPointerErc20NativeAll
       responses:
         '200':
@@ -57480,15 +57481,20 @@ paths:
           schema:
             type: object
             properties:
-              erc20Native:
+              erc20_native:
                 type: array
                 items:
                   type: object
                   properties:
-                    tokenDenom:
+                    token_denom:
                       type: string
-                    erc20Addr:
+                      description: token_denom is the native token denom.
+                    erc20_addr:
                       type: string
+                      description: >-
+                        erc20_addr is the erc20 contract address that point to
+                        the native token.
+                  description: Erc20Native defines the erc20 => native token mapping.
               pagination:
                 type: object
                 properties:
@@ -57517,6 +57523,9 @@ paths:
                            repeated Bar results = 1;
                            PageResponse page = 2;
                    }
+            description: >-
+              QueryErc20NativeAllResponse is response type for the
+              Query/Erc20NativeAll RPC method.
         default:
           description: An unexpected error response.
           schema:
@@ -57594,9 +57603,9 @@ paths:
           type: boolean
       tags:
         - Query
-  /titantkx/titan/pointer/erc_20_native/{tokenDenom}:
+  /titantkx/titan/pointer/erc_20_native/{token_denom}:
     get:
-      summary: Queries a list of Erc20Native items.
+      summary: Queries a Erc20Native by token_denom.
       operationId: TitanPointerErc20Native
       responses:
         '200':
@@ -57604,13 +57613,21 @@ paths:
           schema:
             type: object
             properties:
-              erc20Native:
+              erc20_native:
                 type: object
                 properties:
-                  tokenDenom:
+                  token_denom:
                     type: string
-                  erc20Addr:
+                    description: token_denom is the native token denom.
+                  erc20_addr:
                     type: string
+                    description: >-
+                      erc20_addr is the erc20 contract address that point to the
+                      native token.
+                description: Erc20Native defines the erc20 => native token mapping.
+            description: >-
+              QueryErc20NativeResponse is response type for the
+              Query/Erc20Native RPC method.
         default:
           description: An unexpected error response.
           schema:
@@ -57630,7 +57647,7 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
-        - name: tokenDenom
+        - name: token_denom
           in: path
           required: true
           type: string
@@ -89722,25 +89739,37 @@ definitions:
   titan.pointer.Erc20Native:
     type: object
     properties:
-      tokenDenom:
+      token_denom:
         type: string
-      erc20Addr:
+        description: token_denom is the native token denom.
+      erc20_addr:
         type: string
+        description: >-
+          erc20_addr is the erc20 contract address that point to the native
+          token.
+    description: Erc20Native defines the erc20 => native token mapping.
+  titan.pointer.MsgAddERC20NativePointerResponse:
+    type: object
   titan.pointer.Params:
     type: object
     description: Params defines the parameters for the module.
-  titan.pointer.QueryAllErc20NativeResponse:
+  titan.pointer.QueryErc20NativeAllResponse:
     type: object
     properties:
-      erc20Native:
+      erc20_native:
         type: array
         items:
           type: object
           properties:
-            tokenDenom:
+            token_denom:
               type: string
-            erc20Addr:
+              description: token_denom is the native token denom.
+            erc20_addr:
               type: string
+              description: >-
+                erc20_addr is the erc20 contract address that point to the
+                native token.
+          description: Erc20Native defines the erc20 => native token mapping.
       pagination:
         type: object
         properties:
@@ -89767,16 +89796,27 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  titan.pointer.QueryGetErc20NativeResponse:
+    description: >-
+      QueryErc20NativeAllResponse is response type for the Query/Erc20NativeAll
+      RPC method.
+  titan.pointer.QueryErc20NativeResponse:
     type: object
     properties:
-      erc20Native:
+      erc20_native:
         type: object
         properties:
-          tokenDenom:
+          token_denom:
             type: string
-          erc20Addr:
+            description: token_denom is the native token denom.
+          erc20_addr:
             type: string
+            description: >-
+              erc20_addr is the erc20 contract address that point to the native
+              token.
+        description: Erc20Native defines the erc20 => native token mapping.
+    description: >-
+      QueryErc20NativeResponse is response type for the Query/Erc20Native RPC
+      method.
   titan.pointer.QueryParamsResponse:
     type: object
     properties:
