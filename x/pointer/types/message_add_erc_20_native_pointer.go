@@ -45,5 +45,9 @@ func (msg *MsgAddERC20NativePointer) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid authority address (%s)", err)
 	}
+	// decimals must be between 0 and 18
+	if msg.Decimals > 18 {
+		return WrapError(sdkerrors.ErrInvalidRequest, "decimals must be between 0 and 18")
+	}
 	return nil
 }

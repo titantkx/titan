@@ -758,6 +758,7 @@ func New(
 		keys[pointermoduletypes.StoreKey],
 		keys[pointermoduletypes.MemStoreKey],
 		app.AccountKeeper,
+		app.EvmKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 

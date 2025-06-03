@@ -240,5 +240,5 @@ replace (
 
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
-// github.com/titantkx/ethermint => /Users/mac/Data/Codes/go/ethermint
+	github.com/titantkx/ethermint => /Users/mac/Data/Codes/go/ethermint
 )

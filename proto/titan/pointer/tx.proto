@@ -28,4 +28,7 @@ message MsgAddERC20NativePointer {
 }
 
 // MsgAddERC20NativePointerResponse defines the Msg/AddERC20NativePointer response type.
-message MsgAddERC20NativePointerResponse {}
+message MsgAddERC20NativePointerResponse {
+  // The address of the ERC20 contract
+  string contract_address = 1;
+}

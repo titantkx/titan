@@ -42,6 +42,7 @@ func PointerKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		storeKey,
 		memStoreKey,
 		authKeeper,
+		nil,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
