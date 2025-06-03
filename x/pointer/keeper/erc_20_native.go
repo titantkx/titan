@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"math/big"
 
 	sdkerrors "cosmossdk.io/errors"
@@ -11,6 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	etherminttypes "github.com/titantkx/ethermint/types"
 
+	"github.com/titantkx/titan/utils"
 	"github.com/titantkx/titan/x/pointer/artifacts"
 	"github.com/titantkx/titan/x/pointer/types"
 )
@@ -91,6 +93,11 @@ func (k Keeper) DeployOrUpdateErc20NativePointer(
 	pointerModuleAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	pointerModuleEthAddr := ethcommon.BytesToAddress(pointerModuleAddr)
 	pointerType := "erc20native"
+
+	// not allow to create pointer for base token (atkx)
+	if token == utils.BaseDenom {
+		return ethcommon.Address{}, fmt.Errorf("cannot create pointer for base token %s", utils.BaseDenom)
+	}
 
 	var bin []byte
 	args := []interface{}{
