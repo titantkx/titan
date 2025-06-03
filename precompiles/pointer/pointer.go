@@ -14,7 +14,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	pcommon "github.com/titantkx/ethermint/precompiles/common"
 
-	utils "github.com/titantkx/titan/utils"
 	pointertypes "github.com/titantkx/titan/x/pointer/types"
 )
 
