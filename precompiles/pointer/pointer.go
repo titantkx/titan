@@ -99,11 +99,6 @@ func (p PrecompileExecutor) AddNative(
 
 	token := args[0].(string)
 
-	// not allow to create pointer for base token (atkx)
-	if token == utils.BaseDenom {
-		return nil, fmt.Errorf("cannot create pointer for base token %s", utils.BaseDenom)
-	}
-
 	metadata, metadataExists := p.bankKeeper.GetDenomMetaData(ctx, token)
 	if !metadataExists {
 		return nil, fmt.Errorf("denom %s does not have metadata stored", token)
