@@ -642,6 +642,9 @@ func New(
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
 	availableCapabilities := strings.Join(AllCapabilities(), ",")
+	wasmGasRegisterConfig := wasmtypes.DefaultGasRegisterConfig()
+	wasmGasRegisterConfig.CompileCost = wasmtypes.DefaultCompileCost * 3 // increase compile cost to 3x default
+
 	wasmKeeper := wasmkeeper.NewKeeper(
 		appCodec,
 		keys[wasmtypes.StoreKey],
@@ -660,6 +663,7 @@ func New(
 		wasmConfig,
 		availableCapabilities,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		wasmkeeper.WithGasRegister(wasmtypes.NewWasmGasRegister(wasmGasRegisterConfig)),
 	)
 	app.WasmKeeper = &wasmKeeper
 
