@@ -28,14 +28,8 @@ async function confirm(question: string) {
  */
 async function runCommandSync(command: string, cwd?: string): Promise<string> {
   const workingDir = cwd ? `${ROOT_DIR}` + cwd : `${ROOT_DIR}`;
-  console.info(`Running command: ${command} in ${workingDir}`);
-  try {
-    return execSync(command, { encoding: 'utf8', cwd: workingDir });
-  } catch (error) {
-    // console.error(`Command failed: ${command}`);
-    // console.error(error);
-    throw error;
-  }
+  // console.info(`Running command: ${command} in ${workingDir}`);
+  return execSync(command, { encoding: 'utf8', cwd: workingDir, stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
 async function waitForNumBlocks(ethers: HardhatEthersHelpers, num: number): Promise<void> {
@@ -46,7 +40,7 @@ async function waitForNumBlocks(ethers: HardhatEthersHelpers, num: number): Prom
   while (currentBlock < targetBlock) {
     await new Promise((resolve) => setTimeout(resolve, 1000)); // wait for 1 second
     currentBlock = await ethers.provider.getBlockNumber();
-    console.info(`Waiting: ${startBlock}==${currentBlock}==>${targetBlock}`);
+    // console.info(`Waiting: ${startBlock}==${currentBlock}==>${targetBlock}`);
 
     // Check if the time limit has been reached
     const elapsedTime = Date.now() - startTime;

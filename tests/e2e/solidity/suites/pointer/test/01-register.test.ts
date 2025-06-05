@@ -17,6 +17,20 @@ describe('Register test', function () {
     await setup();
   });
 
+  it('Can not register pointer contract for base token', async function () {
+    const pointerAddr = '0x000000000000000000000000000000000000100b';
+    const pointer = new ethers.Contract(pointerAddr, pointerAbi, owner);
+    try {
+      const tx = await pointer.addNativePointer(`atkx`);
+      await tx.wait();
+      expect.fail('Should not be able to register pointer for base token');
+    } catch (e: unknown) {
+      expect(e).to.be.instanceOf(Error);
+      expect((e as Error).message).to.include('cannot create pointer for base token atkx');
+    }
+    await utils.waitForNumBlocks(ethers, 1);
+  });
+
   it('Can register pointer contract', async function () {
     // create factory token
     const tokenDenom = 'test';
@@ -26,7 +40,7 @@ describe('Register test', function () {
     try {
       await utils.runTitandTx(ethers, createTokenCmd);
     } catch (e: unknown) {
-      if (e instanceof Error && e.message.includes('already exists')) {
+      if (e instanceof Error && e.message.includes('attempting to create a denom that already exists')) {
         console.log('Token already exists, skipping creation.');
       } else {
         throw e;
@@ -67,7 +81,7 @@ describe('Register test', function () {
     const pointer = new ethers.Contract(pointerAddr, pointerAbi, owner);
     const tx = await pointer.addNativePointer(`factory/titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr/${tokenDenom}`);
     const receipt = await tx.wait();
-    console.log('Transaction hash:', tx.hash);
+    // console.log('Transaction hash:', tx.hash);
     // check event
     const event = receipt.events?.find((event: any) => event.event === 'PointerRegistered');
     expect(event.args.pointerType).to.equal(0);
