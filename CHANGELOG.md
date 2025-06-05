@@ -50,6 +50,11 @@ Ref: https://keepachangelog.com/en/1.1.0/
 - Upgrade `wasmvm` to `v1.5.9`
 - Upgrade `packet-forward-middleware` to `v7.2.1`
 - Increase wasm contract `CompileCost` 3x
+- (x/pointer) Implement `x/pointer` module to support precompiles contract pointer functionality.
+
+### Features
+
+- (precompiles) Implement precompiles contract `bank` and `pointer`
 
 ### Bug Fixes
 
