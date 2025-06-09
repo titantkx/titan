@@ -1,6 +1,7 @@
 package cmd_test
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 
@@ -14,7 +15,9 @@ import (
 	"github.com/titantkx/titan/testutil/cmd/nft"
 	"github.com/titantkx/titan/testutil/sample"
 
+	"github.com/titantkx/titan/testutil/cmd/pointer"
 	"github.com/titantkx/titan/testutil/cmd/staking"
+	"github.com/titantkx/titan/testutil/cmd/tokenfactory"
 	"github.com/titantkx/titan/utils"
 )
 
@@ -442,4 +445,129 @@ func testSubmitProposal(
 	if callbackFunc != nil {
 		callbackFunc(proposalId, proposalMsg.Messages)
 	}
+}
+
+func TestSubmitAddErc20NativePointer(t *testing.T) {
+	// Create new token factory
+	creator := MustCreateAccount(t, "1"+utils.DisplayDenom).Address
+	tokenDenom := tokenfactory.MustCreateNewToken(t, creator, "erc20nativepointerTest")
+	// Mint token factory
+	tokenfactory.MustMintTokenFactory(t, creator, creator, tokenDenom, testutil.MakeInt(1000000000))
+
+	// Create new token factory 2
+	creator2 := MustCreateAccount(t, "1"+utils.DisplayDenom).Address
+	tokenDenom2 := tokenfactory.MustCreateNewToken(t, creator2, "erc20nativepointerTest2")
+	// Mint token factory
+	tokenfactory.MustMintTokenFactory(t, creator2, creator2, tokenDenom2, testutil.MakeInt(1000000000))
+
+	govParams := gov.MustGetParams(t)
+
+	require.Equal(t, "0.334", govParams.Quorum.String())
+	require.Equal(t, "0.5", govParams.Threshold.String())
+	require.Equal(t, "0.334", govParams.VetoThreshold.String())
+	require.Equal(t, "250000000000000000000"+utils.BaseDenom, govParams.MinDeposit.String())
+
+	voter1 := keys.MustShowAddress(t, "val1") // Will represent voter3, voter4, voter5 if they do not vote
+	voter2 := keys.MustShowAddress(t, "val2")
+
+	proposal := struct {
+		Name           string
+		Proposer       string
+		Proposal       gov.ProposalMsg
+		Deposits       []Deposit
+		Votes          []Vote
+		ExpectedStatus string
+		CallbackFunc   func(string, []interface{}) // CallbackFunc will be called after the proposal is finished
+	}{
+		"TestSubmitAddErc20NativePointer",
+		voter1,
+		gov.ProposalMsg{
+			Title:    "TestSubmitAddErc20NativePointer",
+			Summary:  "TestSubmitAddErc20NativePointer",
+			Metadata: "TestSubmitAddErc20NativePointer",
+			Deposit:  "250" + utils.DisplayDenom,
+			Messages: []any{
+				gov.MsgAddERC20NativePointer{
+					Type:      "/titan.pointer.MsgAddERC20NativePointer",
+					Authority: "titan10d07y265gmmuvt4z0w9aw880jnsr700jste397",
+					Token:     tokenDenom,
+					Name:      "erc20nativepointerTest",
+					Symbol:    "ERC20NATIVEPOINTERTEST",
+					Decimals:  6,
+				},
+			},
+		},
+		nil,
+		[]Vote{
+			{voter1, gov.VOTE_OPTION_YES},
+			{voter2, gov.VOTE_OPTION_YES},
+		},
+		gov.PROPOSAL_STATUS_PASSED,
+		func(s string, i []interface{}) {},
+	}
+
+	testSubmitProposal(
+		t,
+		proposal.Proposer,
+		proposal.Proposal,
+		proposal.Deposits,
+		proposal.Votes,
+		proposal.ExpectedStatus,
+		proposal.CallbackFunc,
+	)
+
+	erc20PointerAddr := pointer.MustGetERC20Pointer(t, tokenDenom)
+	fmt.Println("ERC20 Pointer Address:", erc20PointerAddr)
+
+	proposal2 := struct {
+		Name           string
+		Proposer       string
+		Proposal       gov.ProposalMsg
+		Deposits       []Deposit
+		Votes          []Vote
+		ExpectedStatus string
+		CallbackFunc   func(string, []interface{}) // CallbackFunc will be called after the proposal is finished
+	}{
+		"TestSubmitAddErc20NativePointer2",
+		voter1,
+		gov.ProposalMsg{
+			Title:    "TestSubmitAddErc20NativePointer2",
+			Summary:  "TestSubmitAddErc20NativePointer2",
+			Metadata: "TestSubmitAddErc20NativePointer2",
+			Deposit:  "250" + utils.DisplayDenom,
+			Messages: []any{
+				gov.MsgAddERC20NativePointer{
+					Type:      "/titan.pointer.MsgAddERC20NativePointer",
+					Authority: "titan10d07y265gmmuvt4z0w9aw880jnsr700jste397",
+					Token:     tokenDenom2,
+					Name:      "erc20nativepointerTest2",
+					Symbol:    "ERC20NATIVEPOINTERTEST2",
+					Decimals:  8,
+				},
+			},
+		},
+		nil,
+		[]Vote{
+			{voter1, gov.VOTE_OPTION_YES},
+			{voter2, gov.VOTE_OPTION_YES},
+		},
+		gov.PROPOSAL_STATUS_PASSED,
+		func(s string, i []interface{}) {},
+	}
+
+	testSubmitProposal(
+		t,
+		proposal2.Proposer,
+		proposal2.Proposal,
+		proposal2.Deposits,
+		proposal2.Votes,
+		proposal2.ExpectedStatus,
+		proposal2.CallbackFunc,
+	)
+
+	erc20PointerAddr2 := pointer.MustGetERC20Pointer(t, tokenDenom2)
+	fmt.Println("ERC20 Pointer Address 2:", erc20PointerAddr2)
+
+	// Verify that the two pointers are different
+	require.NotEqual(t, erc20PointerAddr, erc20PointerAddr2, "ERC20 Pointer addresses should be different")
 }

@@ -184,6 +184,20 @@ type MsgValidatorRewardSetRate struct {
 	Rate      string `json:"rate"`
 }
 
+type MsgAddERC20NativePointer struct {
+	Type string `json:"@type"`
+	// The sender address of the message. Should be gov
+	Authority string `json:"authority,omitempty"`
+	// The token denom of cosmos native token
+	Token string `json:"token,omitempty"`
+	// The name of the ERC20 token
+	Name string `json:"name,omitempty"`
+	// The symbol of the ERC20 token. Should be uppercase
+	Symbol string `json:"symbol,omitempty"`
+	// The decimals of the ERC20 token. Should be 0-18
+	Decimals uint64 `json:"decimals,omitempty"`
+}
+
 func MustSubmitProposal(t testutil.TestingT, from string, proposal ProposalMsg) string {
 	file := testutil.MustCreateTemp(t, "proposal_*.json")
 	err := json.NewEncoder(file).Encode(proposal)
