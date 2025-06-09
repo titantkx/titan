@@ -4,10 +4,12 @@ import { ethers } from 'hardhat';
 
 import { NativeTokensERC20__factory } from '@contracts/factories/contracts/NativeTokensERC20__factory.ts';
 import pointerAbi from '@precompiles/pointer/abi.json';
+import { BigNumber } from 'ethers';
 import utils from 'utils';
 
 describe('Register test', function () {
   var owner: SignerWithAddress, wallets: SignerWithAddress[];
+  const FAUCET_TITAN_ADDR = 'titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr';
 
   async function setup() {
     [owner, ...wallets] = await ethers.getSigners();
@@ -74,6 +76,28 @@ describe('Register test', function () {
 
     await utils.runTitandTx(ethers, setTokenDenomCmd);
 
+    // mint new token to faucet
+    const mintCmd = `titand tx tokenfactory mint 1000000000factory/titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr/${tokenDenom} ${FAUCET_TITAN_ADDR}`;
+    await utils.runTitandTx(ethers, mintCmd);
+
+    // get total supply
+    const totalSupply = (await utils.runTitandQuery(`titand q bank total`)) as {
+      supply: { denom: string; amount: string }[];
+    };
+    const newTokenSupply = totalSupply.supply.find(
+      (supply) => supply.denom === `factory/titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr/${tokenDenom}`
+    );
+    expect(newTokenSupply).to.not.be.undefined;
+
+    // get faucet balance
+    const faucetBalance = (await utils.runTitandQuery(`titand q bank balances ${FAUCET_TITAN_ADDR}`)) as {
+      balances: { denom: string; amount: string }[];
+    };
+    const faucetTokenBalance = faucetBalance.balances.find(
+      (balance) => balance.denom === `factory/titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr/${tokenDenom}`
+    );
+    expect(faucetTokenBalance).to.not.be.undefined;
+
     /// deploy pointer contract
     ///
     ///
@@ -103,7 +127,7 @@ describe('Register test', function () {
     expect(await testERC20.symbol()).to.equal(tokenDenom.toUpperCase());
     expect(await testERC20.decimals()).to.equal(tokenDecimals);
     expect(await testERC20.denom()).to.equal(`factory/titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr/${tokenDenom}`);
-    expect(await testERC20.totalSupply()).to.equal(0);
-    expect(await testERC20.balanceOf(owner.address)).to.equal(0);
+    expect(await testERC20.totalSupply()).to.equal(BigNumber.from(newTokenSupply?.amount));
+    expect(await testERC20.balanceOf(owner.address)).to.equal(BigNumber.from(faucetTokenBalance?.amount));
   });
 });

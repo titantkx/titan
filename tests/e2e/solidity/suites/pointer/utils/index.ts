@@ -1,5 +1,7 @@
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types';
+import { bech32 } from 'bech32';
 import { execSync } from 'child_process';
+import { BigNumber } from 'ethers';
 import prompts from 'prompts';
 
 const ROOT_DIR = `${__dirname}` + '/' + '../../../../../../';
@@ -50,13 +52,43 @@ async function waitForNumBlocks(ethers: HardhatEthersHelpers, num: number): Prom
   }
 }
 
-async function runTitandTx(ethers: HardhatEthersHelpers, command: string, signerName = 'faucet') {
-  let params = `--home local_test_data/.titan_val1 --keyring-backend test`;
+async function runTitandTx(ethers: HardhatEthersHelpers, command: string, signerName = 'faucet'): Promise<any> {
+  let params = `--home local_test_data/.titan_val1 --keyring-backend test --output json`;
   params += ` --node http://localhost:26657 --chain-id titan_18887-1 --from ${signerName} --gas=auto --gas-prices=100000000000atkx --gas-adjustment=2 -y`;
 
   const cmd = command + ` ${params}`;
-  await runCommandSync(cmd);
+  const output = await runCommandSync(cmd);
   await waitForNumBlocks(ethers, 1);
+
+  return output;
+}
+
+async function runTitandQuery(command: string): Promise<any> {
+  let params = `--home local_test_data/.titan_val1 --output json`;
+  params += ` --node http://localhost:26657 --chain-id titan_18887-1`;
+
+  const cmd = command + ` ${params}`;
+  const output = await runCommandSync(cmd);
+  return JSON.parse(output);
+}
+
+async function getAddressBalance(address: string, tokenDenom: string): Promise<BigNumber> {
+  const balance = await runTitandQuery(`titand q bank balances ${address}`);
+  const tokenBalance = balance.balances.find((b: { denom: string }) => b.denom === tokenDenom);
+  if (!tokenBalance) {
+    return BigNumber.from(0);
+  }
+  return BigNumber.from(tokenBalance.amount);
+}
+
+async function evmAddressToTitanAddress(evmAddress: string): Promise<string> {
+  // Convert EVM address to Titan address format use bech32 encoding
+  const titanPrefix = 'titan';
+  // convert evmAddress to bytes
+  const bytes = Buffer.from(evmAddress.slice(2), 'hex');
+  // convert bytes to bech32
+  const titanAddress = bech32.encode(titanPrefix, bech32.toWords(bytes));
+  return titanAddress;
 }
 
 export default {
@@ -64,4 +96,7 @@ export default {
   runCommandSync,
   waitForNumBlocks,
   runTitandTx,
+  runTitandQuery,
+  getAddressBalance,
+  evmAddressToTitanAddress,
 };
