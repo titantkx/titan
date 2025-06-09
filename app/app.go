@@ -142,6 +142,7 @@ import (
 	"github.com/titantkx/titan/app/upgrades/v2_0_1"
 	"github.com/titantkx/titan/app/upgrades/v3_0_0"
 	v3_0_0_rc_0 "github.com/titantkx/titan/app/upgrades/v3_0_0/rc_0"
+	v4_0_0_rc_0 "github.com/titantkx/titan/app/upgrades/v4_0_0/rc_0"
 	"github.com/titantkx/titan/docs"
 	"github.com/titantkx/titan/precompiles"
 	"github.com/titantkx/titan/utils"
@@ -171,6 +172,7 @@ import (
 	pointermodule "github.com/titantkx/titan/x/pointer"
 	pointermodulekeeper "github.com/titantkx/titan/x/pointer/keeper"
 	pointermoduletypes "github.com/titantkx/titan/x/pointer/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/titantkx/titan/app/params"
@@ -1358,6 +1360,11 @@ func (app *App) setupUpgradeHandlers() {
 		v3_0_0.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v4_0_0_rc_0.UpgradeName,
+		v4_0_0_rc_0.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1387,6 +1394,8 @@ func (app *App) setupUpgradeHandlers() {
 		storeUpgrades = v3_0_0_rc_0.CreateStoreUpgrade()
 	case v3_0_0.UpgradeName:
 		storeUpgrades = v3_0_0.CreateStoreUpgrade()
+	case v4_0_0_rc_0.UpgradeName:
+		storeUpgrades = v4_0_0_rc_0.CreateStoreUpgrade()
 	}
 
 	if storeUpgrades != nil {
