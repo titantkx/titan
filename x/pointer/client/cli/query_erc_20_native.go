@@ -12,7 +12,7 @@ func CmdListErc20Native() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-erc-20-native",
 		Short: "list all erc20_native",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err

@@ -51,7 +51,7 @@ func NewPrecompile(pointerKeeper PointerKeeper, bankKeeper BankKeeper) *pcommon.
 	return pcommon.NewPrecompile(abi, ethcommon.HexToAddress(precompileContractAddress), p)
 }
 
-func (p *PrecompileExecutor) RequiredGas(input []byte, method *ethabi.Method) uint64 {
+func (p *PrecompileExecutor) RequiredGas(input []byte, method *ethabi.Method) uint64 { //nolint:revive
 	return 0
 }
 
@@ -106,7 +106,7 @@ func (p PrecompileExecutor) AddNative(
 	symbol := metadata.Symbol
 	var decimals uint8
 	for _, denomUnit := range metadata.DenomUnits {
-		if denomUnit.Exponent > uint32(decimals) && denomUnit.Exponent <= math.MaxUint8 {
+		if denomUnit.Exponent > uint32(decimals) && denomUnit.Exponent <= math.MaxUint8 { //nolint:gosec
 			decimals = uint8(denomUnit.Exponent)
 			name = denomUnit.Denom
 			symbol = strings.ToUpper(denomUnit.Denom)

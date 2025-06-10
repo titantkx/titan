@@ -49,7 +49,7 @@ func PointerKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger()).WithGasMeter(sdk.NewGasMeter(1000000))
 
 	// Initialize params
-	k.SetParams(ctx, types.DefaultParams())
+	_ = k.SetParams(ctx, types.DefaultParams())
 
 	return k, ctx
 }

@@ -21,7 +21,6 @@ func TestGenesisState_Validate(t *testing.T) {
 		{
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
-
 				Erc20NativeList: []types.Erc20Native{
 					{
 						TokenDenom: "0",

@@ -29,7 +29,7 @@ func (p PrecompileExecutor) emitPointerRegisteredEvent(ctx sdk.Context,
 		Address:     ethcommon.HexToAddress(precompileContractAddress),
 		Topics:      topics,
 		Data:        data,
-		BlockNumber: uint64(ctx.BlockHeight()), //nolint:gosec // G115
+		BlockNumber: uint64(ctx.BlockHeight()),
 	})
 	return nil
 }

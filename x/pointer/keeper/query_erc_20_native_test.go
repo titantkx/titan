@@ -114,7 +114,7 @@ func TestErc20NativeQueryPaginated(t *testing.T) {
 	t.Run("Total", func(t *testing.T) {
 		resp, err := keeper.Erc20NativeAll(wctx, request(nil, 0, 0, true))
 		require.NoError(t, err)
-		require.Equal(t, len(msgs), int(resp.Pagination.Total))
+		require.Equal(t, len(msgs), int(resp.Pagination.Total)) //nolint:gosec
 		require.ElementsMatch(t,
 			nullify.Fill(msgs),
 			nullify.Fill(resp.Erc20Native),

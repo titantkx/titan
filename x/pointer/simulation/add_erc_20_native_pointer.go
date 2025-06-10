@@ -11,11 +11,12 @@ import (
 )
 
 func SimulateMsgAddERC20NativePointer(
-	ak types.AccountKeeper,
-	bk types.BankKeeper,
-	k keeper.Keeper,
+	ak types.AccountKeeper, //nolint:revive
+	bk types.BankKeeper, //nolint:revive
+	k keeper.Keeper, //nolint:revive
 ) simtypes.Operation {
-	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
+	return func(
+		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string, //nolint:revive
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgAddERC20NativePointer{

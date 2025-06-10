@@ -23,7 +23,7 @@ var (
 )
 
 const (
-	opWeightMsgAddERC20NativePointer = "op_weight_msg_add_erc_20_native_pointer"
+	opWeightMsgAddERC20NativePointer = "op_weight_msg_add_erc_20_native_pointer" //nolint:gosec
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgAddERC20NativePointer int = 100
 
@@ -47,7 +47,7 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
 
 // ProposalContents doesn't return any content functions for governance proposals.
-func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent {
+func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent { //nolint:staticcheck
 	return nil
 }
 
@@ -72,12 +72,12 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 }
 
 // ProposalMsgs returns msgs used for governance proposals for simulations.
-func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg { //nolint:revive
 	return []simtypes.WeightedProposalMsg{
 		simulation.NewWeightedProposalMsg(
 			opWeightMsgAddERC20NativePointer,
 			defaultWeightMsgAddERC20NativePointer,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg { //nolint:revive
 				pointersimulation.SimulateMsgAddERC20NativePointer(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},

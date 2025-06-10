@@ -43,7 +43,7 @@ func (msg *MsgAddERC20NativePointer) GetSignBytes() []byte {
 func (msg *MsgAddERC20NativePointer) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Authority)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid authority address (%s)", err)
+		return WrapErrorf(sdkerrors.ErrInvalidAddress, "invalid authority address (%s)", err)
 	}
 	// decimals must be between 0 and 18
 	if msg.Decimals > 18 {

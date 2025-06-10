@@ -531,7 +531,7 @@ func TestSubmitAddErc20NativePointer(t *testing.T) {
 			{voter2, gov.VOTE_OPTION_YES},
 		},
 		gov.PROPOSAL_STATUS_PASSED,
-		func(s string, i []interface{}) {},
+		func(s string, i []interface{}) {}, //nolint:revive
 	}
 
 	testSubmitProposal(
@@ -580,7 +580,7 @@ func TestSubmitAddErc20NativePointer(t *testing.T) {
 			{voter2, gov.VOTE_OPTION_YES},
 		},
 		gov.PROPOSAL_STATUS_PASSED,
-		func(s string, i []interface{}) {},
+		func(s string, i []interface{}) {}, //nolint:revive
 	}
 
 	testSubmitProposal(

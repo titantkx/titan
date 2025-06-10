@@ -22,7 +22,7 @@ func (k Keeper) Erc20NativeAll(goCtx context.Context, req *types.QueryErc20Nativ
 	store := ctx.KVStore(k.storeKey)
 	erc20NativeStore := prefix.NewStore(store, types.KeyPrefix(types.Erc20NativeKeyPrefix))
 
-	pageRes, err := query.Paginate(erc20NativeStore, req.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.Paginate(erc20NativeStore, req.Pagination, func(_ []byte, value []byte) error {
 		var erc20Native types.Erc20Native
 		if err := k.cdc.Unmarshal(value, &erc20Native); err != nil {
 			return err

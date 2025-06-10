@@ -13,7 +13,7 @@ type BankKeeper interface {
 	GetDenomMetaData(ctx sdk.Context, denom string) (banktypes.Metadata, bool)
 }
 
-type PointerKeeper interface {
+type PointerKeeper interface { //nolint:revive
 	DeployOrUpdateErc20NativePointer(
 		ctx sdk.Context,
 		evm *vm.EVM,

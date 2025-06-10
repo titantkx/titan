@@ -153,7 +153,7 @@ func TestListErc20Native(t *testing.T) {
 		var resp types.QueryErc20NativeAllResponse
 		require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 		require.NoError(t, err)
-		require.Equal(t, len(objs), int(resp.Pagination.Total))
+		require.Equal(t, len(objs), int(resp.Pagination.Total)) //nolint:gosec
 		require.ElementsMatch(t,
 			nullify.Fill(objs),
 			nullify.Fill(resp.Erc20Native),

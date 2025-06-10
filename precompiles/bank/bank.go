@@ -59,7 +59,7 @@ func NewPrecompile(pointerKeeper PointerKeeper, bankKeeper bankkeeper.Keeper) *p
 	return pcommon.NewPrecompile(abi, ethcommon.HexToAddress(PrecompileContractAddress), p)
 }
 
-func (p *PrecompileExecutor) RequiredGas(input []byte, method *ethabi.Method) uint64 {
+func (p *PrecompileExecutor) RequiredGas(input []byte, method *ethabi.Method) uint64 { //nolint:revive
 	return 0
 }
 
@@ -100,7 +100,7 @@ func (p *PrecompileExecutor) Execute(
 
 func (p PrecompileExecutor) send(
 	ctx sdk.Context,
-	evm *vm.EVM,
+	_ *vm.EVM,
 	method *ethabi.Method,
 	caller ethcommon.Address,
 	args []interface{},
@@ -173,9 +173,9 @@ func (p PrecompileExecutor) send(
 
 func (p PrecompileExecutor) balance(
 	ctx sdk.Context,
-	evm *vm.EVM,
+	_ *vm.EVM,
 	method *ethabi.Method,
-	caller ethcommon.Address, //nolint:revive
+	_ ethcommon.Address,
 	args []interface{},
 	value *big.Int,
 ) ([]byte, error) {
@@ -202,9 +202,9 @@ func (p PrecompileExecutor) balance(
 
 func (p PrecompileExecutor) allBalances(
 	ctx sdk.Context,
-	evm *vm.EVM,
+	_ *vm.EVM,
 	method *ethabi.Method,
-	caller ethcommon.Address, //nolint:revive
+	_ ethcommon.Address,
 	args []interface{},
 	value *big.Int,
 ) ([]byte, error) {
@@ -239,9 +239,9 @@ func (p PrecompileExecutor) allBalances(
 
 func (p PrecompileExecutor) name(
 	ctx sdk.Context,
-	evm *vm.EVM,
+	_ *vm.EVM,
 	method *ethabi.Method,
-	caller ethcommon.Address, //nolint:revive
+	_ ethcommon.Address,
 	args []interface{},
 	value *big.Int,
 ) ([]byte, error) {
@@ -264,9 +264,9 @@ func (p PrecompileExecutor) name(
 
 func (p PrecompileExecutor) symbol(
 	ctx sdk.Context,
-	evm *vm.EVM,
+	_ *vm.EVM,
 	method *ethabi.Method,
-	caller ethcommon.Address, //nolint:revive
+	_ ethcommon.Address,
 	args []interface{},
 	value *big.Int,
 ) ([]byte, error) {
@@ -288,27 +288,27 @@ func (p PrecompileExecutor) symbol(
 }
 
 func (p PrecompileExecutor) decimals(
-	ctx sdk.Context,
-	evm *vm.EVM,
+	_ sdk.Context,
+	_ *vm.EVM,
 	method *ethabi.Method,
-	caller ethcommon.Address, //nolint:revive
-	args []interface{},
+	_ ethcommon.Address,
+	_ []interface{},
 	value *big.Int,
 ) ([]byte, error) {
 	if err := pcommon.ValidateNonPayable(value); err != nil {
 		return nil, err
 	}
 
-	// all native tokens are integer-based, returns decimals for microdenom (usei)
+	// all native tokens are integer-based, returns decimals 0
 	bz, err := method.Outputs.Pack(uint8(0))
 	return bz, err
 }
 
 func (p PrecompileExecutor) totalSupply(
 	ctx sdk.Context,
-	evm *vm.EVM,
+	_ *vm.EVM,
 	method *ethabi.Method,
-	caller ethcommon.Address, //nolint:revive
+	_ ethcommon.Address,
 	args []interface{},
 	value *big.Int,
 ) ([]byte, error) {

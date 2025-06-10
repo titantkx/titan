@@ -14,7 +14,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		_ = k.SetErc20Native(ctx, elem)
 	}
 	// this line is used by starport scaffolding # genesis/module/init
-	k.SetParams(ctx, genState.Params)
+	_ = k.SetParams(ctx, genState.Params)
 }
 
 // ExportGenesis returns the module's exported genesis
