@@ -98,7 +98,7 @@ func (p PrecompileExecutor) send(
 	ctx sdk.Context,
 	evm *vm.EVM,
 	method *ethabi.Method,
-	caller ethcommon.Address, //nolint:revive
+	caller ethcommon.Address,
 	args []interface{},
 	value *big.Int,
 	readOnly bool,
