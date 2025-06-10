@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	"github.com/stretchr/testify/require"
+	etherminttests "github.com/titantkx/ethermint/tests"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -28,6 +29,7 @@ func networkWithErc20NativeObjects(t *testing.T, n int) (*network.Network, []typ
 	for i := 0; i < n; i++ {
 		erc20Native := types.Erc20Native{
 			TokenDenom: strconv.Itoa(i),
+			Erc20Addr:  etherminttests.GenerateAddress().String(),
 		}
 		nullify.Fill(&erc20Native)
 		state.Erc20NativeList = append(state.Erc20NativeList, erc20Native)
