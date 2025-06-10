@@ -28,7 +28,7 @@ func (k Keeper) SetErc20Native(ctx sdk.Context, erc20Native types.Erc20Native) e
 	erc20Native.Erc20Addr = erc20Addr.Hex()
 
 	if etherminttypes.IsZeroAddress(erc20Native.Erc20Addr) {
-		return sdkerrors.Wrap(errortypes.ErrInvalidAddress, "invalid checksum for erc20 address")
+		return sdkerrors.Wrap(errortypes.ErrInvalidAddress, "invalid zero erc20 address")
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.Erc20NativeKeyPrefix))
