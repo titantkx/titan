@@ -128,7 +128,7 @@ func (p PrecompileExecutor) send(
 		return nil, fmt.Errorf("erc20native %s not found", tokenDenom)
 	}
 	if erc20Native.Erc20Addr != caller.Hex() {
-		return nil, fmt.Errorf("only pointer %s can call button %s", erc20Native.Erc20Addr, caller.Hex())
+		return nil, fmt.Errorf("only pointer %s can call send %s", erc20Native.Erc20Addr, caller.Hex())
 	}
 
 	from, err := pcommon.GetCosmosAddressFromEVMAddressArg(args[0])
