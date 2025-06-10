@@ -119,27 +119,30 @@ func (k Keeper) DeployOrUpdateErc20NativePointer(
 		// pointer contract already exited, update it code
 		contractAddr, err = types.GetErc20AddressFromString(erc20Native.Erc20Addr)
 		if err != nil {
-			return
+			return ethcommon.Address{}, err
 		}
 		ret, remainingGas, err = evm.GetDeploymentCode(vm.AccountRef(pointerModuleEthAddr), bin, suppliedGas, big.NewInt(0), contractAddr)
 		evm.StateDB.SetCode(contractAddr, ret)
 	} else {
 		// deploy new pointer contract
-		// @todo maybe need to override set nonce of EVM like ethermint did
 		_, contractAddr, remainingGas, err = evm.Create(vm.AccountRef(pointerModuleEthAddr), bin, suppliedGas, big.NewInt(0))
 	}
 	if err != nil {
-		return
+		return ethcommon.Address{}, err
 	}
 
 	ctx.GasMeter().ConsumeGas(suppliedGas-remainingGas, "erc20native contract deploy or update")
 	// set erc20native contract address
-	k.SetErc20Native(ctx, types.Erc20Native{
+	err = k.SetErc20Native(ctx, types.Erc20Native{
 		TokenDenom: token,
 		Erc20Addr:  contractAddr.Hex(),
 	})
+	if err != nil {
+		return ethcommon.Address{}, err
+	}
+
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypePointerRegistered, sdk.NewAttribute(types.AttributeKeyPointerType, pointerType),
 		sdk.NewAttribute(types.AttributeKeyPointerAddress, contractAddr.Hex()), sdk.NewAttribute(types.AttributeKeyPointee, token)))
-	return
+	return contractAddr, nil
 }
