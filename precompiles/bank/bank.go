@@ -74,6 +74,10 @@ func (p *PrecompileExecutor) Execute(
 	readOnly bool,
 	isFromDelegateCall bool,
 ) (ret []byte, err error) {
+	if isFromDelegateCall {
+		return nil, errors.New("cannot call bank precompile from delegatecall")
+	}
+
 	switch method.Name {
 	case SendMethod:
 		return p.send(ctx, evm, method, caller, args, value, readOnly)
