@@ -80,7 +80,7 @@ func (p *PrecompileExecutor) Execute(
 	case BalanceMethod:
 		return p.balance(ctx, evm, method, caller, args, value)
 	case AllBalancesMethod:
-		return p.all_balances(ctx, evm, method, caller, args, value)
+		return p.allBalances(ctx, evm, method, caller, args, value)
 	case NameMethod:
 		return p.name(ctx, evm, method, caller, args, value)
 	case SymbolMethod:
@@ -196,7 +196,7 @@ func (p PrecompileExecutor) balance(
 	return bz, err
 }
 
-func (p PrecompileExecutor) all_balances(
+func (p PrecompileExecutor) allBalances(
 	ctx sdk.Context,
 	evm *vm.EVM,
 	method *ethabi.Method,
