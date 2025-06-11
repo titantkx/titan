@@ -26,6 +26,7 @@ function checkTestEnv() {
     .describe('network', 'set which network to use: ganache|titan')
     .describe('batch', 'set the test batch in parallelized testing. Format: %d-%d')
     .describe('allow-tests', 'only run specified tests. Separated by comma.')
+    .boolean('include-staking-test').describe('include-staking-test', 'include staking test (take long time), default false')
     .boolean('verbose-log').describe('verbose-log', 'print titand output, default false')
     .argv;
 
@@ -72,6 +73,7 @@ function checkTestEnv() {
 
   // only test
   runConfig.onlyTest = !!argv['allow-tests'] ? argv['allow-tests'].split(',') : undefined;
+  runConfig.includeStakingTest = !!argv['include-staking-test'];
   runConfig.verboseLog = !!argv['verbose-log'];
 
   logger.info(`Running on network: ${runConfig.network}`);
@@ -116,6 +118,11 @@ function loadTests(runConfig) {
 
   if (runConfig.onlyTest) {
     validTests = validTests.filter(t => runConfig.onlyTest.indexOf(t) !== -1);
+  }
+
+  if(!runConfig.includeStakingTest) {
+    // remove staking test
+    validTests = validTests.filter(t => t.indexOf('staking') === -1);
   }
 
   if (runConfig.batch) {
