@@ -2,6 +2,17 @@
 
 set -e
 
+# kill any existing `titand` processes
+process_name="titand"
+if pgrep -x "$process_name" >/dev/null; then
+    # Get the PID of the process
+    pid=$(pgrep -x "$process_name")
+
+    # Kill the process
+    echo "Killing process $process_name with PID $pid"
+    kill $pid
+fi
+
 # Install nvm if not present
 export NVM_DIR="$HOME/.nvm"
 if [ ! -d "$NVM_DIR" ]; then
@@ -39,4 +50,16 @@ else
     yarn install
 fi
 
+# shellcheck disable=SC2068
 yarn test --network titan $@
+
+# kill any existing `titand` processes
+process_name="titand"
+if pgrep -x "$process_name" >/dev/null; then
+    # Get the PID of the process
+    pid=$(pgrep -x "$process_name")
+
+    # Kill the process
+    echo "Killing process $process_name with PID $pid"
+    kill $pid
+fi
