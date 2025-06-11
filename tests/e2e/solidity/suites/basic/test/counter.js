@@ -39,19 +39,16 @@ contract('Counter', (accounts) => {
 
     await counter.add({ from: one })
     count = await counter.getCounter()
-    console.log(count.toString())
     assert.equal(count, '1', 'Counter should be 1')
     assert.notEqual(balanceOne, await web3.eth.getBalance(one), `${one}'s balance should be different`)
 
     await counter.add({ from: two })
     count = await counter.getCounter()
-    console.log(count.toString())
     assert.equal(count, '2', 'Counter should be 2')
     assert.notEqual(balanceTwo, await web3.eth.getBalance(two), `${two}'s balance should be different`)
 
     await counter.add({ from: three })
     count = await counter.getCounter()
-    console.log(count.toString())
     assert.equal(count, '3', 'Counter should be 3')
     assert.notEqual(balanceThree, await web3.eth.getBalance(three), `${three}'s balance should be different`)
   })
@@ -61,7 +58,6 @@ contract('Counter', (accounts) => {
 
     await counter.add()
     count = await counter.getCounter()
-    console.log(count.toString())
     assert.equal(count, '1', 'Counter should be 1')
 
     // Use receipt to ensure logs are emitted
