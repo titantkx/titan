@@ -122,10 +122,10 @@ all: build-with-regen
 
 lint:	golangci-lint
 	go mod verify	
-	golangci-lint run --out-format=tab
+	golangci-lint run
 
 lint-fix:	golangci-lint	
-	golangci-lint run --fix --out-format=tab --issues-exit-code=0
+	golangci-lint run --fix --issues-exit-code=0
 
 .PHONY: lint lint-fix
 
@@ -238,10 +238,10 @@ cosmovisor:
 	cp cosmovisor_tmp/tools/cosmovisor/cosmovisor build/cosmovisor
 	rm -rf cosmovisor_tmp
 
-GOLANGCI_VERSION=latest
+GOLANGCI_VERSION=v2.1.6
 
 golangci-lint:
-	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_VERSION)
+	@go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_VERSION)
 
 .PHONE: ignite cosmovisor golangci-lint
 ###############################################################################
@@ -263,7 +263,7 @@ localnet-serve-reset:
 
 test-solidity:
 	@echo "Beginning solidity tests..."
-	./scripts/run-solidity-tests.sh
+	./scripts/run-solidity-tests.sh --allowTests=pointer
 
 vulncheck: $(BUILDDIR)/
 	GOBIN=$(BUILDDIR) go install golang.org/x/vuln/cmd/govulncheck@latest
