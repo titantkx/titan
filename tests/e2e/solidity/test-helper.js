@@ -21,11 +21,11 @@ function checkTestEnv() {
   const argv = yargs(hideBin(process.argv))
     .usage('Usage: $0 [options] <tests>')
     .example('$0 --network titan', 'run all tests using titan network')
-    .example('$0 --network titan --allowTests=test1,test2', 'run only test1 and test2 using titan network')
+    .example('$0 --network titan --allow-tests=test1,test2', 'run only test1 and test2 using titan network')
     .help('h').alias('h', 'help')
     .describe('network', 'set which network to use: ganache|titan')
     .describe('batch', 'set the test batch in parallelized testing. Format: %d-%d')
-    .describe('allowTests', 'only run specified tests. Separated by comma.')
+    .describe('allow-tests', 'only run specified tests. Separated by comma.')
     .boolean('verbose-log').describe('verbose-log', 'print titand output, default false')
     .argv;
 
@@ -36,7 +36,7 @@ function checkTestEnv() {
   
   // Check test network
   if (!argv.network) {
-    runConfig.network = 'ganache';
+    runConfig.network = 'titan';
   }
   else {
     if (argv.network !== 'titan' && argv.network !== 'ganache') {
@@ -71,7 +71,7 @@ function checkTestEnv() {
   }
 
   // only test
-  runConfig.onlyTest = !!argv['allowTests'] ? argv['allowTests'].split(',') : undefined;
+  runConfig.onlyTest = !!argv['allow-tests'] ? argv['allow-tests'].split(',') : undefined;
   runConfig.verboseLog = !!argv['verbose-log'];
 
   logger.info(`Running on network: ${runConfig.network}`);
@@ -210,7 +210,7 @@ async function main() {
 
   console.log(`Running Tests: ${allTests.join()}`);
 
-  const proc = await setupNetwork({ runConfig, timeout: 120000 });
+  const proc = await setupNetwork({ runConfig, timeout: 300000 });
   await performTests({ allTests, runConfig });
 
   if (proc) {

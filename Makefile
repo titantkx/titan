@@ -263,7 +263,7 @@ localnet-serve-reset:
 
 test-solidity:
 	@echo "Beginning solidity tests..."
-	./scripts/run-solidity-tests.sh --allowTests=pointer
+	./scripts/run-solidity-tests.sh
 
 vulncheck: $(BUILDDIR)/
 	GOBIN=$(BUILDDIR) go install golang.org/x/vuln/cmd/govulncheck@latest

@@ -21,7 +21,7 @@ You can simply run `yarn test --network titan` to run all tests with ethermint n
 In most cases, there two networks should produce identical test results.
 
 If you only want to run a few test cases, append the name of tests following by the command line.
-For example, use `yarn test --network titan --allowTests=basic` to run the `basic` test under `titan` network.
+For example, use `yarn test --network titan --allow-tests=basic` to run the `basic` test under `titan` network.
 
 If you need to take more control, you can also run `titand` using:
 
