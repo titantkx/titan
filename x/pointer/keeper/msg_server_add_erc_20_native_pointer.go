@@ -30,7 +30,7 @@ func (k msgServer) AddERC20NativePointer(goCtx context.Context, msg *types.MsgAd
 				return sdkerrors.ErrInvalidRequest.Wrapf("decimals cannot be greater than 18")
 			}
 			contractAddr, err = k.DeployOrUpdateErc20NativePointer(ctx, evm, msg.Token, types.ERCMetadata{
-				Name: msg.Name, Symbol: msg.Symbol, Decimals: uint8(msg.Decimals),
+				Name: msg.Name, Symbol: msg.Symbol, Decimals: uint8(msg.Decimals), //nolint:gosec
 			})
 			if err != nil {
 				return err

@@ -5,6 +5,7 @@
   "license": "MIT",
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",
+    "@openzeppelin/contracts": "4.9.3",
     "@commitlint/config-conventional": "^17.3.0",
     "@ethersproject/abi": "^5.4.7",
     "@ethersproject/providers": "^5.4.7",
@@ -61,8 +62,5 @@
     "clean": "hardhat clean",
     "slither": "slither .",
     "slither:triage": "slither . --triage-mode"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "4.9.3"
   }
 }

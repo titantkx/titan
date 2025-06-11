@@ -106,7 +106,7 @@ func (p PrecompileExecutor) AddNative(
 	symbol := metadata.Symbol
 	var decimals uint8
 	for _, denomUnit := range metadata.DenomUnits {
-		if denomUnit.Exponent > uint32(decimals) && denomUnit.Exponent <= math.MaxUint8 { //nolint:gosec
+		if denomUnit.Exponent > uint32(decimals) && denomUnit.Exponent <= math.MaxUint8 {
 			decimals = uint8(denomUnit.Exponent)
 			name = denomUnit.Denom
 			symbol = strings.ToUpper(denomUnit.Denom)

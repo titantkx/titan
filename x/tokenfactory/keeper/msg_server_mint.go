@@ -16,7 +16,7 @@ func (server msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.
 		return nil, types.ErrDenomDoesNotExist.Wrapf("denom: %s", msg.Amount.Denom)
 	}
 
-	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
+	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom()) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (server msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.
 		msg.MintToAddress = msg.Sender
 	}
 
-	err = server.Keeper.mintTo(ctx, msg.Amount, msg.MintToAddress)
+	err = server.Keeper.mintTo(ctx, msg.Amount, msg.MintToAddress) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}

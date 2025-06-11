@@ -88,7 +88,7 @@ func TestErc20NativeQueryPaginated(t *testing.T) {
 	t.Run("ByOffset", func(t *testing.T) {
 		step := 2
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.Erc20NativeAll(wctx, request(nil, uint64(i), uint64(step), false))
+			resp, err := keeper.Erc20NativeAll(wctx, request(nil, uint64(i), uint64(step), false)) //nolint:gosec
 			require.NoError(t, err)
 			require.LessOrEqual(t, len(resp.Erc20Native), step)
 			require.Subset(t,
@@ -101,7 +101,7 @@ func TestErc20NativeQueryPaginated(t *testing.T) {
 		step := 2
 		var next []byte
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.Erc20NativeAll(wctx, request(next, 0, uint64(step), false))
+			resp, err := keeper.Erc20NativeAll(wctx, request(next, 0, uint64(step), false)) //nolint:gosec
 			require.NoError(t, err)
 			require.LessOrEqual(t, len(resp.Erc20Native), step)
 			require.Subset(t,

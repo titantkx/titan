@@ -15,7 +15,7 @@ const (
 func (p PrecompileExecutor) emitPointerRegisteredEvent(ctx sdk.Context,
 	evm *vm.EVM, token string, contractAddr ethcommon.Address,
 ) error {
-	event := p.ABI.Events[EventPointerRegistered]
+	event := p.ABI.Events[EventPointerRegistered] //nolint:staticcheck
 	topics := []ethcommon.Hash{
 		event.ID,
 	}
@@ -29,7 +29,7 @@ func (p PrecompileExecutor) emitPointerRegisteredEvent(ctx sdk.Context,
 		Address:     ethcommon.HexToAddress(precompileContractAddress),
 		Topics:      topics,
 		Data:        data,
-		BlockNumber: uint64(ctx.BlockHeight()),
+		BlockNumber: uint64(ctx.BlockHeight()), //nolint:gosec
 	})
 	return nil
 }

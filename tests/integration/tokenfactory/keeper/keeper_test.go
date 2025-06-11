@@ -40,7 +40,7 @@ func TestKeeperTestSuite(t *testing.T) {
 
 func (s *KeeperTestSuite) SetupTest() {
 	s.app, s.genAddr = app.Setup(s.T(), false)
-	s.ctx = s.app.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
+	s.ctx = s.app.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()}) //nolint:staticcheck
 
 	queryHelper := baseapp.NewQueryServerTestHelper(s.ctx, s.app.InterfaceRegistry())
 	types.RegisterQueryServer(queryHelper, s.app.TokenfactoryKeeper)
@@ -54,7 +54,7 @@ func (s *KeeperTestSuite) SetupTest() {
 func (s *KeeperTestSuite) SetupTestForInitGenesis() {
 	// Setting to True, leads to init genesis not running
 	s.app, s.genAddr = app.Setup(s.T(), true)
-	s.ctx = s.app.BaseApp.NewContext(true, tmproto.Header{Time: time.Now()})
+	s.ctx = s.app.BaseApp.NewContext(true, tmproto.Header{Time: time.Now()}) //nolint:staticcheck
 }
 
 func (s *KeeperTestSuite) CreateDenom(creator string, denom string) string {
@@ -80,7 +80,7 @@ func (s *KeeperTestSuite) TestCreateModuleAccount() {
 	app.AccountKeeper.RemoveAccount(s.ctx, tokenfactoryModuleAccount)
 
 	// ensure module account was removed
-	s.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
+	s.ctx = app.BaseApp.NewContext(false, tmproto.Header{}) //nolint:staticcheck
 	tokenfactoryModuleAccount = app.AccountKeeper.GetAccount(s.ctx, app.AccountKeeper.GetModuleAddress(types.ModuleName))
 	s.Require().Nil(tokenfactoryModuleAccount)
 

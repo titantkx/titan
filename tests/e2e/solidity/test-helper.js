@@ -99,7 +99,7 @@ function loadTests(runConfig) {
     // test package.json
     try {
       const testManifest = JSON.parse(fs.readFileSync(path.join(__dirname, 'suites', dirname, 'package.json'), 'utf-8'))
-      const needScripts = ['test-ganache', 'test-titan'];
+      const needScripts = ['test-titan'];
       for (const s of needScripts) {
         if (Object.keys(testManifest['scripts']).indexOf(s) === -1) {
           logger.warn(`${dirname} does not have test script: \`${s}\`. Skip this test suite.`);

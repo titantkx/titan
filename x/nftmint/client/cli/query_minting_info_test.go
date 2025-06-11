@@ -118,7 +118,7 @@ func TestListMintingInfo(t *testing.T) {
 	t.Run("ByOffset", func(t *testing.T) {
 		step := 2
 		for i := 0; i < len(objs); i += step {
-			args := request(nil, uint64(i), uint64(step), false)
+			args := request(nil, uint64(i), uint64(step), false) //nolint:gosec
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListMintingInfo(), args)
 			require.NoError(t, err)
 			var resp types.QueryMintingInfosResponse
@@ -134,7 +134,7 @@ func TestListMintingInfo(t *testing.T) {
 		step := 2
 		var next []byte
 		for i := 0; i < len(objs); i += step {
-			args := request(next, 0, uint64(step), false)
+			args := request(next, 0, uint64(step), false) //nolint:gosec
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListMintingInfo(), args)
 			require.NoError(t, err)
 			var resp types.QueryMintingInfosResponse

@@ -10,7 +10,7 @@ import (
 func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
+	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom()) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 		return nil, types.ErrUnauthorized
 	}
 
-	err = server.Keeper.burnFrom(ctx, msg.Amount, msg.Sender)
+	err = server.Keeper.burnFrom(ctx, msg.Amount, msg.Sender) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
