@@ -146,7 +146,7 @@ BUILD_TARGETS := build install
 
 build: BUILD_ARGS=-o $(BUILDDIR)/
 
-$(BUILD_TARGETS): sync $(BUILDDIR)/
+$(BUILD_TARGETS): go.sum $(BUILDDIR)/
 	CGO_ENABLED=1 go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 build-with-regen: proto-all lint go.sum $(BUILDDIR)/
