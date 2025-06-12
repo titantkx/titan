@@ -138,11 +138,15 @@ format:
 ###                                  Build                                  ###
 ###############################################################################
 
+sync: go.sum proto-gen update-swagger-docs-by-ignite
+
+.PHONY: sync
+
 BUILD_TARGETS := build install
 
 build: BUILD_ARGS=-o $(BUILDDIR)/
 
-$(BUILD_TARGETS): go.sum $(BUILDDIR)/
+$(BUILD_TARGETS): sync $(BUILDDIR)/
 	CGO_ENABLED=1 go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 build-with-regen: proto-all lint go.sum $(BUILDDIR)/
@@ -273,6 +277,7 @@ go.sum: go.mod
 	@echo "Ensure dependencies have not been modified ..." >&2
 	go mod verify
 	go mod tidy
+	pushd tests/interchain && go mod verify && go mod tidy && popd
 
 test-testutil:
 	go test -timeout 1200s -cover github.com/titantkx/titan/testutil -v
