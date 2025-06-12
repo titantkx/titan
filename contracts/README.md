@@ -9,4 +9,4 @@ This is project for Titan embedded contracts.
    yarn compile
    ```
 
-3. Copy those files to corresponding directories
+3. Copy those files to corresponding directories in [x/pointer/artifacts/](../x/pointer/artifacts/)
