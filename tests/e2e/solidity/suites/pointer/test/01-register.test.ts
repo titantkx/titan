@@ -43,7 +43,7 @@ describe('Register test', function () {
       await utils.runTitandTx(ethers, createTokenCmd);
     } catch (e: unknown) {
       if (e instanceof Error && e.message.includes('attempting to create a denom that already exists')) {
-        console.log('Token already exists, skipping creation.');
+        console.log('Token already exists.');
       } else {
         throw e;
       }

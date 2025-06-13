@@ -6,7 +6,7 @@ import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import utils from 'utils';
 
-describe('Register test', function () {
+describe('ERC20 test', function () {
   var faucet: SignerWithAddress, wallets: SignerWithAddress[];
 
   const FAUCET_TITAN_ADDR = 'titan16e6pnctgxcnv8y9n27p285gdnmgyl6ndsuu2nr';
