@@ -138,8 +138,7 @@ format:
 ###                                  Build                                  ###
 ###############################################################################
 
-sync: go.sum proto-gen update-swagger-docs-by-ignite
-
+sync: go.sum proto-gen mocks update-swagger-docs-by-ignite
 .PHONY: sync
 
 BUILD_TARGETS := build install
