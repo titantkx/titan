@@ -99,6 +99,8 @@ func (k Keeper) DeployOrUpdateErc20NativePointer(
 		return ethcommon.Address{}, fmt.Errorf("cannot create pointer for base token %s", utils.BaseDenom)
 	}
 
+	// construct bin is contract code and constructor parameter
+	// REF: https://github.com/sei-protocol/sei-chain/blob/a28fa186f5436f855012b2090cfb064ad4f6b95a/x/evm/keeper/pointer_upgrade.go#L92-L97
 	var bin []byte
 	args := []interface{}{
 		token, metadata.Name, metadata.Symbol, metadata.Decimals,
