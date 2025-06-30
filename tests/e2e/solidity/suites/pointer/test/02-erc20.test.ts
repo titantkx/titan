@@ -58,4 +58,49 @@ describe('ERC20 test', function () {
     expect(newOwnerBalance).to.equal(oldOwnerBalance.sub(BigNumber.from('1000')));
     expect(newRecipientBalance).to.equal(oldRecipientBalance.add(BigNumber.from('1000')));
   });
+
+  it('Not faucet cannot transferFrom token from faucet to another', async function () {
+    const testERC20 = NativeTokensERC20__factory.connect(TEST_ERC20_ADDR, faucet);
+
+    const recipient = wallets[0];
+
+    // check balance of owner and recipient via BANK
+    const oldOwnerBalanceBank = await utils.getAddressBalance(FAUCET_TITAN_ADDR, TOKEN_DENOM);
+    const oldRecipientBalanceBank = await utils.getAddressBalance(
+      await utils.evmAddressToTitanAddress(recipient.address),
+      TOKEN_DENOM
+    );
+
+    // check balance of owner and recipient via EVM
+    const oldOwnerBalance = await testERC20.balanceOf(faucet.address);
+    const oldRecipientBalance = await testERC20.balanceOf(recipient.address);
+
+    try {
+      const tx = await testERC20
+        .connect(wallets[0])
+        .transferFrom(faucet.address, recipient.address, BigNumber.from('1000'));
+
+      await tx.wait();
+      expect.fail('Should not be successful');
+    } catch (e: unknown) {
+      expect(e).to.be.instanceOf(Error);
+      expect((e as Error).message).to.include(`ERC20: insufficient allowance`);
+    }
+
+    // check balance of owner and recipient via BANK
+    const newOwnerBalanceBank = await utils.getAddressBalance(FAUCET_TITAN_ADDR, TOKEN_DENOM);
+    const newRecipientBalanceBank = await utils.getAddressBalance(
+      await utils.evmAddressToTitanAddress(recipient.address),
+      TOKEN_DENOM
+    );
+
+    // check balance of owner and recipient via EVM
+    const newOwnerBalance = await testERC20.balanceOf(faucet.address);
+    const newRecipientBalance = await testERC20.balanceOf(recipient.address);
+
+    expect(newOwnerBalanceBank).to.equal(oldOwnerBalanceBank);
+    expect(newRecipientBalanceBank).to.equal(oldRecipientBalanceBank);
+    expect(newOwnerBalance).to.equal(oldOwnerBalance);
+    expect(newRecipientBalance).to.equal(oldRecipientBalance);
+  });
 });
