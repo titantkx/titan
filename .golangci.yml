@@ -57,6 +57,9 @@ linters:
           - revive
           - staticcheck
         text: 'don''t use an underscore in package name|ST1003:'
+      - linters:
+          - revive
+        text: 'avoid meaningless package names'
     paths:
       - third_party$
       - builtin$
