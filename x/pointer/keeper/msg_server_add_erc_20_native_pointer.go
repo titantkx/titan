@@ -20,7 +20,7 @@ func (k msgServer) AddERC20NativePointer(goCtx context.Context, msg *types.MsgAd
 		return nil, err
 	}
 	if authority.String() != k.authority {
-		return nil, types.WrapErrorf(sdkerrors.ErrUnauthorized, "incorrect authority %s", msg.Authority)
+		return nil, types.WrapError(sdkerrors.ErrUnauthorized, "only gov is allowed to perform this operation")
 	}
 
 	var contractAddr ethcommon.Address
