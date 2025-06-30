@@ -26,9 +26,6 @@ func (k msgServer) AddERC20NativePointer(goCtx context.Context, msg *types.MsgAd
 	var contractAddr ethcommon.Address
 	err = k.evmKeeper.RunWithOneOffEVMInstance(ctx, ethcommon.BytesToAddress(authority),
 		func(evm *vm.EVM) error {
-			if msg.Decimals > 18 {
-				return sdkerrors.ErrInvalidRequest.Wrapf("decimals cannot be greater than 18")
-			}
 			contractAddr, err = k.DeployOrUpdateErc20NativePointer(ctx, evm, msg.Token, types.ERCMetadata{
 				Name: msg.Name, Symbol: msg.Symbol, Decimals: uint8(msg.Decimals), //nolint:gosec
 			})
