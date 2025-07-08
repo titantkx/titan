@@ -19,8 +19,6 @@ import (
 
 const (
 	EventTypeRefund = "refund"
-
-	AttributeKeyRefund = "refund"
 )
 
 // ensure RefundGasRemainingDecorator implements the cosmos-sdk sdk.PostDecorator
