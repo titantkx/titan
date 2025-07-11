@@ -292,6 +292,6 @@ replace (
 	github.com/ethereum/go-ethereum => github.com/titantkx/go-ethereum v1.10.26-titan.3
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/misko9/go-substrate-rpc-client/v4 => github.com/faddat/go-substrate-rpc-client/v4 v4.0.1-0.20240402155230-48db8c110afe
-	github.com/strangelove-ventures/interchaintest/v7 => github.com/titantkx/interchaintest/v7 v7.1.2
+	github.com/strangelove-ventures/interchaintest/v7 => github.com/titantkx/interchaintest/v7 v7.1.3
 	github.com/titantkx/titan => ../..
 )

@@ -1187,8 +1187,8 @@ github.com/titantkx/ethermint v0.24.0 h1:5PCJA+1onEH7PhJbsjrZGSAtIg5mOBe9yNX38um
 github.com/titantkx/ethermint v0.24.0/go.mod h1:ShY/NSPV242Htwc3HiGZmgU6DYhCEWBJoUCFuA2NCzQ=
 github.com/titantkx/go-ethereum v1.10.26-titan.3 h1:8WN7eE2b0HOUuy05cQl5wXX+qk02jVpCqKG9l7eJx3w=
 github.com/titantkx/go-ethereum v1.10.26-titan.3/go.mod h1:vexqnuZth0CZjPTa+237NS1BKP2wpd1xAOmZZP/MYfU=
-github.com/titantkx/interchaintest/v7 v7.1.2 h1:nF+3WRCDiit3nTA1EIZsK5tRvR6xAwhoKI0/AfQo34M=
-github.com/titantkx/interchaintest/v7 v7.1.2/go.mod h1:cQfuoZfMP+F94q6rR+z4PSShgbQI79jxpl8W2T7ei+Q=
+github.com/titantkx/interchaintest/v7 v7.1.3 h1:/DacRM9Fc2wz2wQGNyOm5q1CFXEmzX/wtOkeBREWwQ8=
+github.com/titantkx/interchaintest/v7 v7.1.3/go.mod h1:cQfuoZfMP+F94q6rR+z4PSShgbQI79jxpl8W2T7ei+Q=
 github.com/titantkx/wasmd v0.46.0-titan.0 h1:oSxDnYuIIHhCAd0vnJMOjIKtBtS687wQ/IcLz2ILqGQ=
 github.com/titantkx/wasmd v0.46.0-titan.0/go.mod h1:BZFz+CFGdLNGomshb3IeccFyD4R+XbnS/mXpytOUyTA=
 github.com/tklauser/go-sysconf v0.3.12 h1:0QaGUFOdQaIVdPgfITYzaTegZvdCjmYO52cSFAEVmqU=
