@@ -10,7 +10,7 @@ import (
 func (server msgServer) ChangeAdmin(goCtx context.Context, msg *types.MsgChangeAdmin) (*types.MsgChangeAdminResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Denom)
+	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Denom) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func (server msgServer) ChangeAdmin(goCtx context.Context, msg *types.MsgChangeA
 		return nil, types.ErrUnauthorized
 	}
 
-	err = server.Keeper.setAdmin(ctx, msg.Denom, msg.NewAdmin)
+	err = server.Keeper.setAdmin(ctx, msg.Denom, msg.NewAdmin) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}

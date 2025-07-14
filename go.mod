@@ -34,7 +34,7 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.10.0
-	github.com/titantkx/ethermint v0.23.2
+	github.com/titantkx/ethermint v0.24.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240903143218-8af14fe29dc1
 	google.golang.org/grpc v1.68.0
 	google.golang.org/protobuf v1.36.1
@@ -231,8 +231,12 @@ require (
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
 
-replace github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
+replace (
+	github.com/CosmWasm/wasmd => github.com/titantkx/wasmd v0.46.0-titan.0
 
-replace github.com/cosmos/cosmos-sdk => github.com/titantkx/cosmos-sdk v0.47.17-titan.0
+	github.com/cosmos/cosmos-sdk => github.com/titantkx/cosmos-sdk v0.47.17-titan.2
 
-replace github.com/ethereum/go-ethereum => github.com/titantkx/go-ethereum v1.10.26-titan.1
+	github.com/ethereum/go-ethereum => github.com/titantkx/go-ethereum v1.10.26-titan.3
+
+	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
+)

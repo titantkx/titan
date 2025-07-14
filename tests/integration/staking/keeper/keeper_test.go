@@ -32,7 +32,7 @@ type IntegrationTestSuite struct {
 
 func (s *IntegrationTestSuite) SetupTest() {
 	s.app, s.genAddr = app.Setup(s.T(), false)
-	ctx := s.app.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := s.app.BaseApp.NewContext(false, tmproto.Header{}) //nolint:staticcheck
 
 	querier := sdkstakingkeeper.Querier{Keeper: s.app.StakingKeeper.Keeper}
 

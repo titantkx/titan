@@ -1,6 +1,7 @@
 package cmd_test
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 
@@ -14,7 +15,9 @@ import (
 	"github.com/titantkx/titan/testutil/cmd/nft"
 	"github.com/titantkx/titan/testutil/sample"
 
+	"github.com/titantkx/titan/testutil/cmd/pointer"
 	"github.com/titantkx/titan/testutil/cmd/staking"
+	"github.com/titantkx/titan/testutil/cmd/tokenfactory"
 	"github.com/titantkx/titan/utils"
 )
 
@@ -224,6 +227,41 @@ func TestSubmitProposals(t *testing.T) {
 				require.Equal(t, originalFeeMarketParams.MinGasPrice.String(), minGasPrice.String())
 			},
 		},
+		{
+			"TestSubmitNftCreateClassProposalPassed",
+			voter1,
+			gov.ProposalMsg{
+				Title:    "TestSubmitNftCreateClassProposalPassed",
+				Summary:  "TestSubmitNftCreateClassProposalPassed",
+				Metadata: "TestSubmitNftCreateClassProposalPassed",
+				Deposit:  "250" + utils.DisplayDenom,
+				Messages: []any{
+					gov.MsgNftCreateClass{
+						Type:        "/titan.nftmint.MsgCreateClass",
+						Creator:     "titan10d07y265gmmuvt4z0w9aw880jnsr700jste397",
+						Name:        sample.Word(),
+						Symbol:      sample.Word(),
+						Description: sample.Paragraph(),
+						Uri:         sample.URL(),
+						UriHash:     sample.Hash(),
+						Data:        sample.JSON(),
+					},
+				},
+			},
+			nil,
+			[]Vote{
+				{voter1, gov.VOTE_OPTION_YES},
+				{voter2, gov.VOTE_OPTION_YES},
+			},
+			gov.PROPOSAL_STATUS_PASSED,
+			func(_ string, msgs []interface{}) {
+				msg, ok := msgs[0].(gov.MsgNftCreateClass)
+				require.True(t, ok)
+				latestClass := nft.MustGetLatestClass(t)
+
+				require.Equal(t, msg.Name, latestClass.Name)
+			},
+		},
 		// PROPOSAL_STATUS_REJECTED
 		{
 			"TestSubmitTextProposalOneYesTwoNoRejected",
@@ -312,41 +350,7 @@ func TestSubmitProposals(t *testing.T) {
 			gov.PROPOSAL_STATUS_DEPOSIT_FAILED,
 			nil,
 		},
-		{
-			"TestSubmitNftCreateClassProposalPassed",
-			voter1,
-			gov.ProposalMsg{
-				Title:    "TestSubmitNftCreateClassProposalPassed",
-				Summary:  "TestSubmitNftCreateClassProposalPassed",
-				Metadata: "TestSubmitNftCreateClassProposalPassed",
-				Deposit:  "250" + utils.DisplayDenom,
-				Messages: []any{
-					gov.MsgNftCreateClass{
-						Type:        "/titan.nftmint.MsgCreateClass",
-						Creator:     "titan10d07y265gmmuvt4z0w9aw880jnsr700jste397",
-						Name:        sample.Word(),
-						Symbol:      sample.Word(),
-						Description: sample.Paragraph(),
-						Uri:         sample.URL(),
-						UriHash:     sample.Hash(),
-						Data:        sample.JSON(),
-					},
-				},
-			},
-			nil,
-			[]Vote{
-				{voter1, gov.VOTE_OPTION_YES},
-				{voter2, gov.VOTE_OPTION_YES},
-			},
-			gov.PROPOSAL_STATUS_PASSED,
-			func(_ string, msgs []interface{}) {
-				msg, ok := msgs[0].(gov.MsgNftCreateClass)
-				require.True(t, ok)
-				latestClass := nft.MustGetLatestClass(t)
-
-				require.Equal(t, msg.Name, latestClass.Name)
-			},
-		},
+		// PROPOSAL_STATUS_FAILED
 		{
 			"TestSubmitValidatorRewardSetRateProposalPassed",
 			voter1,
@@ -369,6 +373,33 @@ func TestSubmitProposals(t *testing.T) {
 				{voter2, gov.VOTE_OPTION_YES},
 			},
 			gov.PROPOSAL_STATUS_FAILED, // because Authority (gov module) is not allowed to set rate
+			nil,
+		},
+		{
+			"TestSubmitCreateErc20NativePointerForBaseDenom",
+			voter1,
+			gov.ProposalMsg{
+				Title:    "TestSubmitCreateErc20NativePointerForBaseDenom",
+				Summary:  "TestSubmitCreateErc20NativePointerForBaseDenom",
+				Metadata: "TestSubmitCreateErc20NativePointerForBaseDenom",
+				Deposit:  "250" + utils.DisplayDenom,
+				Messages: []any{
+					gov.MsgAddERC20NativePointer{
+						Type:      "/titan.pointer.MsgAddERC20NativePointer",
+						Authority: "titan10d07y265gmmuvt4z0w9aw880jnsr700jste397",
+						Token:     "atkx",
+						Name:      "tkx",
+						Symbol:    "TKX",
+						Decimals:  18,
+					},
+				},
+			},
+			nil,
+			[]Vote{
+				{voter1, gov.VOTE_OPTION_YES},
+				{voter2, gov.VOTE_OPTION_YES},
+			},
+			gov.PROPOSAL_STATUS_FAILED, // because can not create pointer for base denom
 			nil,
 		},
 	}
@@ -442,4 +473,129 @@ func testSubmitProposal(
 	if callbackFunc != nil {
 		callbackFunc(proposalId, proposalMsg.Messages)
 	}
+}
+
+func TestSubmitAddErc20NativePointer(t *testing.T) {
+	// Create new token factory
+	creator := MustCreateAccount(t, "1"+utils.DisplayDenom).Address
+	tokenDenom := tokenfactory.MustCreateNewToken(t, creator, "erc20nativepointerTest")
+	// Mint token factory
+	tokenfactory.MustMintTokenFactory(t, creator, creator, tokenDenom, testutil.MakeInt(1000000000))
+
+	// Create new token factory 2
+	creator2 := MustCreateAccount(t, "1"+utils.DisplayDenom).Address
+	tokenDenom2 := tokenfactory.MustCreateNewToken(t, creator2, "erc20nativepointerTest2")
+	// Mint token factory
+	tokenfactory.MustMintTokenFactory(t, creator2, creator2, tokenDenom2, testutil.MakeInt(1000000000))
+
+	govParams := gov.MustGetParams(t)
+
+	require.Equal(t, "0.334", govParams.Quorum.String())
+	require.Equal(t, "0.5", govParams.Threshold.String())
+	require.Equal(t, "0.334", govParams.VetoThreshold.String())
+	require.Equal(t, "250000000000000000000"+utils.BaseDenom, govParams.MinDeposit.String())
+
+	voter1 := keys.MustShowAddress(t, "val1") // Will represent voter3, voter4, voter5 if they do not vote
+	voter2 := keys.MustShowAddress(t, "val2")
+
+	proposal := struct {
+		Name           string
+		Proposer       string
+		Proposal       gov.ProposalMsg
+		Deposits       []Deposit
+		Votes          []Vote
+		ExpectedStatus string
+		CallbackFunc   func(string, []interface{}) // CallbackFunc will be called after the proposal is finished
+	}{
+		"TestSubmitAddErc20NativePointer",
+		voter1,
+		gov.ProposalMsg{
+			Title:    "TestSubmitAddErc20NativePointer",
+			Summary:  "TestSubmitAddErc20NativePointer",
+			Metadata: "TestSubmitAddErc20NativePointer",
+			Deposit:  "250" + utils.DisplayDenom,
+			Messages: []any{
+				gov.MsgAddERC20NativePointer{
+					Type:      "/titan.pointer.MsgAddERC20NativePointer",
+					Authority: "titan10d07y265gmmuvt4z0w9aw880jnsr700jste397",
+					Token:     tokenDenom,
+					Name:      "erc20nativepointerTest",
+					Symbol:    "ERC20NATIVEPOINTERTEST",
+					Decimals:  6,
+				},
+			},
+		},
+		nil,
+		[]Vote{
+			{voter1, gov.VOTE_OPTION_YES},
+			{voter2, gov.VOTE_OPTION_YES},
+		},
+		gov.PROPOSAL_STATUS_PASSED,
+		func(s string, i []interface{}) {}, //nolint:revive
+	}
+
+	testSubmitProposal(
+		t,
+		proposal.Proposer,
+		proposal.Proposal,
+		proposal.Deposits,
+		proposal.Votes,
+		proposal.ExpectedStatus,
+		proposal.CallbackFunc,
+	)
+
+	erc20PointerAddr := pointer.MustGetERC20Pointer(t, tokenDenom)
+	fmt.Println("ERC20 Pointer Address:", erc20PointerAddr)
+
+	proposal2 := struct {
+		Name           string
+		Proposer       string
+		Proposal       gov.ProposalMsg
+		Deposits       []Deposit
+		Votes          []Vote
+		ExpectedStatus string
+		CallbackFunc   func(string, []interface{}) // CallbackFunc will be called after the proposal is finished
+	}{
+		"TestSubmitAddErc20NativePointer2",
+		voter1,
+		gov.ProposalMsg{
+			Title:    "TestSubmitAddErc20NativePointer2",
+			Summary:  "TestSubmitAddErc20NativePointer2",
+			Metadata: "TestSubmitAddErc20NativePointer2",
+			Deposit:  "250" + utils.DisplayDenom,
+			Messages: []any{
+				gov.MsgAddERC20NativePointer{
+					Type:      "/titan.pointer.MsgAddERC20NativePointer",
+					Authority: "titan10d07y265gmmuvt4z0w9aw880jnsr700jste397",
+					Token:     tokenDenom2,
+					Name:      "erc20nativepointerTest2",
+					Symbol:    "ERC20NATIVEPOINTERTEST2",
+					Decimals:  8,
+				},
+			},
+		},
+		nil,
+		[]Vote{
+			{voter1, gov.VOTE_OPTION_YES},
+			{voter2, gov.VOTE_OPTION_YES},
+		},
+		gov.PROPOSAL_STATUS_PASSED,
+		func(s string, i []interface{}) {}, //nolint:revive
+	}
+
+	testSubmitProposal(
+		t,
+		proposal2.Proposer,
+		proposal2.Proposal,
+		proposal2.Deposits,
+		proposal2.Votes,
+		proposal2.ExpectedStatus,
+		proposal2.CallbackFunc,
+	)
+
+	erc20PointerAddr2 := pointer.MustGetERC20Pointer(t, tokenDenom2)
+	fmt.Println("ERC20 Pointer Address 2:", erc20PointerAddr2)
+
+	// Verify that the two pointers are different
+	require.NotEqual(t, erc20PointerAddr, erc20PointerAddr2, "ERC20 Pointer addresses should be different")
 }

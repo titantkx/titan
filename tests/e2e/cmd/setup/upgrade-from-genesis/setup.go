@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	UpgradeName     = "v3_1_0"
-	GenesisFileName = "genesis-mainnet-2024-05-05.json"
+	UpgradeName     = "v4_0_0_rc_0"
+	GenesisFileName = "genesis-mainnet-2025-06-10.json"
 )
 
 func Setup(m *testing.M, rootDir string, logger io.Writer) {

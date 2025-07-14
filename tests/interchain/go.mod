@@ -228,7 +228,7 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
-	github.com/titantkx/ethermint v0.23.2 // indirect
+	github.com/titantkx/ethermint v0.24.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/tyler-smith/go-bip32 v1.0.0 // indirect
@@ -287,9 +287,11 @@ require (
 )
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/titantkx/cosmos-sdk v0.47.6-titan.6
+	github.com/CosmWasm/wasmd => github.com/titantkx/wasmd v0.46.0-titan.0
+	github.com/cosmos/cosmos-sdk => github.com/titantkx/cosmos-sdk v0.47.17-titan.2
+	github.com/ethereum/go-ethereum => github.com/titantkx/go-ethereum v1.10.26-titan.3
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/misko9/go-substrate-rpc-client/v4 => github.com/faddat/go-substrate-rpc-client/v4 v4.0.1-0.20240402155230-48db8c110afe
-	github.com/strangelove-ventures/interchaintest/v7 => github.com/titantkx/interchaintest/v7 v7.1.2
+	github.com/strangelove-ventures/interchaintest/v7 => github.com/titantkx/interchaintest/v7 v7.1.3
 	github.com/titantkx/titan => ../..
 )
