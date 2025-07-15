@@ -38,6 +38,8 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+## [v4.0.0-rc.0](https://github.com/titantkx/titan/releases/tag/v4.0.0-rc.0)
+
 ### State Machine Breaking
 
 - Upgrade `ibc go` to `v7.10.0`
@@ -47,10 +49,13 @@ Ref: https://keepachangelog.com/en/1.1.0/
 - Upgrade `packet-forward-middleware` to `v7.2.1`
 - Increase wasm contract `CompileCost` 3x
 - (x/pointer) Implement `x/pointer` module to support precompiles contract pointer functionality.
+- (refund_gas_remaining): After EIP-3529: refunds are capped to gasUsed / 5
+- (app): 3x gas cost to store wasm code contract
 
 ### Features
 
 - (precompiles) Implement precompiles contract `bank` and `pointer`
+- (x/pointer) Implement `x/pointer` module to support precompiles contract pointer functionality.
 
 ### Bug Fixes
 
