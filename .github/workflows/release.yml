@@ -4,9 +4,6 @@ on:
   push:
     tags:
       - "v*.*.*"
-    branches:
-      - main
-      - release/**
     
 jobs:
   goreleaser:
@@ -15,9 +12,21 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      -
-        name: Git fetch everything
-        run: git fetch --prune --unshallow      
+          fetch-depth: 0  # Fetch all history for all branches and tags
+
+      - name: Check if tag is on allowed branch
+        id: check_branch
+        run: |
+          # Get the branch that contains this tag
+          BRANCH=$(git branch -r --contains ${{ github.ref }} | grep -E '(origin/main|origin/release/)' | head -1)
+          if [ -z "$BRANCH" ]; then
+            echo "Tag is not on main or release/* branch"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "Tag is on allowed branch: $BRANCH"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+      
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
