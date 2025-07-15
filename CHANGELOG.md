@@ -38,10 +38,6 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
-### Miscellaneous
-
-- (solidity-test) Bypass failed unit test - evm does not return correct error message when initializing new contract
-
 ### State Machine Breaking
 
 - Upgrade `ibc go` to `v7.10.0`
@@ -60,6 +56,10 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 - (app) Correct init AccountKeeper with address prefix "titan" instead of "cosmos".
 - (tokenfactory) Implement LegacyMsg
+
+### Miscellaneous
+
+- (solidity-test) Bypass failed unit test - evm does not return correct error message when initializing new contract
 
 ## [v3.0.0](https://github.com/titantkx/titan/releases/tag/v3.0.0)
 
