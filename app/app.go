@@ -269,7 +269,9 @@ var (
 		nftminttypes.ModuleName:                           nil,
 		nfttransfertypes.ModuleName:                       nil,
 		tokenfactorytypes.ModuleName:                      {authtypes.Minter, authtypes.Burner},
-		pointermoduletypes.ModuleName:                     nil,
+		// * NOTE: The pointer module account is use to deploy NativeTokensERC20 contract
+		// * 				so it stored as `EthAccount` not `ModuleAccount`
+		// pointermoduletypes.ModuleName:                     nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )

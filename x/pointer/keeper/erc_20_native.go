@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	errortypes "github.com/cosmos/cosmos-sdk/types/errors"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
 	etherminttypes "github.com/titantkx/ethermint/types"
@@ -90,7 +91,7 @@ func (k Keeper) DeployOrUpdateErc20NativePointer(
 	evm *vm.EVM,
 	token string, metadata types.ERCMetadata,
 ) (contractAddr ethcommon.Address, err error) {
-	pointerModuleAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
+	pointerModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
 	pointerModuleEthAddr := ethcommon.BytesToAddress(pointerModuleAddr)
 	pointerType := "erc20native"
 
