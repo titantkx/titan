@@ -40,6 +40,7 @@ validators:
     pruning: nothing
   config:
     moniker: "titan val1"
+    log_level: "debug"
     consensus: 
       create_empty_blocks: false
       create_empty_blocks_interval: 30s
