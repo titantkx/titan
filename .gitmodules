@@ -1,4 +1,4 @@
 [submodule "examples"]
-	path = examples
-	url = git@github.com:titantkx/titan-examples.git
-	branch = master
+path = examples
+url = https://github.com/titantkx/titan-examples.git
+branch = master

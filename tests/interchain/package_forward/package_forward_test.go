@@ -1,4 +1,4 @@
-package interchain_test
+package package_forward_test
 
 import (
 	"context"

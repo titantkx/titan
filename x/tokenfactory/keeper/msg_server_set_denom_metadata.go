@@ -16,7 +16,7 @@ func (server msgServer) SetDenomMetadata(goCtx context.Context, msg *types.MsgSe
 		return nil, err
 	}
 
-	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Metadata.Base)
+	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Metadata.Base) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (server msgServer) SetDenomMetadata(goCtx context.Context, msg *types.MsgSe
 		return nil, types.ErrUnauthorized
 	}
 
-	server.Keeper.bankKeeper.SetDenomMetaData(ctx, msg.Metadata)
+	server.Keeper.bankKeeper.SetDenomMetaData(ctx, msg.Metadata) //nolint:staticcheck
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(

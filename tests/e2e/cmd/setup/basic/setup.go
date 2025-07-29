@@ -18,6 +18,7 @@ func Setup(m *testing.M, rootDir string, logger io.Writer) {
 	testutil.Chdir(t, "setup/basic")
 	testutil.MkdirAll(t, "tmp", os.ModePerm)
 	homeDir := testutil.AbsPath(t, "tmp/val1/.titand")
+	// homeDir := testutil.AbsPath(t, "../../../../../local_test_data/.titan_val1")
 	cmd.MustInit(t, homeDir)
 
 	setup.StopChain(t, logger, "docker-compose.yml") // Stop any running instance

@@ -57190,45 +57190,6 @@ paths:
                         }
       tags:
         - Query
-  /ibc/apps/packetforward/v1/params:
-    get:
-      summary: Params queries all parameters of the packetforward module.
-      operationId: PacketforwardV1Params
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              params:
-                description: params defines the parameters of the module.
-                type: object
-                properties:
-                  fee_percentage:
-                    type: string
-            description: >-
-              QueryParamsResponse is the response type for the Query/Params RPC
-              method.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      tags:
-        - Query
   /titantkx/titan/nftmint/minting_info:
     get:
       summary: MintingInfos queries a list of minting info.
@@ -57490,6 +57451,224 @@ paths:
               Query/QuerySystemInfo
 
               RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /titantkx/titan/pointer/erc_20_native:
+    get:
+      summary: Queries a list of Erc20Native items.
+      operationId: TitanPointerErc20NativeAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              erc20_native:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    token_denom:
+                      type: string
+                      description: token_denom is the native token denom.
+                    erc20_addr:
+                      type: string
+                      description: >-
+                        erc20_addr is the erc20 contract address that point to
+                        the native token.
+                  description: Erc20Native defines the erc20 => native token mapping.
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+            description: >-
+              QueryErc20NativeAllResponse is response type for the
+              Query/Erc20NativeAll RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /titantkx/titan/pointer/erc_20_native/{token_denom}:
+    get:
+      summary: Queries a Erc20Native by token_denom.
+      operationId: TitanPointerErc20Native
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              erc20_native:
+                type: object
+                properties:
+                  token_denom:
+                    type: string
+                    description: token_denom is the native token denom.
+                  erc20_addr:
+                    type: string
+                    description: >-
+                      erc20_addr is the erc20 contract address that point to the
+                      native token.
+                description: Erc20Native defines the erc20 => native token mapping.
+            description: >-
+              QueryErc20NativeResponse is response type for the
+              Query/Erc20Native RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: token_denom
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /titantkx/titan/pointer/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: TitanPointerParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
         default:
           description: An unexpected error response.
           schema:
@@ -84653,6 +84832,33 @@ definitions:
       its associated interchain accounts
 
       host
+  ibc.core.channel.v1.Order:
+    type: string
+    enum:
+      - ORDER_NONE_UNSPECIFIED
+      - ORDER_UNORDERED
+      - ORDER_ORDERED
+    default: ORDER_NONE_UNSPECIFIED
+    description: |-
+      - ORDER_NONE_UNSPECIFIED: zero-value for channel ordering
+       - ORDER_UNORDERED: packets can be delivered in any order, which may differ from the order in
+      which they were sent.
+       - ORDER_ORDERED: packets are delivered exactly in the order which they were sent
+    title: Order defines if a channel is ORDERED or UNORDERED
+  ibc.applications.interchain_accounts.host.v1.MsgModuleQuerySafeResponse:
+    type: object
+    properties:
+      height:
+        type: string
+        format: uint64
+        title: height at which the responses were queried
+      responses:
+        type: array
+        items:
+          type: string
+          format: byte
+        title: protobuf encoded responses for each query
+    title: MsgModuleQuerySafeResponse defines the response for Msg/ModuleQuerySafe
   ibc.applications.interchain_accounts.host.v1.Params:
     type: object
     properties:
@@ -84687,6 +84893,25 @@ definitions:
               allow_messages defines a list of sdk message typeURLs allowed to
               be executed on a host chain.
     description: QueryParamsResponse is the response type for the Query/Params RPC method.
+  ibc.applications.interchain_accounts.host.v1.QueryRequest:
+    type: object
+    properties:
+      path:
+        type: string
+        title: >-
+          path defines the path of the query request as defined by ADR-021.
+
+          https://github.com/cosmos/cosmos-sdk/blob/main/docs/architecture/adr-021-protobuf-query-encoding.md#custom-query-registration-and-routing
+      data:
+        type: string
+        format: byte
+        title: >-
+          data defines the payload of the query request as defined by ADR-021.
+
+          https://github.com/cosmos/cosmos-sdk/blob/main/docs/architecture/adr-021-protobuf-query-encoding.md#custom-query-registration-and-routing
+    description: |-
+      QueryRequest defines the parameters for a particular query request
+      by an interchain account.
   ibc.applications.nft_transfer.v1.ClassTrace:
     type: object
     properties:
@@ -85301,19 +85526,6 @@ definitions:
           ResponseResultType defines the possible outcomes of the execution of a
           message
     description: MsgTimeoutResponse defines the Msg/Timeout response type.
-  ibc.core.channel.v1.Order:
-    type: string
-    enum:
-      - ORDER_NONE_UNSPECIFIED
-      - ORDER_UNORDERED
-      - ORDER_ORDERED
-    default: ORDER_NONE_UNSPECIFIED
-    description: |-
-      - ORDER_NONE_UNSPECIFIED: zero-value for channel ordering
-       - ORDER_UNORDERED: packets can be delivered in any order, which may differ from the order in
-      which they were sent.
-       - ORDER_ORDERED: packets are delivered exactly in the order which they were sent
-    title: Order defines if a channel is ORDERED or UNORDERED
   ibc.core.channel.v1.Packet:
     type: object
     properties:
@@ -89374,29 +89586,6 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
-  packetforward.v1.MsgUpdateParamsResponse:
-    type: object
-    description: |-
-      MsgUpdateParamsResponse defines the response structure for executing a
-      MsgUpdateParams message.
-
-      Since: cosmos-sdk 0.47
-  packetforward.v1.Params:
-    type: object
-    properties:
-      fee_percentage:
-        type: string
-    description: Params defines the set of packetforward parameters.
-  packetforward.v1.QueryParamsResponse:
-    type: object
-    properties:
-      params:
-        description: params defines the parameters of the module.
-        type: object
-        properties:
-          fee_percentage:
-            type: string
-    description: QueryParamsResponse is the response type for the Query/Params RPC method.
   titan.nftmint.MintingInfo:
     type: object
     properties:
@@ -89547,6 +89736,101 @@ definitions:
           next_class_id is the unique identifier of the next class that will be
           created.
     description: SystemInfo defines the system info of this module.
+  titan.pointer.Erc20Native:
+    type: object
+    properties:
+      token_denom:
+        type: string
+        description: token_denom is the native token denom.
+      erc20_addr:
+        type: string
+        description: >-
+          erc20_addr is the erc20 contract address that point to the native
+          token.
+    description: Erc20Native defines the erc20 => native token mapping.
+  titan.pointer.MsgAddERC20NativePointerResponse:
+    type: object
+    properties:
+      contract_address:
+        type: string
+        title: The address of the ERC20 contract
+    description: >-
+      MsgAddERC20NativePointerResponse defines the Msg/AddERC20NativePointer
+      response type.
+  titan.pointer.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  titan.pointer.QueryErc20NativeAllResponse:
+    type: object
+    properties:
+      erc20_native:
+        type: array
+        items:
+          type: object
+          properties:
+            token_denom:
+              type: string
+              description: token_denom is the native token denom.
+            erc20_addr:
+              type: string
+              description: >-
+                erc20_addr is the erc20 contract address that point to the
+                native token.
+          description: Erc20Native defines the erc20 => native token mapping.
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            description: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently. It will be empty if
+              there are no more results.
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+    description: >-
+      QueryErc20NativeAllResponse is response type for the Query/Erc20NativeAll
+      RPC method.
+  titan.pointer.QueryErc20NativeResponse:
+    type: object
+    properties:
+      erc20_native:
+        type: object
+        properties:
+          token_denom:
+            type: string
+            description: token_denom is the native token denom.
+          erc20_addr:
+            type: string
+            description: >-
+              erc20_addr is the erc20 contract address that point to the native
+              token.
+        description: Erc20Native defines the erc20 => native token mapping.
+    description: >-
+      QueryErc20NativeResponse is response type for the Query/Erc20Native RPC
+      method.
+  titan.pointer.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
   titan.tokenfactory.v1beta1.DenomAuthorityMetadata:
     type: object
     properties:

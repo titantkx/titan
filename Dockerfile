@@ -1,9 +1,9 @@
-FROM golang:1.22-alpine as builder
+FROM golang:1.23-alpine AS builder
 
 ARG TARGETOS TARGETARCH
 RUN echo "Building for $TARGETOS/$TARGETARCH"
 
-ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev file build-base binutils
+ENV PACKAGES="curl make git libc-dev bash gcc linux-headers eudev-dev file build-base binutils"
 RUN apk add --no-cache $PACKAGES
 
 ENV GOCACHE=/root/.cache/go-build
@@ -11,20 +11,20 @@ ENV GOCACHE=/root/.cache/go-build
 WORKDIR /go/src/github.com/titantkx/titan
 
 # See https://github.com/CosmWasm/wasmvm/releases
-ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.5.0/libwasmvm_muslc.aarch64.a /lib/libwasmvm_muslc.aarch64.a
-RUN sha256sum /lib/libwasmvm_muslc.aarch64.a | grep 2687afbdae1bc6c7c8b05ae20dfb8ffc7ddc5b4e056697d0f37853dfe294e913
-ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.5.0/libwasmvm_muslc.x86_64.a /lib/libwasmvm_muslc.x86_64.a
-RUN sha256sum /lib/libwasmvm_muslc.x86_64.a | grep 465e3a088e96fd009a11bfd234c69fb8a0556967677e54511c084f815cf9ce63
-ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.5.0/libwasmvmstatic_darwin.a /lib/libwasmvmstatic_darwin.a
-RUN sha256sum /lib/libwasmvmstatic_darwin.a | grep e45a274264963969305ab9b38a992dbc4401ae97252c7d59b217740a378cb5f2
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.5.9/libwasmvm_muslc.aarch64.a /lib/libwasmvm_muslc.aarch64.a
+RUN sha256sum /lib/libwasmvm_muslc.aarch64.a | grep a43cb22bf85e89bea45c9af04a229bc92f70ddd8216fee7db21d349d7579cff6
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.5.9/libwasmvm_muslc.x86_64.a /lib/libwasmvm_muslc.x86_64.a
+RUN sha256sum /lib/libwasmvm_muslc.x86_64.a | grep 797a235aefb5f8b2d60ecd0f3a430bab28d913b46b7661c0280dc7195a7e1144
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.5.9/libwasmvmstatic_darwin.a /lib/libwasmvmstatic_darwin.a
+RUN sha256sum /lib/libwasmvmstatic_darwin.a | grep dfd377c760742fe6771345c3a5bf2c888d45caa1826f20bb67db8c7b889ce2ae
 
 # Copy the library you want to the final location that will be found by the linker flag `-lwasmvm_muslc`
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
-        ARCH="x86_64"; \
+    ARCH="x86_64"; \
     elif [ "$TARGETARCH" = "arm64" ]; then \
-        ARCH="aarch64"; \
+    ARCH="aarch64"; \
     else \
-        echo "Unsupported architecture: $TARGETARCH"  ; exit 1; \
+    echo "Unsupported architecture: $TARGETARCH"  ; exit 1; \
     fi && \
     cp "/lib/libwasmvm_muslc.$ARCH.a" "/lib/libwasmvm.$ARCH.a"
 

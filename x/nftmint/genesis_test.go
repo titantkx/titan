@@ -33,10 +33,10 @@ func TestGenesis(t *testing.T) {
 	got := nftmint.ExportGenesis(ctx, *k)
 	require.NotNil(t, got)
 
-	nullify.Fill(&genesisState)
-	nullify.Fill(got)
-
 	require.ElementsMatch(t, genesisState.MintingInfoList, got.MintingInfoList)
 	require.Equal(t, genesisState.SystemInfo, got.SystemInfo)
 	// this line is used by starport scaffolding # genesis/test/assert
+
+	nullify.Fill(&genesisState)
+	nullify.Fill(got)
 }

@@ -142,7 +142,9 @@ import (
 	"github.com/titantkx/titan/app/upgrades/v2_0_1"
 	"github.com/titantkx/titan/app/upgrades/v3_0_0"
 	v3_0_0_rc_0 "github.com/titantkx/titan/app/upgrades/v3_0_0/rc_0"
+	v4_0_0_rc_0 "github.com/titantkx/titan/app/upgrades/v4_0_0/rc_0"
 	"github.com/titantkx/titan/docs"
+	"github.com/titantkx/titan/precompiles"
 	"github.com/titantkx/titan/utils"
 	nftutil "github.com/titantkx/titan/utils/nft"
 	distr "github.com/titantkx/titan/x/distribution"
@@ -166,6 +168,10 @@ import (
 	"github.com/titantkx/titan/x/tokenfactory"
 	tokenfactorykeeper "github.com/titantkx/titan/x/tokenfactory/keeper"
 	tokenfactorytypes "github.com/titantkx/titan/x/tokenfactory/types"
+
+	pointermodule "github.com/titantkx/titan/x/pointer"
+	pointermodulekeeper "github.com/titantkx/titan/x/pointer/keeper"
+	pointermoduletypes "github.com/titantkx/titan/x/pointer/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
@@ -241,6 +247,7 @@ var (
 		nftmint.AppModuleBasic{},
 		nfttransfer.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
+		pointermodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -262,6 +269,9 @@ var (
 		nftminttypes.ModuleName:                           nil,
 		nfttransfertypes.ModuleName:                       nil,
 		tokenfactorytypes.ModuleName:                      {authtypes.Minter, authtypes.Burner},
+		// * NOTE: The pointer module account is use to deploy NativeTokensERC20 contract
+		// * 				so it stored as `EthAccount` not `ModuleAccount`
+		// pointermoduletypes.ModuleName:                     nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -342,6 +352,8 @@ type App struct {
 	NFTTransferKeeper nfttransferkeeper.Keeper
 
 	TokenfactoryKeeper tokenfactorykeeper.Keeper
+
+	PointerKeeper pointermodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -407,6 +419,7 @@ func New(
 		nftminttypes.StoreKey,
 		nfttransfertypes.StoreKey,
 		tokenfactorytypes.StoreKey,
+		pointermoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
@@ -457,7 +470,7 @@ func New(
 		keys[authtypes.StoreKey],
 		ethermint.ProtoAccount,
 		MaccPerms,
-		sdk.Bech32PrefixAccAddr,
+		AccountAddressPrefix,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -523,7 +536,8 @@ func New(
 		tkeys[evmtypes.TransientKey],
 		authtypes.NewModuleAddress(govtypes.ModuleName),
 		app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.FeeMarketKeeper,
-		nil, geth.NewEVM, tracer,
+		nil,
+		geth.NewEVM, tracer,
 		evmSs,
 	)
 
@@ -604,7 +618,6 @@ func New(
 		keys[packetforwardtypes.StoreKey],
 		app.TransferKeeper,
 		app.IBCKeeper.ChannelKeeper,
-		app.DistrKeeper,
 		app.BankKeeper,
 		app.IBCKeeper.ChannelKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
@@ -624,6 +637,8 @@ func New(
 		scopedICAHostKeeper,
 		app.MsgServiceRouter(),
 	)
+	app.ICAHostKeeper.WithQueryRouter(app.GRPCQueryRouter())
+
 	app.ICAControllerKeeper = icacontrollerkeeper.NewKeeper(
 		appCodec, keys[icacontrollertypes.StoreKey],
 		app.GetSubspace(icacontrollertypes.SubModuleName),
@@ -641,6 +656,9 @@ func New(
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
 	availableCapabilities := strings.Join(AllCapabilities(), ",")
+	wasmGasRegisterConfig := wasmtypes.DefaultGasRegisterConfig()
+	wasmGasRegisterConfig.CompileCost = wasmtypes.DefaultCompileCost * 3 // increase compile cost to 3x default
+
 	wasmKeeper := wasmkeeper.NewKeeper(
 		appCodec,
 		keys[wasmtypes.StoreKey],
@@ -659,6 +677,7 @@ func New(
 		wasmConfig,
 		availableCapabilities,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		wasmkeeper.WithGasRegister(wasmtypes.NewWasmGasRegister(wasmGasRegisterConfig)),
 	)
 	app.WasmKeeper = &wasmKeeper
 
@@ -742,7 +761,22 @@ func New(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
+	app.PointerKeeper = *pointermodulekeeper.NewKeeper(
+		appCodec,
+		keys[pointermoduletypes.StoreKey],
+		keys[pointermoduletypes.MemStoreKey],
+		app.AccountKeeper,
+		app.EvmKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
+
+	// Config custom precompiles contracts
+	app.EvmKeeper.SetCustomPrecompiles(precompiles.GetCustomPrecompiles(
+		app.PointerKeeper,
+		app.BankKeeper,
+	))
 
 	/**** IBC Routing ****/
 
@@ -825,7 +859,7 @@ func New(
 		genutil.NewAppModule(
 			app.AccountKeeper,
 			app.StakingKeeper,
-			app.BaseApp.DeliverTx,
+			app.BaseApp.DeliverTx, //nolint:staticcheck
 			encodingConfig.TxConfig,
 		),
 		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
@@ -858,6 +892,7 @@ func New(
 		nftmint.NewAppModule(appCodec, app.NftmintKeeper, app.AccountKeeper, app.BankKeeper),
 		nfttransfer.NewAppModule(app.NFTTransferKeeper),
 		tokenfactory.NewAppModule(app.TokenfactoryKeeper, app.AccountKeeper, app.BankKeeper),
+		pointermodule.NewAppModule(appCodec, app.PointerKeeper, app.AccountKeeper, app.BankKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
@@ -900,6 +935,7 @@ func New(
 		nftminttypes.ModuleName,
 		nfttransfertypes.ModuleName,
 		tokenfactorytypes.ModuleName,
+		pointermoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -934,6 +970,7 @@ func New(
 		nftminttypes.ModuleName,
 		nfttransfertypes.ModuleName,
 		tokenfactorytypes.ModuleName,
+		pointermoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -979,6 +1016,7 @@ func New(
 		nftminttypes.ModuleName,
 		nfttransfertypes.ModuleName,
 		tokenfactorytypes.ModuleName,
+		pointermoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -1050,7 +1088,7 @@ func New(
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
 		}
-		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
+		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{}) //nolint:staticcheck
 
 		// Initialize pinned codes in wasmvm as they are not persisted there
 		if err := app.WasmKeeper.InitializePinnedCodes(ctx); err != nil {
@@ -1238,14 +1276,14 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 
 // RegisterTxService implements the Application.RegisterTxService method.
 func (app *App) RegisterTxService(clientCtx client.Context) {
-	authtx.RegisterTxService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.BaseApp.Simulate, app.interfaceRegistry)
+	authtx.RegisterTxService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.BaseApp.Simulate, app.interfaceRegistry) //nolint:staticcheck
 }
 
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *App) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(
 		clientCtx,
-		app.BaseApp.GRPCQueryRouter(),
+		app.BaseApp.GRPCQueryRouter(), //nolint:staticcheck
 		app.interfaceRegistry,
 		app.Query,
 	)
@@ -1269,7 +1307,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
-	paramsKeeper.Subspace(packetforwardtypes.ModuleName).WithKeyTable(packetforwardtypes.ParamKeyTable())
+	paramsKeeper.Subspace(packetforwardtypes.ModuleName)
 	paramsKeeper.Subspace(ibcexported.ModuleName)
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
@@ -1279,6 +1317,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 
 	paramsKeeper.Subspace(validatorrewardtypes.ModuleName)
 	paramsKeeper.Subspace(nftminttypes.ModuleName)
+	paramsKeeper.Subspace(pointermoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
@@ -1323,6 +1362,11 @@ func (app *App) setupUpgradeHandlers() {
 		v3_0_0.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v4_0_0_rc_0.UpgradeName,
+		v4_0_0_rc_0.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1352,6 +1396,8 @@ func (app *App) setupUpgradeHandlers() {
 		storeUpgrades = v3_0_0_rc_0.CreateStoreUpgrade()
 	case v3_0_0.UpgradeName:
 		storeUpgrades = v3_0_0.CreateStoreUpgrade()
+	case v4_0_0_rc_0.UpgradeName:
+		storeUpgrades = v4_0_0_rc_0.CreateStoreUpgrade()
 	}
 
 	if storeUpgrades != nil {

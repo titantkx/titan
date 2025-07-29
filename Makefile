@@ -122,10 +122,10 @@ all: build-with-regen
 
 lint:	golangci-lint
 	go mod verify	
-	golangci-lint run --out-format=tab
+	golangci-lint run
 
 lint-fix:	golangci-lint	
-	golangci-lint run --fix --out-format=tab --issues-exit-code=0
+	golangci-lint run --fix --issues-exit-code=0
 
 .PHONY: lint lint-fix
 
@@ -137,6 +137,9 @@ format:
 ###############################################################################
 ###                                  Build                                  ###
 ###############################################################################
+
+sync: go.sum proto-gen mocks update-swagger-docs-by-ignite
+.PHONY: sync
 
 BUILD_TARGETS := build install
 
@@ -238,10 +241,10 @@ cosmovisor:
 	cp cosmovisor_tmp/tools/cosmovisor/cosmovisor build/cosmovisor
 	rm -rf cosmovisor_tmp
 
-GOLANGCI_VERSION=latest
+GOLANGCI_VERSION=v2.2.1
 
 golangci-lint:
-	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_VERSION)
+	@go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_VERSION)
 
 .PHONE: ignite cosmovisor golangci-lint
 ###############################################################################
@@ -273,6 +276,7 @@ go.sum: go.mod
 	@echo "Ensure dependencies have not been modified ..." >&2
 	go mod verify
 	go mod tidy
+	pushd tests/interchain && go mod verify && go mod tidy && popd
 
 test-testutil:
 	go test -timeout 1200s -cover github.com/titantkx/titan/testutil -v

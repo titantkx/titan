@@ -1,0 +1,15 @@
+{
+  "extends": "solhint:recommended",
+  "rules": {
+    "not-rely-on-time": "off",
+    "avoid-throw": "off",
+    "avoid-suicide": "error",
+    "avoid-sha3": "warn",
+    "compiler-version": ["error", "^0.8.0"],
+    "func-visibility": ["warn", { "ignoreConstructors": true }],
+    "max-line-length": ["warn", 120],
+    "no-empty-blocks": "off",
+    "reason-string": ["off", { "maxLength": 128 }],
+    "var-name-mixedcase": "off"
+  }
+}

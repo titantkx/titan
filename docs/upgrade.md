@@ -9,7 +9,7 @@ In cosmos base chain, we have version of application and version for each module
 
 ### App version
 
-Version of application will be store in `app/upgrades/[version]/keys.go`. We declare constant `UpgradeName` for each version.
+Version of application will be store in `app/upgrades/[version]/constants.go`. We declare constant `UpgradeName` for each version.
 
 App version will use format `v[major].[minor].[patch]`.
 Where major will be increase when we add new module.

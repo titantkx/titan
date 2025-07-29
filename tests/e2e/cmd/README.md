@@ -46,8 +46,22 @@ go test github.com/titantkx/titan/tests/e2e/cmd -v
 
 3. To run the upgrade test from an exported genesis file, you need to export the genesis file from the current chain state first.
 
+    - Direct use `titand` binary
+
     ```shell
     titand export --for-zero-height > genesis.json
+    ```
+
+    - or with cosmovisor (bin setup by user account):
+
+    ```shell
+    COSMOVISOR_DISABLE_LOGS=true sudo -E /home/ubuntu/go/bin/cosmovisor run export --for-zero-height > genesis-mainnet.json
+    ```
+
+    - With cosmovisor (bin setup by user root):
+
+    ```shell
+    COSMOVISOR_DISABLE_LOGS=true cosmovisor run export --for-zero-height > genesis-mainnet.json
     ```
 
 4. Run test

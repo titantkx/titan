@@ -1,5 +1,5 @@
 # dependencies
-node_modules/
+node_modules
 
 # ignore package-lock files (only use yarn.lock)
 package-lock.json

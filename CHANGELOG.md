@@ -38,6 +38,44 @@ Ref: https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+## [v4.0.0-rc.0](https://github.com/titantkx/titan/releases/tag/v4.0.0-rc.0)
+
+### State Machine Breaking
+
+- Upgrade `ibc go` to `v7.10.0`
+- Upgrade `cosmos sdk` to `v0.47.17`
+- Upgrade `wasmd` to `v0.46.0`
+- Upgrade `wasmvm` to `v1.5.9`
+- Upgrade `packet-forward-middleware` to `v7.2.1`
+- Increase wasm contract `CompileCost` 3x
+- (x/pointer) Implement `x/pointer` module to support precompiles contract pointer functionality.
+- (refund_gas_remaining): After EIP-3529: refunds are capped to gasUsed / 5
+- (app): 3x gas cost to store wasm code contract
+
+### Features
+
+- (precompiles) Implement precompiles contract `bank` and `pointer`
+- (x/pointer) Implement `x/pointer` module to support precompiles contract pointer functionality.
+
+### Bug Fixes
+
+- (app) Correct init AccountKeeper with address prefix "titan" instead of "cosmos".
+- (tokenfactory) Implement LegacyMsg
+
+### Miscellaneous
+
+- (solidity-test) Bypass failed unit test - evm does not return correct error message when initializing new contract
+
+## [v3.0.0](https://github.com/titantkx/titan/releases/tag/v3.0.0)
+
+### Improvements
+
+- (deps) upgrade cosmos-sdk to v0.47.6-titan.8
+
+### Miscellaneous
+
+- Fix upgrade test
+
 ## [v3.0.0-rc.0](https://github.com/titantkx/titan/releases/tag/v3.0.0-rc.0)
 
 ### State Machine Breaking

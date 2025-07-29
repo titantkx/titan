@@ -19,15 +19,14 @@ import (
 
 const (
 	EventTypeRefund = "refund"
-
-	AttributeKeyRefund = "refund"
 )
 
 // ensure RefundGasRemainingDecorator implements the cosmos-sdk sdk.PostDecorator
 var _ sdk.PostDecorator = RefundGasRemainingDecorator{}
 
 // MaxPortionOfFeeToRefund is the maximum portion of the fee that can be refunded.
-var MaxPortionOfFeeToRefund = sdk.NewDecWithPrec(5, 1) // 50%
+// After EIP-3529: refunds are capped to gasUsed / 5
+var MaxPortionOfFeeToRefund = sdk.NewDecWithPrec(2, 1) // 20%
 
 // RefundGasCost is the amount of gas consumed during the execution of this
 // posthandler. If a tx reaches this posthandler with gas remaining in excess of

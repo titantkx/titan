@@ -30,7 +30,7 @@ func (k msgServer) CreateClass(goCtx context.Context, msg *types.MsgCreateClass)
 		Data:        classData,
 	}
 
-	if err := k.Keeper.nftKeeper.SaveClass(ctx, class); err != nil {
+	if err := k.Keeper.nftKeeper.SaveClass(ctx, class); err != nil { //nolint:staticcheck
 		return nil, types.WrapInternalError(err)
 	}
 
@@ -40,10 +40,10 @@ func (k msgServer) CreateClass(goCtx context.Context, msg *types.MsgCreateClass)
 		NextTokenId: types.DefaultIndex,
 	}
 
-	k.Keeper.SetMintingInfo(ctx, mintingInfo)
+	k.Keeper.SetMintingInfo(ctx, mintingInfo) //nolint:staticcheck
 
 	systemInfo.NextClassId++
-	k.Keeper.SetSystemInfo(ctx, systemInfo)
+	k.Keeper.SetSystemInfo(ctx, systemInfo) //nolint:staticcheck
 
 	err := ctx.EventManager().EmitTypedEvent(&types.EventCreateClass{
 		Id:    classId,
